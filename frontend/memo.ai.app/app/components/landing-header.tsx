@@ -75,13 +75,13 @@ export default function Header() {
                     {/* Desktop Auth Buttons */}
                     <div className="hidden lg:flex items-center gap-3">
                         <Link 
-                            href="/login" 
+                            href="/auth?authForm=login" 
                             className="hover:bg-accent border border-transparent hover:border-accent-foreground/10 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
                         >
                             Iniciar Sesión
                         </Link>
                         <Link 
-                            href="/register" 
+                            href="/auth?authForm=register" 
                             className="bg-primary rounded-lg px-5 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors duration-200"
                         >
                             Registrarse
@@ -123,14 +123,14 @@ export default function Header() {
                     
                     {/* Mobile Auth Buttons */}
                     <Link 
-                        href="/login"
+                        href="/auth?authForm=login"
                         onClick={() => setIsOpen(false)}
                         className="block px-4 py-3 rounded-lg hover:bg-accent text-sm font-medium transition-colors"
                     >
                         Iniciar Sesión
                     </Link>
                     <Link 
-                        href="/register"
+                        href="/auth?authForm=register"
                         onClick={() => setIsOpen(false)}
                         className="block bg-primary text-center rounded-lg px-4 py-3 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
                     >
