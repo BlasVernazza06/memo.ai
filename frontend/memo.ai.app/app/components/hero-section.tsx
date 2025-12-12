@@ -1,9 +1,17 @@
-import { ArrowRight, ChevronUp, User } from "lucide-react";
+'use client';
+
+import { ArrowRight, ChevronUp, User, MousePointer2 } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function HeroSection() {
     return (
         <div className="memo-container">
-            <div className="flex flex-col items-center text-center">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="flex flex-col items-center text-center"
+            >
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-8">
                     <span className="text-amber-500">⭐⭐⭐⭐⭐</span>
@@ -40,9 +48,14 @@ export default function HeroSection() {
                 <p className="text-sm text-muted-foreground mt-4">
                     Sin tarjeta de crédito requerida
                 </p>
-            </div>
+            </motion.div>
 
-            <div className="relative mt-12 mx-auto max-w-3xl">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, type: "spring", bounce: 0.3 }}
+                className="relative mt-12 mx-auto max-w-3xl"
+            >
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-chart-2/5 rounded-2xl blur-xl" />
 
                 <div className="relative bg-card rounded-2xl border border-border shadow-2xl overflow-hidden">
@@ -133,9 +146,8 @@ export default function HeroSection() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </div></div>
+            </motion.div>
         </div>
     );
 }

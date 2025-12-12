@@ -3,6 +3,11 @@ import Header from "./components/landing-header";
 import TrustSection from "./components/trust-section";
 import FeaturesSection from "./components/features-section";
 import HowItWorkSection from "./components/howitworks-section";
+import TestimonialsSection from "./components/testimonials-section";
+import PricingSection from "./components/pricing-section";
+import Footer from "./components/footer";
+import CTASection from "./components/cta-section";
+
 export default function Home() {
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -22,13 +27,16 @@ export default function Home() {
       
       <Header />
       
-      {/* Hero Section */}
       <main className="pt-24 sm:pt-28 lg:pt-32 relative z-10">
         <HeroSection />
         <TrustSection />
         <FeaturesSection />
         <HowItWorkSection />
+        <TestimonialsSection />
+        <PricingSection />
+        <CTASection />
       </main>
+      <Footer />
     </div>
   );
 }
