@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,23 +10,11 @@ import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
 import { useSearchParams, useRouter } from "next/navigation"
+import { loginSchema, registerSchema, LoginFormValues, RegisterFormValues } from "@/lib/schemas/auth-schema"
+import OAuthButtons from "./oauth-buttons"
 
-const loginSchema = z.object({
-  email: z.string().email("Ingresa un correo electrónico válido"),
-  password: z.string().min(1, "La contraseña es requerida"),
-})
 
-const registerSchema = z.object({
-  email: z.string().email("Ingresa un correo electrónico válido"),
-  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
-  confirmPassword: z.string().min(1, "Confirma tu contraseña"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Las contraseñas no coinciden",
-  path: ["confirmPassword"],
-})
 
-type LoginFormValues = z.infer<typeof loginSchema>
-type RegisterFormValues = z.infer<typeof registerSchema>
 
 export function AuthForm() {
   const router = useRouter()
@@ -37,11 +24,12 @@ export function AuthForm() {
   // Derived state: URL is the source of truth
   const isLogin = authMode !== "register"
   const [showPassword, setShowPassword] = useState(false)
+  const [isOAuthLoading, setIsOAuthLoading] = useState(false)
 
   const form = useForm<LoginFormValues | RegisterFormValues>({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
     defaultValues: {
-      email: "",
+      email: "",    
       password: "",
       confirmPassword: "", 
     },
@@ -57,10 +45,14 @@ export function AuthForm() {
     router.replace(`?authForm=${newMode}`, { scroll: false })
   }
 
-  const onSubmit = (data: LoginFormValues | RegisterFormValues) => {
+  const onSubmit = async (data: LoginFormValues | RegisterFormValues) => {
     console.log(data)
+    // Here we can simulate a delay to show the disabled state
+    await new Promise(resolve => setTimeout(resolve, 2000))
     // Aquí irían las Server Actions
   }
+  
+  const isGlobalLoading = isOAuthLoading || form.formState.isSubmitting
 
   return (
     <div className="w-full max-w-md">
@@ -112,6 +104,7 @@ export function AuthForm() {
             type="email"
             placeholder="tu@email.com"
             {...form.register("email")}
+            disabled={isGlobalLoading}
             className="rounded-xl h-11 bg-background/50"
           />
           {form.formState.errors.email && (
@@ -129,6 +122,7 @@ export function AuthForm() {
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               {...form.register("password")}
+              disabled={isGlobalLoading}
               className="rounded-xl h-11 bg-background/50 pr-10"
             />
             <button
@@ -162,6 +156,7 @@ export function AuthForm() {
                   type="password"
                   placeholder="••••••••"
                   {...form.register("confirmPassword")}
+                  disabled={isGlobalLoading}
                   className="rounded-xl h-11 bg-background/50"
                 />
                 {(form.formState.errors as any).confirmPassword && (
@@ -174,8 +169,9 @@ export function AuthForm() {
           )}
         </AnimatePresence>
 
+
         {isLogin && (
-          <div className="flex justify-end">
+            <div className="flex justify-end">
             <Link 
               href="#" 
               className="text-sm font-medium text-primary hover:text-primary/90 transition-colors"
@@ -188,10 +184,16 @@ export function AuthForm() {
         <Button 
             type="submit" 
             className="w-full h-11 rounded-xl font-medium text-base mt-2"
+            disabled={isGlobalLoading}
         >
+          {form.formState.isSubmitting && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />}
           {isLogin ? "Iniciar sesión" : "Crear cuenta"}
         </Button>
       </form>
+
+        <div className="mt-4 flex justify-center">
+            <OAuthButtons disabled={isGlobalLoading} onLoadingChange={setIsOAuthLoading} />
+        </div>
 
       {/* Footer */}
       <div className="text-center mt-8 text-sm text-muted-foreground">
