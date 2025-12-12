@@ -1,14 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { Sparkles, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { AuthForm } from "./_components/auth-form";
 import { Suspense } from "react";
+import { motion } from "motion/react";
 
 export default function AuthPage() {
     return (
         <div className="flex min-h-screen bg-background text-foreground">
-            
-
             {/* Panel Izquierdo (Branding & Info) - Oculto en móvil */}
             <div className="hidden lg:flex w-1/2 relative bg-slate-50 overflow-hidden items-center justify-center p-12">
                 {/* Background decorative elements */}
@@ -16,7 +17,12 @@ export default function AuthPage() {
                 <div className="absolute -left-20 top-40 w-96 h-96 bg-blue-200/20 rounded-full blur-[100px]" />
                 <div className="absolute bottom-20 right-20 w-80 h-80 bg-indigo-200/20 rounded-full blur-[80px]" />
 
-                <div className="relative z-10 max-w-lg">
+                <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="relative z-10 max-w-lg"
+                >
                     {/* Botón volver flotante (visible siempre) */}
                     <Link 
                         href="/" 
@@ -46,26 +52,41 @@ export default function AuthPage() {
             
                     {/* Feature List */}
                     <div className="mt-12 space-y-5">
-                        <div className="flex items-center gap-4 group">
+                        <motion.div 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                            className="flex items-center gap-4 group"
+                        >
                             <div className="w-10 h-10 rounded-full bg-blue-100/80 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                                 <Sparkles className="w-5 h-5 text-primary" />
                             </div>
                             <span className="text-slate-700 font-medium">Análisis inteligente de documentos</span>
-                        </div>
-                        <div className="flex items-center gap-4 group">
+                        </motion.div>
+                        <motion.div 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3, duration: 0.5 }}
+                            className="flex items-center gap-4 group"
+                        >
                             <div className="w-10 h-10 rounded-full bg-purple-100/80 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
                                 <Sparkles className="w-5 h-5 text-purple-600" />
                             </div>
                             <span className="text-slate-700 font-medium">Flashcards automáticas y Roadmaps</span>
-                        </div>
-                        <div className="flex items-center gap-4 group">
+                        </motion.div>
+                        <motion.div 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.4, duration: 0.5 }}
+                            className="flex items-center gap-4 group"
+                        >
                             <div className="w-10 h-10 rounded-full bg-orange-100/80 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
                                 <Sparkles className="w-5 h-5 text-orange-600" />
                             </div>
                             <span className="text-slate-700 font-medium">Sistema de motivación gamificado</span>
-                        </div>
+                        </motion.div>
                     </div>
-                </div>
+                </motion.div>
             </div>
 
             {/* Panel Derecho (Auth Form) */}
@@ -78,9 +99,16 @@ export default function AuthPage() {
                     </Link>
                  </div>
 
-                <Suspense fallback={<div className="animate-pulse w-full max-w-md h-96 bg-muted/20 rounded-xl" />}>
-                    <AuthForm />
-                </Suspense>
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="w-full max-w-md"
+                >
+                    <Suspense fallback={<div className="animate-pulse w-full max-w-md h-96 bg-muted/20 rounded-xl" />}>
+                        <AuthForm />
+                    </Suspense>
+                </motion.div>
             </div>
         </div>
     );
