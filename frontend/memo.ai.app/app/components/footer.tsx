@@ -1,5 +1,6 @@
 import { GraduationCap } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -8,10 +9,10 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-primary-foreground" />
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center">
+                <Image src="/logo.webp" alt="Logo" width={60} height={60} />
               </div>
-              <span className="text-xl font-bold">StudyFlow</span>
+              <span className="text-xl font-bold">Memo.ai</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Transforma tus apuntes en conocimiento con inteligencia artificial.

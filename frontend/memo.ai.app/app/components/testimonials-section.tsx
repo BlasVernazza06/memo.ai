@@ -1,4 +1,7 @@
+"use client";
+
 import { Star, Quote } from "lucide-react";
+import { motion } from "motion/react";
 
 const testimonials = [
   {
@@ -29,19 +32,30 @@ export default function TestimonialsSection() {
         <section className="py-24 relative overflow-hidden" id="testimonials">
             
             <div className="container mx-auto px-4 relative z-10">
-                <div className="text-center max-w-2xl mx-auto mb-16">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="text-center max-w-2xl mx-auto mb-16"
+                >
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
                     Lo que dicen nuestros estudiantes
                 </h2>
                 <p className="text-lg text-muted-foreground">
                     Miles de estudiantes ya están transformando su forma de estudiar.
                 </p>
-                </div>
+                </motion.div>
                 
                 <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {testimonials.map((testimonial, index) => (
-                    <div 
+                    <motion.div 
                     key={testimonial.name}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
                     className="p-6 rounded-2xl bg-card border border-border hover:shadow-lg transition-all"
                     >
                     <Quote className="w-8 h-8 text-primary mb-4" />
@@ -67,7 +81,7 @@ export default function TestimonialsSection() {
                         <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                         </div>
                     </div>
-                    </div>
+                    </motion.div>
                 ))}
                 </div>
             </div>

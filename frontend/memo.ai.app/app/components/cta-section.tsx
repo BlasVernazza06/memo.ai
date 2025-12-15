@@ -1,11 +1,20 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { motion } from "motion/react";
 
 export default function CTASection() {
   return (
     <section className="py-10 relative overflow-hidden">
-      <div className="container rounded-lg bg-primary/15  border border-border mx-auto p-8 relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="container rounded-lg bg-primary/15  border border-border mx-auto p-8 relative z-10"
+      >
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
             ¿Listo para{" "}
@@ -30,7 +39,7 @@ export default function CTASection() {
             Sin tarjeta de crédito • Prueba gratuita de 7 días
           </p>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

@@ -1,6 +1,9 @@
+"use client";
+
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { motion } from "motion/react";
 
 const plans = [
   {
@@ -8,8 +11,8 @@ const plans = [
     price: "0",
     description: "Para probar la magia",
     features: [
-      "Hasta 3 PDFs al mes", // Aumenté un poco para generar hábito
-      "50 flashcards por documento",
+      "Hasta 1 PDFs al mes", // Aumenté un poco para generar hábito
+      "10 flashcards por documento",
       "Modo de estudio web",
       "Racha de estudio básica"
     ],
@@ -51,19 +54,29 @@ export default function PricingSection() {
   return (
     <section className="py-24 bg-card/50" id="pricing">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-2xl mx-auto mb-16"
+        >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Planes simples y transparentes
           </h2>
           <p className="text-lg text-muted-foreground">
             Elige el plan que mejor se adapte a tus necesidades de estudio.
           </p>
-        </div>
+        </motion.div>
         
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {plans.map((plan) => (
-            <div 
+          {plans.map((plan, index) => (
+            <motion.div 
               key={plan.name}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
               className={`relative p-6 rounded-2xl border transition-all ${
                 plan.popular 
                   ? 'bg-card border-primary shadow-xl shadow-primary/10 scale-105' 
@@ -99,9 +112,14 @@ export default function PricingSection() {
                 className={`w-full rounded-full ${plan.popular ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}
                 variant={plan.popular ? "default" : "secondary"}
               >
-                <Link href="/dashboard">{plan.cta}</Link>
+                <Link 
+                  href={plan.name === "Gratis" ? "/dashboard" : `/checkout?plan=${plan.name.toLowerCase()}`}
+                  prefetch={false}
+                >
+                  {plan.cta}
+                </Link>
               </Button>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
