@@ -9,8 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.0.2",
+    "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@ridemountainpig/svgl-react": "^1.0.14",
     "@stripe/stripe-js": "^8.5.3",
     "@uploadthing/react": "^7.3.3",
     "better-auth": "^1.4.6",
@@ -23,10 +26,12 @@
     "next": "16.0.8",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "react-hook-form": "^7.68.0",
     "resend": "^6.6.0",
     "stripe": "^20.0.0",
     "tailwind-merge": "^3.4.0",
     "uploadthing": "^7.7.4",
+    "zod": "^4.1.13",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
