@@ -221,7 +221,7 @@
 
 html {
   scroll-behavior: smooth;
-  prefer-color-scheme: light;
+  color-scheme: light dark;
 }
 
 body {
