@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@repo/ui/components/theme-provider";
 
 
-const poppins = Poppins({
+const outfit = Outfit({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} font-sans`}>
+      <body className={`${outfit.variable} font-sans`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

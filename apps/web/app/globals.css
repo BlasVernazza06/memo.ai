@@ -1,3 +1,7 @@
 @import "@repo/ui/styles.css";
 
+html {
+    scroll-behavior: smooth;
+}
+
 /* Si quieres añadir estilos específicos para la app web, hazlo aquí */

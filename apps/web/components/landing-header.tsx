@@ -1,12 +1,12 @@
 'use client';
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import {Menu, X} from "lucide-react";
+import { Menu, X } from "lucide-react";
 import AuthDesktopButtons from "./auth-components/auth-desktop-buttons";
 import AuthMobileButtons from "./auth-components/auth-mobile-buttons";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 const navLinks = [
     {
@@ -35,31 +35,63 @@ export default function Header() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Close mobile menu when resizing to desktop
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth >= 1024) {
+    const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        // Only trigger smooth scroll if the link is a hash on the current page
+        if (href.startsWith('/#')) {
+            e.preventDefault();
+            const id = href.replace('/#', '');
+            const element = document.getElementById(id);
+            if (element) {
+                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                const elementHeight = element.offsetHeight;
+                const viewportHeight = window.innerHeight;
+                
+                // Calculate position to center the element in the viewport
+                const offsetPosition = elementPosition - (viewportHeight / 2) + (elementHeight / 2);
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+                
                 setIsOpen(false);
             }
-        };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+        }
+    };
 
     return (
-        <header className={`w-full fixed top-0 z-50 transition-all duration-300 ${scrolled || isOpen ? 'bg-background/95 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+        <header className="fixed top-0 left-0 right-0 z-50 pt-4 px-4 pointer-events-none">
+            <motion.div 
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className={`
+                    mx-auto max-w-7xl h-16 pointer-events-auto
+                    transition-all duration-300 ease-in-out
+                    border border-white/10
+                    ${scrolled 
+                        ? 'bg-white/10 dark:bg-black/10 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] rounded-2xl px-6 h-14' 
+                        : 'bg-transparent border-transparent rounded-none px-4'
+                    }
+                `}
+            >
+                <div className="flex items-center justify-between h-full">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2">
-                        <Image 
-                            src="/logo.webp" 
-                            alt="Memo.ai Logo" 
-                            width={36} 
-                            height={36} 
-                            className="rounded-lg"
-                        />
-                        <span className="text-xl font-bold">Memo.ai</span>
+                    <Link href="/" className="flex items-center gap-3 group">
+                        <div className="relative">
+                            <motion.div 
+                                className="absolute -inset-1 bg-primary/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                            />
+                            <Image 
+                                src="/logo.webp" 
+                                alt="Memo.ai Logo" 
+                                width={32} 
+                                height={32} 
+                                className="rounded-lg relative z-10"
+                            />
+                        </div>
+                        <span className="text-xl font-extrabold tracking-tight">
+                            memo<span className="text-primary">.ai</span>
+                        </span>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -68,56 +100,61 @@ export default function Header() {
                             <Link 
                                 key={link.name} 
                                 href={link.href} 
-                                className="hover:bg-accent border border-transparent hover:border-accent-foreground/10 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                                onClick={(e) => handleScroll(e, link.href)}
+                                className="relative px-5 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-all group"
                             >
-                                {link.name}
+                                <span>{link.name}</span>
+                                <motion.div 
+                                    className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary rounded-full group-hover:w-4 transition-all"
+                                />
                             </Link>
                         ))}
                     </nav>
 
-                    {/* Desktop Auth Buttons */}
-                    <div className="hidden lg:flex items-center gap-3">
+                    {/* Desktop Actions */}
+                    <div className="hidden lg:flex items-center gap-4">
                         <AuthDesktopButtons />
                     </div>
 
                     {/* Mobile Menu Button */}
                     <button 
                         onClick={() => setIsOpen(!isOpen)}
-                        className="lg:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+                        className="lg:hidden p-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors"
                         aria-label="Toggle menu"
                     >
-                        {isOpen ? (
-                            <X className="w-6 h-6" />
-                        ) : (
-                            <Menu className="w-6 h-6" />
-                        )}
+                        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                     </button>
                 </div>
             </motion.div>
 
-            {/* Mobile Menu */}
-            <div className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="bg-background/95 backdrop-blur-md border-t border-border px-4 py-4 space-y-2">
-                    {/* Mobile Nav Links */}
-                    {navLinks.map((link) => (
-                        <Link 
-                            key={link.name} 
-                            href={link.href}
-                            onClick={() => setIsOpen(false)}
-                            className="block px-4 py-3 rounded-lg hover:bg-accent text-sm font-medium transition-colors"
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
-                    
-                    {/* Divider */}
-                    <div className="border-t border-border my-2" />
-                    
-                    {/* Mobile Auth Buttons */}
-                    
-                    <AuthMobileButtons onClose={() => setIsOpen(false)} />
-                </div>
-            </div>
+            {/* Mobile Menu Overlay */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        className="lg:hidden absolute top-20 left-4 right-4 p-6 bg-white/95 dark:bg-black/95 backdrop-blur-2xl border border-white/10 rounded-4xl shadow-2xl pointer-events-auto"
+                    >
+                        <nav className="space-y-4">
+                            {navLinks.map((link) => (
+                                <Link 
+                                    key={link.name} 
+                                    href={link.href}
+                                    onClick={(e) => handleScroll(e, link.href)}
+                                    className="block p-4 rounded-2xl hover:bg-primary/5 text-lg font-bold tracking-tight transition-colors"
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+                            <div className="h-px bg-white/10 mx-2" />
+                            <div className="pt-2">
+                                <AuthMobileButtons onClose={() => setIsOpen(false)} />
+                            </div>
+                        </nav>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </header>
     );
 }
