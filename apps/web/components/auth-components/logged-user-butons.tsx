@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { User } from "better-auth";
+import { Button } from "@repo/ui/components/ui/button";
 import Image from "next/image";
 
-export default function LoggedUserButtons({ user }: { user: User }) {
+export default function LoggedUserButtons() {
     return (
         <div className="flex items-center gap-3" >
             <Link 
@@ -17,13 +16,9 @@ export default function LoggedUserButtons({ user }: { user: User }) {
                 size="icon"
                 className="rounded-full h-9 w-9"
             >
-                {user.image ? (
-                    <Image src={user.image} alt={user.name || "User"} width={36} height={36} />
-                ) : (
-                    <div className="w-full h-full bg-primary/10 border-1 border-black rounded-full flex items-center justify-center text-xs font-bold text-primary">
-                        {user.name?.charAt(0) || "U"}
-                    </div>
-                )}
+                <div className="w-full h-full bg-primary/10 border-1 border-black rounded-full flex items-center justify-center text-xs font-bold text-primary">
+                    U
+                </div>
             </Button>
         </div>
     );
