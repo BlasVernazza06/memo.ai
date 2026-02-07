@@ -5,21 +5,14 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Google, GithubLight, Microsoft } from "svgl-react";
-import { Mail, ArrowRight, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon } from "lucide-react";
+import { Mail, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon } from "lucide-react";
 import OAuthButtons from "../components/oauth-buttons";
+import { loginSchema, type LoginFormValues } from "@repo/validators/auth";
 
-const loginSchema = z.object({
-    email: z.string().email("Email inválido"),
-    password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
-    rememberMe: z.boolean().optional(),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
