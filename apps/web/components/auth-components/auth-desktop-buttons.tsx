@@ -4,7 +4,7 @@ export default function AuthDesktopButtons() {
     return (
         <div className="flex items-center gap-4">
             <Link 
-                href="/auth?authForm=login" 
+                href="/auth/login" 
                 className="hover:bg-accent border border-transparent hover:border-accent-foreground/10 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
             >
                 Iniciar Sesión
