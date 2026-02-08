@@ -20,9 +20,9 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const navItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard", active: true },
-        { icon: Layers, label: "Workspaces", href: "/workspaces" },
-        { icon: FileText, label: "Documentos", href: "/documentos" },
-        { icon: Settings, label: "Ajustes", href: "/settings" },
+        { icon: Layers, label: "Workspaces", href: "/dashboard/workspaces" },
+        { icon: FileText, label: "Documentos", href: "/dashboard/documentos" },
+        { icon: Settings, label: "Ajustes", href: "/dashboard/settings" },
     ];
 
     return (
@@ -68,9 +68,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
 
                     <div className="flex flex-col gap-4 pt-6 border-t border-slate-100">
-                        <button className="w-12 h-12 flex items-center justify-center rounded-2xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
-                            <HelpCircle className="w-5 h-5" />
-                        </button>
+                        <Link href="/dashboard/help">
+                            <button className="w-12 h-12 flex items-center justify-center rounded-2xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer">
+                                <HelpCircle className="w-5 h-5" />
+                            </button>
+                        </Link>
                         <button className="w-12 h-12 flex items-center justify-center rounded-2xl text-red-400 hover:text-red-500 hover:bg-red-50 transition-all">
                             <LogOut className="w-5 h-5" />
                         </button>
@@ -79,21 +81,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </motion.aside>
 
             {/* Floating User Button */}
-            <div className="fixed top-8 right-8 z-50 flex items-center gap-4">
-                <button className="w-12 h-12 bg-white/70 backdrop-blur-md border border-white/40 shadow-sm rounded-2xl flex items-center justify-center text-slate-600 hover:bg-white transition-all">
-                    <Bell className="w-5 h-5" />
-                </button>
+            <div className="fixed top-8 right-8 z-50 flex flex-col items-center gap-4">
                 <div className="group relative">
-                    <button className="flex items-center gap-3 bg-white/70 backdrop-blur-md border border-white/40 shadow-sm p-1.5 pr-4 rounded-4xl hover:bg-white transition-all">
-                        <div className="w-10 h-10 bg-linear-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-inner">
-                            BV
-                        </div>
-                        <div className="hidden sm:block text-left">
-                            <p className="text-[12px] font-bold text-slate-800 leading-none">Blas Vernazza</p>
-                            <p className="text-[10px] font-medium text-slate-500 mt-1 uppercase tracking-tight">Pro Plan</p>
-                        </div>
-                    </button>
+                    <Link href="/dashboard/profile">
+                        <button className="flex items-center gap-3 bg-white/70 backdrop-blur-md border border-white/40 shadow-sm p-1.5 pr-4 rounded-4xl hover:bg-white transition-all cursor-pointer">
+                            <div className="w-10 h-10 bg-linear-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-inner">
+                                BV
+                            </div>
+                            <div className="hidden sm:block text-left">
+                                <p className="text-[12px] font-bold text-slate-800 leading-none">Blas Vernazza</p>
+                                <p className="text-[10px] font-medium text-slate-500 mt-1 uppercase tracking-tight">Pro Plan</p>
+                            </div>
+                        </button>
+                    </Link>
                     {/* Minimal Dropdown (Hidden for now) */}
+                </div>
+                <div className="flex items-center gap-4">
+                    <button className="w-12 h-12 bg-white/70 backdrop-blur-md border border-white/40 shadow-sm rounded-2xl flex items-center justify-center text-slate-600 hover:bg-white transition-all">
+                        <Bell className="w-5 h-5" />
+                    </button>
+                    <button className="w-12 h-12 bg-white/70 backdrop-blur-md border border-white/40 shadow-sm rounded-2xl flex items-center justify-center text-slate-600 hover:bg-white transition-all">
+                        <Bell className="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
@@ -114,9 +123,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             </div>
                         </Link>
                     ))}
-                    <div className="w-10 h-10 bg-linear-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
-                        BV
-                    </div>
+                    <Link href="/dashboard/profile">
+                        <div className="w-10 h-10 bg-linear-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                            BV
+                        </div>
+                    </Link>
                 </nav>
             </div>
         </div>
