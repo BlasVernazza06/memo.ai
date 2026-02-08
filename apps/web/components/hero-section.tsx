@@ -2,6 +2,7 @@
 
 import { ArrowRight, Sparkles, Brain, FileText, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 export default function HeroSection() {
     return (
@@ -56,14 +57,16 @@ export default function HeroSection() {
                     
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row items-center gap-4 mt-12">
-                        <motion.button 
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-3 text-md"
-                        >
-                            Comenzar ahora
-                            <ArrowRight className="w-5 h-5" />
-                        </motion.button>
+                        <Link href="/dashboard" className="flex items-center gap-2">
+                            <motion.button 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-3 text-md"
+                            >
+                                Comenzar ahora
+                                <ArrowRight className="w-5 h-5" />
+                            </motion.button>
+                        </Link>
                         <motion.button 
                             whileHover={{ backgroundColor: "rgba(0,0,0,0.03)" }}
                             className="bg-background border border-border px-8 py-3 rounded-2xl font-semibold hover:bg-accent transition-all flex items-center gap-3 text-md"

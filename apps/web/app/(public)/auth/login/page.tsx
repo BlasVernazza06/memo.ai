@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
@@ -9,19 +10,38 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Mail, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon } from "lucide-react";
+import { Mail, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon, Eye, EyeOff } from "lucide-react";
 import OAuthButtons from "../components/oauth-buttons";
-import { loginSchema, type LoginFormValues } from "@repo/validators/auth";
+import { loginSchema, type LoginFormValues } from "@repo/validators";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 
 export default function LoginPage() {
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const router = useRouter();
+
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema)
     });
 
-    const onSubmit = (data: LoginFormValues) => {
-        console.log("Login data:", data);
-        // Aquí iría la integración con better-auth
+    const onSubmit = async (data: LoginFormValues) => {
+        setIsLoading(true)
+        const {error} = await authClient.signIn.email({
+            email: data.email,
+            password: data.password,
+        }, {
+            onSuccess: () => {
+                setIsLoading(false)
+                router.push('/dashboard')
+            },
+            onError: (ctx) => {
+                setIsLoading(false)
+                alert(ctx.error.message)
+            }
+        })
     };
 
     return (
@@ -90,11 +110,22 @@ export default function LoginPage() {
                                     </div>
                                     <Input 
                                         id="password"
-                                        type="password" 
+                                        type={showPassword ? "text" : "password"} 
                                         {...register("password")}
                                         placeholder="••••••••••••" 
-                                        className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+                                        className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
                                     />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
+                                    >
+                                        {showPassword ? 
+                                            <Eye className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                         : 
+                                            <EyeOff className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                        }
+                                    </button>
                                 </div>
                                 {errors.password && <p className="text-[10px] text-red-500 font-bold ml-1 uppercase">{errors.password.message}</p>}
                             </div>
