@@ -1,9 +1,20 @@
-import { Controller, All, Req } from '@nestjs/common';
+import { Controller, All, Req, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { UserDecorator } from './user.decorator';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  getProfile(@UserDecorator() user: any) {
+    return {
+      message: '¡Estas autenticado!',
+      user,
+    };
+  }
 
   @All('*')
   async handleAuth(@Req() req: any) {
