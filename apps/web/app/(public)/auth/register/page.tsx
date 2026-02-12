@@ -1,33 +1,49 @@
 'use client';
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Mail, Lock, User, Sparkles, Trophy, Zap, Rocket } from "lucide-react";
+import { Mail, Lock, User, Sparkles, Trophy, Zap, Rocket, EyeOff, Eye } from "lucide-react";
 import OAuthButtons from "../components/oauth-buttons";
-
-const registerSchema = z.object({
-    name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-    email: z.string().email("Email inválido"),
-    password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
-});
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
-
+import { registerSchema, type RegisterFormValues } from "@repo/validators";
+import { authClient } from "@/lib/auth-client";
+import { redirect, useRouter } from "next/navigation";
+ 
 export default function RegisterPage() {
+    const { data: session, isPending: isLoading } = authClient.useSession();
+    const [isLoadingForm, setIsLoadingForm] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    
+    if(session) {
+        redirect('/');
+    }
+    
+    const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema)
     });
 
-    const onSubmit = (data: RegisterFormValues) => {
-        console.log("Register data:", data);
-        // Aquí iría la integración con better-auth
+    const onSubmit = async (formData: RegisterFormValues) => {
+        setIsLoadingForm(true);
+
+        try {
+            await authClient.signUp.email({
+                email: formData.email,
+                password: formData.password,
+                name: formData.name,
+            });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoadingForm(false);
+        }
+
     };
 
     return (
@@ -141,7 +157,7 @@ export default function RegisterPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
                             className="space-y-4" 
-                            onSubmit={handleSubmit(onSubmit)}
+                            onSubmit={handleSubmit(onSubmit, (errors) => console.log("Errores de validación:", errors))}
                         >
                             <div className="space-y-2">
                                 <Label htmlFor="name" className="text-xs font-bold text-[#4A4C4E] ml-1 uppercase tracking-wider">Nombre Completo</Label>
@@ -185,17 +201,56 @@ export default function RegisterPage() {
                                     </div>
                                     <Input 
                                         id="password"
-                                        type="password" 
+                                        type={showPassword ? "text" : "password"} 
                                         {...register("password")}
                                         placeholder="Mínimo 8 caracteres" 
-                                        className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+                                        className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
                                     />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
+                                    >
+                                        {showPassword ? 
+                                            <Eye className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                            : 
+                                            <EyeOff className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                        }
+                                    </button>
+                                </div>
+                                {errors.password && <p className="text-[10px] text-red-500 font-bold ml-1 uppercase">{errors.password.message}</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="password" className="text-xs font-bold text-[#4A4C4E] ml-1 uppercase tracking-wider">Confirmar Contraseña</Label>
+                                <div className="relative group">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
+                                        <Lock className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                    </div>
+                                    <Input 
+                                        id="confirmPassword"
+                                        type={showPassword ? "text" : "password"} 
+                                        {...register("confirmPassword")}
+                                        placeholder="Mínimo 8 caracteres" 
+                                        className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
+                                    >
+                                        {showPassword ? 
+                                            <Eye className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                            : 
+                                            <EyeOff className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                        }
+                                    </button>
                                 </div>
                                 {errors.password && <p className="text-[10px] text-red-500 font-bold ml-1 uppercase">{errors.password.message}</p>}
                             </div>
 
                             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98] mt-2">
-                                Crear Cuenta Gratuita
+                                {isLoadingForm ? "Creando Cuenta..." : "Crear Cuenta Gratuita"}
                             </Button>
 
                             <div className="relative py-4">

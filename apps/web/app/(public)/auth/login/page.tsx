@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
@@ -9,19 +10,41 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Mail, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon } from "lucide-react";
+import { Mail, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon, Eye, EyeOff, Loader } from "lucide-react";
 import OAuthButtons from "../components/oauth-buttons";
-import { loginSchema, type LoginFormValues } from "@repo/validators/auth";
+import { loginSchema, type LoginFormValues } from "@repo/validators";
+import { authClient } from "@/lib/auth-client"; 
+import { redirect, useRouter } from "next/navigation";
+import { signIn } from "@/lib/actions/auth-actions";
 
 
 export default function LoginPage() {
+    const { data: session, isPending: isLoading } = authClient.useSession();
+    const [isLoadingForm, setIsLoadingForm] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    if(session) {
+        redirect("/")
+    }
+
+    const router = useRouter();
+
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema)
     });
 
-    const onSubmit = (data: LoginFormValues) => {
-        console.log("Login data:", data);
-        // Aquí iría la integración con better-auth
+    const onSubmit = async (formData: LoginFormValues) => {
+        setIsLoadingForm(true)
+        try {
+            await authClient.signIn.email({
+                email: formData.email,
+                password: formData.password,
+            });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoadingForm(false);
+        }
     };
 
     return (
@@ -83,34 +106,41 @@ export default function LoginPage() {
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between ml-1">
                                     <Label htmlFor="password" className="text-xs font-bold text-[#4A4C4E] uppercase tracking-wider">Contraseña</Label>
-                                </div>
+                                </div> 
                                 <div className="relative group">
                                     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
                                         <Lock className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
                                     </div>
-                                    <Input 
+                                    <Input
                                         id="password"
-                                        type="password" 
+                                        type={showPassword ? "text" : "password"} 
                                         {...register("password")}
                                         placeholder="••••••••••••" 
-                                        className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+                                        className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
                                     />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
+                                    >
+                                        {showPassword ? 
+                                            <Eye className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                         : 
+                                            <EyeOff className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                                        }
+                                    </button>
                                 </div>
                                 {errors.password && <p className="text-[10px] text-red-500 font-bold ml-1 uppercase">{errors.password.message}</p>}
                             </div>
 
                             <div className="flex items-center justify-between px-1">
-                                <label className="flex items-center gap-2 cursor-pointer group">
-                                    <input type="checkbox" {...register("rememberMe")} className="w-4 h-4 rounded border-[#E2E8F0] text-primary focus:ring-primary/20 accent-primary cursor-pointer" />
-                                    <span className="text-[13px] text-muted-foreground group-hover:text-foreground transition-colors font-medium">Recuérdame</span>
-                                </label>
                                 <Link href="#" className="text-[13px] font-bold text-primary hover:text-primary/80 transition-colors">
                                     ¿Olvidaste tu contraseña?
                                 </Link>
                             </div>
 
                             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98]">
-                                Iniciar Sesión
+                                {isLoadingForm ? <Loader className="size-4"/> : "Iniciar Sesión"}
                             </Button>
 
                             <div className="relative py-4">
