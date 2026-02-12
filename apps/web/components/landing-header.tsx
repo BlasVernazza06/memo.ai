@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu, User2, X } from "lucide-react";
 import AuthDesktopButtons from "./auth-components/auth-desktop-buttons";
 import AuthMobileButtons from "./auth-components/auth-mobile-buttons";
 import { motion, AnimatePresence } from "motion/react";
+import { authClient } from "@/lib/auth-client";
 
 const navLinks = [
     {
@@ -24,6 +25,7 @@ const navLinks = [
 ]
 
 export default function Header() {
+    const { data: session, isPending: isLoading } = authClient.useSession();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     
@@ -112,10 +114,28 @@ export default function Header() {
                     </nav>
 
                     {/* Desktop Actions */}
-                    <div className="hidden lg:flex items-center gap-4">
-                        <AuthDesktopButtons />
-                    </div>
-
+                    {
+                        session ? (
+                            <div className="hidden lg:flex items-center gap-4">
+                                <Link href="/dashboard" className="flex items-center gap-2">
+                                    <motion.button 
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="bg-primary text-sm text-primary-foreground px-4 py-2 rounded-lg font-semibold  transition-all flex items-center gap-3 text-md"
+                                    >
+                                        Dashboard
+                                    </motion.button>
+                                </Link>
+                                <div className="relative border border-muted-foreground/20 rounded-full overflow-hidden">
+                                    <User2 className="size-9 rounded-full" />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="hidden lg:flex items-center gap-4">
+                                <AuthDesktopButtons />
+                            </div>
+                        )
+                    }
                     {/* Mobile Menu Button */}
                     <button 
                         onClick={() => setIsOpen(!isOpen)}

@@ -13,33 +13,36 @@ import { Mail, Lock, User, Sparkles, Trophy, Zap, Rocket, EyeOff, Eye } from "lu
 import OAuthButtons from "../components/oauth-buttons";
 import { registerSchema, type RegisterFormValues } from "@repo/validators";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
  
 export default function RegisterPage() {
-    const [isLoading, setIsLoading] = useState(false);
+    const { data: session, isPending: isLoading } = authClient.useSession();
+    const [isLoadingForm, setIsLoadingForm] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    
+    if(session) {
+        redirect('/');
+    }
+    
     const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema)
     });
 
-    const onSubmit = async (data: RegisterFormValues) => {
-        setIsLoading(true);
+    const onSubmit = async (formData: RegisterFormValues) => {
+        setIsLoadingForm(true);
 
-        const { error } = await authClient.signUp.email({
-            name: data.name,
-            email: data.email,
-            password: data.password,
-        }, {
-            onSuccess: () => {
-                setIsLoading(false);
-                router.push('/dashboard');
-            },
-            onError: (ctx) => {
-                setIsLoading(false);
-                alert(ctx.error.message);
-            }
-        });
+        try {
+            await authClient.signUp.email({
+                email: formData.email,
+                password: formData.password,
+                name: formData.name,
+            });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoadingForm(false);
+        }
 
     };
 
@@ -247,7 +250,7 @@ export default function RegisterPage() {
                             </div>
 
                             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98] mt-2">
-                                {isLoading ? "Creando Cuenta..." : "Crear Cuenta Gratuita"}
+                                {isLoadingForm ? "Creando Cuenta..." : "Crear Cuenta Gratuita"}
                             </Button>
 
                             <div className="relative py-4">

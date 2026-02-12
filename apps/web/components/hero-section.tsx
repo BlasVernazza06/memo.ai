@@ -57,7 +57,7 @@ export default function HeroSection() {
                     
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row items-center gap-4 mt-12">
-                        <Link href="/dashboard" className="flex items-center gap-2">
+                        <Link href="/auth/register" className="flex items-center gap-2">
                             <motion.button 
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
