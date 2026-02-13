@@ -1,12 +1,11 @@
 'use client';
 
+import { useState } from "react";
 import { motion } from "motion/react";
 import { 
     FileText, 
-    Search, 
     Plus, 
     Filter, 
-    MoreVertical, 
     Clock, 
     ChevronRight,
     ArrowUpRight,
@@ -16,15 +15,19 @@ import {
     Trash2
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
+import SearchInput from "@/components/shared/search-input";
+
+const INITIAL_DOCUMENTS = [
+    { id: 1, name: "Sistema Inmune.pdf", type: "pdf", date: "Hace 2 horas", size: "2.4 MB", workspace: "Anatomía" },
+    { id: 2, name: "Clase 04: SEO Estratégico", type: "youtube", date: "Ayer", size: "15:20 min", workspace: "Marketing digital" },
+    { id: 3, name: "Marketing_Plan_2024.docx", type: "link", date: "Hace 2 días", size: "Link externo", workspace: "Marketing digital" },
+    { id: 4, name: "Resumen_Bioquimica.pdf", type: "pdf", date: "Hace 1 semana", size: "1.1 MB", workspace: "Medicina" },
+];
+
+const SEARCH_KEYS: (keyof typeof INITIAL_DOCUMENTS[0])[] = ["name", "workspace"];
 
 export default function DocumentsPage() {
-    const documents = [
-        { id: 1, name: "Sistema Inmune.pdf", type: "pdf", date: "Hace 2 horas", size: "2.4 MB", workspace: "Anatomía" },
-        { id: 2, name: "Clase 04: SEO Estratégico", type: "youtube", date: "Ayer", size: "15:20 min", workspace: "Marketing digital" },
-        { id: 3, name: "Marketing_Plan_2024.docx", type: "link", date: "Hace 2 días", size: "Link externo", workspace: "Marketing digital" },
-        { id: 4, name: "Resumen_Bioquimica.pdf", type: "pdf", date: "Hace 1 semana", size: "1.1 MB", workspace: "Medicina" },
-    ];
+    const [filteredDocuments, setFilteredDocuments] = useState(INITIAL_DOCUMENTS);
 
     const getIcon = (type: string) => {
         switch (type) {
@@ -56,24 +59,23 @@ export default function DocumentsPage() {
             </div>
 
             {/* Search Bar */}
-            <div className="bg-white border border-slate-200/60 p-3 rounded-[2rem] shadow-sm flex flex-col md:flex-row gap-4 items-center">
-                <div className="relative flex-1 w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <Input 
-                        placeholder="Buscar documentos..." 
-                        className="pl-12 bg-transparent border-none h-12 focus-visible:ring-0 text-slate-900 font-medium" 
-                    />
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" className="rounded-xl font-bold flex gap-2 h-11">
-                        <Filter className="w-4 h-4" />
-                        Tipo
-                    </Button>
-                    <Button variant="ghost" className="rounded-xl font-bold flex gap-2 h-11">
-                        Fecha
-                    </Button>
-                </div>
-            </div>
+            <SearchInput 
+                data={INITIAL_DOCUMENTS}
+                onResultsChange={setFilteredDocuments}
+                searchKeys={SEARCH_KEYS}
+                placeholder="Buscar documentos..."
+                suffix={
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" className="rounded-xl font-bold flex gap-2 h-11 transition-all hover:bg-slate-50">
+                            <Filter className="w-4 h-4" />
+                            Tipo
+                        </Button>
+                        <Button variant="ghost" className="rounded-xl font-bold flex gap-2 h-11 transition-all hover:bg-slate-50">
+                            Fecha
+                        </Button>
+                    </div>
+                }
+            />
 
             {/* Documents List */}
             <div className="bg-white border border-slate-200/60 rounded-4xl overflow-hidden shadow-sm">
@@ -88,7 +90,7 @@ export default function DocumentsPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                            {documents.map((doc) => (
+                            {filteredDocuments.map((doc) => (
                                 <motion.tr 
                                     key={doc.id}
                                     initial={{ opacity: 0 }}
@@ -137,7 +139,7 @@ export default function DocumentsPage() {
             
             {/* Empty State Mockup */}
             <div className="flex items-center justify-center py-12">
-                <p className="text-slate-400 text-sm font-medium">Mostrando {documents.length} archivos totales</p>
+                <p className="text-slate-400 text-sm font-medium">Mostrando {filteredDocuments.length} archivos totales</p>
             </div>
         </div>
     );

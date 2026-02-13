@@ -1,16 +1,12 @@
 import { ReactNode } from "react";
 import DashAside from "./dashboard/components/dash-aside";
-import { getSession } from "@/lib/auth-session";
+import UserMenu from "@/components/shared/user-menu";
 
 interface DashboardLayoutProps {
     children: ReactNode;
 }
 
-export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-    const session = await getSession();
-
-    const user = session?.user ?? null;
-
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-primary/10 overflow-x-hidden">
             {/* Background elements */}
@@ -25,11 +21,14 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
                 />
             </div>
 
-            {/* Client-side navigation shell (sidebar + user button + mobile nav) */}
-            <DashAside user={user} />
+            {/* Global User Menu (Floating Top-Right) */}
+            <UserMenu />
+
+            {/* Sidebar & Mobile Nav */}
+            <DashAside />
 
             {/* Main Content Area */}
-            <main className="lg:pl-32 pt-10 min-h-screen relative z-10">
+            <main className="lg:pl-32 pt-10 min-h-screen relative">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pb-20">
                     {children}
                 </div>

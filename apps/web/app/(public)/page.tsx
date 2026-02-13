@@ -9,7 +9,6 @@ import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
 
 export default function Home() {
-
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
       {/* Background gradient blobs */}
@@ -26,7 +25,7 @@ export default function Home() {
         style={{ background: 'hsla(199, 89%, 48%, 0.08)' }}
       />
       
-      <Header/>
+      <Header />
       
       <main className="pt-24 sm:pt-28 lg:pt-32 relative z-10">
         <HeroSection />
