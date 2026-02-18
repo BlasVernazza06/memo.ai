@@ -2,7 +2,6 @@ import DashHero from "@/components/dashboard/dash-hero";
 import DashWorkspacesSec from "@/components/dashboard/dash-workspaces-sec";
 import { Workspace } from "@/components/dashboard/workspace-card";
 
-// Mock data — will be replaced with DB fetch
 const MOCK_WORKSPACES: Workspace[] = [
     { 
         id: "1", 

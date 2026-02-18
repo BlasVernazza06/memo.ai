@@ -184,6 +184,61 @@ export const quizAttempt = pgTable("quiz_attempt", {
 });
 
 // ============================================================
+// ACTIVITY & NOTIFICATIONS TABLES
+// ============================================================
+
+/**
+ * user_activity - Registra cada acción relevante del usuario.
+ * Se usa para: cálculo de racha, feed de actividad reciente y triggers de notificaciones.
+ * 
+ * Tipos de actividad:
+ * - "study"              → Estudió un workspace
+ * - "flashcard_created"  → Creó flashcards
+ * - "flashcard_reviewed" → Repasó flashcards
+ * - "quiz_completed"     → Completó un quiz
+ * - "document_uploaded"  → Subió un documento
+ * - "workspace_created"  → Creó un workspace
+ */
+export const userActivity = pgTable("user_activity", {
+	id: text("id").primaryKey(),
+	userId: text("user_id").notNull().references(() => user.id),
+	workspaceId: text("workspace_id").references(() => workspace.id),
+	type: text("type").notNull(),
+	metadata: jsonb("metadata"),              // datos extra: { workspaceName, count, score, fileName... }
+	date: text("date").notNull(),             // "2026-02-18" — solo fecha, para cálculo de racha
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type DbUserActivity = InferSelectModel<typeof userActivity>;
+export type NewUserActivity = InferInsertModel<typeof userActivity>;
+
+/**
+ * notification - Notificaciones del usuario.
+ * Generadas automáticamente por eventos de actividad o por el sistema.
+ * 
+ * Tipos:
+ * - "streak_milestone"     → "🔥 ¡12 días seguidos!"
+ * - "achievement_unlocked" → "🏆 Desbloqueaste: Cerebro de Oro"
+ * - "quiz_result"          → "✅ Quiz completado: 85%"
+ * - "weekly_summary"       → "📊 Tu resumen semanal"
+ * - "system"               → Anuncios generales
+ */
+export const notification = pgTable("notification", {
+	id: text("id").primaryKey(),
+	userId: text("user_id").notNull().references(() => user.id),
+	type: text("type").notNull(),
+	title: text("title").notNull(),
+	message: text("message").notNull(),
+	icon: text("icon"),                       // nombre del icono (ej: "Flame", "Trophy", "CheckCircle2")
+	metadata: jsonb("metadata"),              // datos extra opcionales
+	read: boolean("read").default(false).notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type DbNotification = InferSelectModel<typeof notification>;
+export type NewNotification = InferInsertModel<typeof notification>;
+
+// ============================================================
 // EXPORTS
 // ============================================================
 
@@ -195,4 +250,9 @@ export const workspaceSchema = {
 	quiz,
 	quizQuestion,
 	quizAttempt,
+};
+
+export const activitySchema = {
+	userActivity,
+	notification,
 };

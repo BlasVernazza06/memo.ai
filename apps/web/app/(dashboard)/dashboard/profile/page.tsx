@@ -60,17 +60,13 @@ export default async function ProfilePage() {
                         <p className="text-sm font-bold text-primary/80 uppercase tracking-widest px-4 py-1.5 bg-primary/5 rounded-full inline-block mt-2">Pro Member</p>
                     </div>
 
-                    <div className="w-full grid grid-cols-2 gap-3 mt-8">
+                    <div className="w-full flex items-center justify-center gap-3 mt-8">
                         <Link href="/dashboard/settings">
                             <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl h-12 shadow-lg shadow-primary/20 flex gap-2">
                                 <Edit3 className="w-4 h-4" />
                                 Editar
                             </Button>
                         </Link>
-                        <Button variant="ghost" className="bg-slate-50 text-slate-400 hover:text-slate-600 font-bold rounded-2xl h-12 flex gap-2">
-                            <Share2 className="w-4 h-4" />
-                            Perfil
-                        </Button>
                     </div>
                 </div>
 
