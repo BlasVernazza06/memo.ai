@@ -18,7 +18,7 @@ import {
 import { Button } from "@repo/ui/components/ui/button";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import WorkspaceSettingsModal from "../../components/workspace-settings-modal";
+import WorkspaceSettingsModal from "../../../../../components/dashboard/workspace-settings-modal";
 import SearchInput from "@/components/shared/search-input";
 
 // ============================================================

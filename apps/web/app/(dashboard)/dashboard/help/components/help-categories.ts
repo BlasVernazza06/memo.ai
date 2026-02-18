@@ -26,8 +26,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
             title: "Guía de Inicio Rápido",
             text: "Bienvenido a Memo AI. Aquí aprenderás cómo transformar tus materiales de estudio en conocimiento real en pocos minutos.",
             sections: [
-                { subtitle: "1. Crea tu primer Workspace", body: "Los Workspaces son contenedores temáticos. Puedes crear uno para 'Anatomía', 'Historia' o 'Programación'." },
-                { subtitle: "2. Sube tus documentos", body: "Aceptamos PDF, imágenes de notas y hasta enlaces de YouTube. Nuestra IA procesará el contenido automáticamente." },
+                { subtitle: "1. Crea tu primer Workspace", body: "Los Workspaces son espacios de estudio para mejorar tu desempeño académico." },
+                { subtitle: "2. Sube tus documentos", body: "Aceptamos PDF y Docs. Nuestra IA procesará el contenido automáticamente y creara metodos de estudio a tu medida." },
                 { subtitle: "3. Interactúa con Memo", body: "Usa el chat para resolver dudas específicas o deja que Memo genere flashcards por ti." }
             ]
         }
@@ -60,8 +60,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
             title: "El Poder de la IA",
             text: "Nuestra IA no solo resume, sino que entiende. Aprende a sacarle el máximo provecho.",
             sections: [
-                { subtitle: "Generación Automática", body: "Al subir un archivo, Memo detecta los conceptos clave y crea flashcards de manera autónoma." },
-                { subtitle: "Repetición Espaciada", body: "Usamos el algoritmo Anki para mostrarte las cartas justo antes de que las olvides." },
+                { subtitle: "Generación Automática", body: "Al subir un archivo, Memo detecta los conceptos clave y crea flashcards, quizzes y resúmenes de manera autónoma." },
+                { subtitle: "Mazos Ilimitados", body: "Estudia a tu ritmo y cuanto quieras. Crea los mazos que necesites para reforzar tu aprendizaje" },
                 { subtitle: "Personalización de IA", body: "Añade 'Contexto del Estudiante' para indicarle a Memo en qué temas debe enfocarse." }
             ]
         }
@@ -77,8 +77,8 @@ export const HELP_CATEGORIES: HelpCategory[] = [
             title: "Planes y Beneficios",
             text: "Memo AI ofrece un plan gratuito generoso y un plan Pro para estudiantes de alto rendimiento.",
             sections: [
-                { subtitle: "Cuenta Gratuita", body: "Incluye 3 Workspaces y hasta 10 documentos por mes." },
-                { subtitle: "Beneficios Pro", body: "Workspaces ilimitados, archivos de hasta 100MB, OCR avanzado y prioridad en servidores." },
+                { subtitle: "Cuenta Gratuita", body: "Incluye hasta 3 Workspaces y 5 mazos de metodos de estudio" },
+                { subtitle: "Beneficios Pro", body: "Workspaces y Mazos ilimitados " },
                 { subtitle: "Gestión de Pagos", body: "Puedes cancelar o cambiar tu plan en cualquier momento desde la sección de Ajustes." }
             ]
         }
@@ -94,9 +94,9 @@ export const HELP_CATEGORIES: HelpCategory[] = [
             title: "Privacidad de tus Datos",
             text: "Tu privacidad es nuestra prioridad. Tus documentos están cifrados y solo tú tienes acceso a ellos.",
             sections: [
-                { subtitle: "Cifrado de Archivos", body: "Usamos estándares de grado bancario para proteger tus materiales de estudio." },
+                { subtitle: "Cifrado de Archivos", body: "Usamos los mas altos estandares para proteger tus materiales de estudio" },
                 { subtitle: "Privacidad de IA", body: "Tus datos no se utilizan para entrenar modelos públicos sin tu consentimiento explícito." },
-                { subtitle: "Gestión de Cuenta", body: "Puedes descargar todos tus datos o eliminar tu cuenta permanentemente desde ajustes." }
+                { subtitle: "Gestión de Cuenta", body: "Puedes eliminar tu cuenta permanentemente desde ajustes." }
             ]
         }
     }

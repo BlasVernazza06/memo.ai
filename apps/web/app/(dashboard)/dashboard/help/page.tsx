@@ -15,9 +15,18 @@ import HelpCategoryCard from "./components/help-category-card";
 import SearchInput from "@/components/shared/search-input";
 
 const FAQS = [
-    { q: "¿Cómo subo un PDF de más de 50MB?", a: "Los usuarios Pro pueden subir archivos de hasta 100MB. Si tu archivo es más grande, intenta dividirlo o comprimirlo." },
-    { q: "¿La IA puede leer mis notas escritas a mano?", a: "Sí, siempre que el escaneo sea legible, nuestro motor de OCR puede procesar notas manuscritas en PDF." },
-    { q: "¿Cómo comparto un Workspace con un compañero?", a: "Ve a la configuración del Workspace y selecciona 'Compartir'. Puedes invitar por email o generar un link público." },
+    { 
+        q: "¿Cómo me ayuda la IA a organizar mi información?", 
+        a: "Nuestra IA analiza automáticamente tus documentos para categorizarlos, extraer conceptos clave y facilitar búsquedas inteligentes en todo tu espacio de trabajo." 
+    },
+    { 
+        q: "¿Puedo generar resúmenes o contenido nuevo con mis notas?", 
+        a: "Sí, utilizando la función de 'Sparkles' puedes resumir textos largos, cambiar el tono de tus escritos o generar borradores automáticos a partir de tus ideas existentes." 
+    },
+    { 
+        q: "¿Es segura mi información al utilizar funciones de IA?", 
+        a: "Totalmente. Tus datos están protegidos con cifrado de extremo a extremo y no se utilizan para entrenar modelos de lenguaje externos, garantizando tu privacidad total." 
+    },
 ];
 
 const SEARCH_KEYS: (keyof HelpCategory)[] = ["title", "desc"];

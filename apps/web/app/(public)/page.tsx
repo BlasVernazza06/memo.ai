@@ -1,12 +1,12 @@
-import HeroSection from "@/components/hero-section";
-import Header from "@/components/landing-header";
-import TrustSection from "@/components/trust-section";
-import FeaturesSection from "@/components/features-section";
-import HowItWorkSection from "@/components/howitworks-section";
-import TestimonialsSection from "@/components/testimonials-section";
-import PricingSection from "@/components/pricing-section";
-import Footer from "@/components/footer";
-import CTASection from "@/components/cta-section";
+import HeroSection from "@/components/landing/hero-section";
+import Header from "@/components/landing/landing-header";
+import TrustSection from "@/components/landing/trust-section";
+import FeaturesSection from "@/components/landing/features-section";
+import HowItWorkSection from "@/components/landing/howitworks-section";
+import TestimonialsSection from "@/components/landing/testimonials-section";
+import PricingSection from "@/components/landing/pricing-section";
+import Footer from "@/components/landing/footer";
+import CTASection from "@/components/landing/cta-section";
 
 export default function Home() {
   return (

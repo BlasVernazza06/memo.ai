@@ -3,8 +3,8 @@ import {
     Layers
 } from "lucide-react";
 import Link from "next/link";
-import WorkspacesClient from "../components/workspaces-client";
-import { Workspace } from "../components/workspace-card";
+import WorkspacesClient from "../../../../components/dashboard/workspaces-client";
+import { Workspace } from "../../../../components/dashboard/workspace-card";
 
 // Mock data logic remains here for now, or move to a separate data file/API call
 const MOCK_WORKSPACES: Workspace[] = [

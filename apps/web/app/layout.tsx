@@ -13,8 +13,11 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  icons: {
+    icon: "/logo-app.webp",
+  },
   title: "memo.ai - Transforma tus PDFs en material de estudio interactivo",
-  description: "La herramienta de estudio inteligente que convierte tus documentos en flashcards y quizzes gamificados con IA.nh",
+  description: "La herramienta de estudio inteligente que convierte tus documentos en flashcards y quizzes gamificados con IA.",
   keywords: ["estudio", "flashcards", "IA", "PDF", "aprendizaje", "universidad"],
 };
 
@@ -41,3 +44,4 @@ export default function RootLayout({
     </html>
   );
 }
+

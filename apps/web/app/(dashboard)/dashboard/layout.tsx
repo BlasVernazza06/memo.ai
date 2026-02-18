@@ -1,12 +1,22 @@
 import { ReactNode } from "react";
-import DashAside from "./dashboard/components/dash-aside";
+import DashAside from "@/components/shared/dash-aside";
 import UserMenu from "@/components/shared/user-menu";
+import { getSession } from "@/lib/auth-session";
+import { redirect } from "next/navigation";
+import { User } from "better-auth";
 
 interface DashboardLayoutProps {
     children: ReactNode;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardLayout({ children }: DashboardLayoutProps) {
+    const session = await getSession();
+    const user = session?.user;
+
+    if (!user) {
+        return redirect("/auth/login");
+    }
+
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-primary/10 overflow-x-hidden">
             {/* Background elements */}
@@ -22,7 +32,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
 
             {/* Global User Menu (Floating Top-Right) */}
-            <UserMenu />
+            <UserMenu user={user as User} />
 
             {/* Sidebar & Mobile Nav */}
             <DashAside />

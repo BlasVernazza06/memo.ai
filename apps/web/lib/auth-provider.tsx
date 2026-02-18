@@ -17,13 +17,21 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, isPending: isLoading } = authClient.useSession();
-
-  const user = session?.user ?? null;
+export function AuthProvider({ 
+  children, 
+  initialSession 
+}: { 
+  children: ReactNode;
+  initialSession?: any;
+}) {
+  const { data: session, isPending } = authClient.useSession();
+  // Si el cliente está cargando (isPending), usamos la data del servidor (initialSession)
+  // Si el cliente ya cargó, usamos la data fresca (session)
+  const currentSession = session || initialSession;
+  const user = currentSession?.user ?? null;
 
   return (
-    <AuthContext.Provider value={{ user, isLoading }}>
+    <AuthContext.Provider value={{ user, isLoading: isPending && !initialSession }}>
       {children}
     </AuthContext.Provider>
   );

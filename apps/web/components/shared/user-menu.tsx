@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
+import { useClickOutside } from "@/hooks/use-click-outside";
 import Link from "next/link";
 import { Bell, Loader2, Sparkles, Brain, Clock, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth-provider";
-import { getInitials } from "@/lib/hooks/useInitials";
+import { getInitials } from "@/hooks/use-Initials";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@repo/ui/components/ui/button";
+import { User } from "better-auth";
 
 const MOCK_NOTIFICATIONS = [
     {
@@ -42,24 +44,14 @@ const MOCK_NOTIFICATIONS = [
     }
 ];
 
-export default function UserMenu() {
-    const { user, isLoading } = useAuth();
+export default function UserMenu({ user }: { user: User | null }) {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // Cerrar al hacer clic fuera
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    useClickOutside(menuRef, useCallback(() => setIsOpen(false), []));
 
     const renderUserButton = () => {
-        if (isLoading) {
+        if (!user) {
             return (
                 <div className="flex items-center gap-3 bg-white/70 backdrop-blur-md border border-white/40 shadow-sm p-1.5 pr-4 rounded-4xl">
                     <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">

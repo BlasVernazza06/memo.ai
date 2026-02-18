@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, User2, X, Loader2 } from "lucide-react";
-import AuthDesktopButtons from "./auth-components/auth-desktop-buttons";
-import AuthMobileButtons from "./auth-components/auth-mobile-buttons";
+import AuthDesktopButtons from "../auth/auth-desktop-buttons";
+import AuthMobileButtons from "../auth/auth-mobile-buttons";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/lib/auth-provider";
 

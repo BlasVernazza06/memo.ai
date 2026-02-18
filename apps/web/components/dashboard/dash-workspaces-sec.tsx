@@ -1,67 +1,62 @@
 'use client';
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { 
-    Grid, 
-    List, 
-    Filter, 
-    Layers,
-    Plus
-} from "lucide-react";
-import { Button } from "@repo/ui/components/ui/button";
+import { FolderPlus, Grid, List, Layers } from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
-import WorkspaceCard, { Workspace } from "../components/workspace-card";
-
+import { Button } from "@repo/ui/components/ui/button";
+import WorkspaceCard, { Workspace } from "./workspace-card";
 import SearchInput from "@/components/shared/search-input";
 
-interface WorkspacesClientProps {
+interface DashWorkspacesSecProps {
     initialWorkspaces: Workspace[];
 }
 
 const SEARCH_KEYS: (keyof Workspace)[] = ["name", "category"];
 
-export default function WorkspacesClient({ initialWorkspaces }: WorkspacesClientProps) {
+export default function DashWorkspacesSec({ initialWorkspaces }: DashWorkspacesSecProps) {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredWorkspaces, setFilteredWorkspaces] = useState(initialWorkspaces);
 
     return (
-        <div className="space-y-10 py-6">
-            {/* Filter & Search Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                <SearchInput 
-                    data={initialWorkspaces}
-                    onResultsChange={setFilteredWorkspaces}
-                    searchKeys={SEARCH_KEYS}
-                    placeholder="Buscar por nombre o categoría..."
-                    className="flex-1 w-full"
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                />
-                
-                <div className="flex items-center gap-2 p-1 bg-white border border-slate-200/60 rounded-2xl w-full md:w-auto shadow-sm">
-                    <button 
-                        onClick={() => setViewMode('grid')}
-                        className={`flex-1 md:flex-none p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-                    >
-                        <Grid className="w-5 h-5" />
-                    </button>
-                    <button 
-                        onClick={() => setViewMode('list')}
-                        className={`flex-1 md:flex-none p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-                    >
-                        <List className="w-5 h-5" />
-                    </button>
-                    <div className="w-px h-6 bg-slate-200 mx-1 hidden md:block" />
-                    <button className="flex-1 md:flex-none flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-500 font-bold text-sm hover:bg-slate-50 transition-all">
-                        <Filter className="w-4 h-4" />
-                        Filtros
-                    </button>
+        <section className="space-y-8">
+            {/* Header + Search */}
+            <div className="flex flex-col gap-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Tus Workspaces</h2>
+                    <p className="text-sm text-slate-500 font-medium">Gestiona tus áreas de estudio inteligentes.</p>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <SearchInput 
+                        data={initialWorkspaces}
+                        onResultsChange={setFilteredWorkspaces}
+                        searchKeys={SEARCH_KEYS}
+                        placeholder="Buscar por nombre o categoría..."
+                        className="flex-1 w-full"
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                    />
+                    
+                    <div className="flex items-center gap-2 p-1 h-max bg-white border border-slate-200/60 rounded-2xl w-full md:w-auto shadow-sm">
+                        <button 
+                            onClick={() => setViewMode('grid')}
+                            className={`flex-1 md:flex-none p-2.5 rounded-xl transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <Grid className="w-5 h-5" />
+                        </button>
+                        <button 
+                            onClick={() => setViewMode('list')}
+                            className={`flex-1 md:flex-none p-2.5 rounded-xl transition-all cursor-pointer ${viewMode === 'list' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <List className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* Workspaces Display */}
+            {/* Workspaces Grid/List */}
             <motion.div 
                 key={viewMode}
                 initial={{ opacity: 0 }}
@@ -72,7 +67,7 @@ export default function WorkspacesClient({ initialWorkspaces }: WorkspacesClient
                     : "flex flex-col gap-4"
                 }
             >
-                {/* Add New Quick Card (Grid only) */}
+                {/* Create New Card (Grid only) */}
                 {viewMode === 'grid' && (
                     <Link href="/dashboard/workspaces/new" className="block h-full">
                         <motion.div 
@@ -80,7 +75,7 @@ export default function WorkspacesClient({ initialWorkspaces }: WorkspacesClient
                             className="group cursor-pointer border-2 border-dashed border-slate-200 rounded-4xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/40 hover:bg-primary/2 transition-all min-h-[380px] h-full"
                         >
                             <div className="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm group-active:scale-95">
-                                <Plus className="w-8 h-8 text-slate-400 group-hover:text-white" />
+                                <FolderPlus className="w-8 h-8 text-slate-400 group-hover:text-white" />
                             </div>
                             <h3 className="font-bold text-slate-900 mb-1">Nuevo Workspace</h3>
                             <p className="text-xs text-slate-400 font-medium">Crea un espacio inteligente para tus PDFs</p>
@@ -88,6 +83,7 @@ export default function WorkspacesClient({ initialWorkspaces }: WorkspacesClient
                     </Link>
                 )}
 
+                {/* Workspace Cards */}
                 {filteredWorkspaces.map((ws, idx) => (
                     <WorkspaceCard key={ws.id} ws={ws} idx={idx} viewMode={viewMode} />
                 ))}
@@ -104,6 +100,6 @@ export default function WorkspacesClient({ initialWorkspaces }: WorkspacesClient
                     <Button variant="ghost" className="text-primary font-bold hover:bg-primary/5 rounded-xl" onClick={() => setSearchQuery("")}>Limpiar búsqueda</Button>
                 </div>
             )}
-        </div>
+        </section>
     );
 }

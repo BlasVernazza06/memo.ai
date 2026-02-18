@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { 
-    FileText, 
     HelpCircle, 
-    Layers, 
     LayoutDashboard, 
     LogOut, 
     Settings,
@@ -13,14 +11,12 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter, usePathname } from "next/navigation";
-import { getInitials } from "@/lib/hooks/useInitials";
+import { getInitials } from "@/hooks/use-Initials";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth-provider";
 
 const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard"},
-    { icon: Layers, label: "Workspaces", href: "/dashboard/workspaces" },
-    { icon: FileText, label: "Documentos", href: "/dashboard/documents" },
     { icon: Settings, label: "Ajustes", href: "/dashboard/settings" },
 ];
 

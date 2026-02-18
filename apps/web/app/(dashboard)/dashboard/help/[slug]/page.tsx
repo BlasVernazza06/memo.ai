@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import { HELP_CATEGORIES } from "../components/help-categories";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { motion } from "motion/react";
 import { ChevronLeft, ArrowRight, Lightbulb } from "lucide-react";
 import Link from "next/link";
@@ -13,7 +13,7 @@ export default function HelpCategoryDetailPage({ params }: { params: Promise<{ s
     const category = HELP_CATEGORIES.find(cat => cat.slug === slug);
 
     if (!category) {
-        notFound();
+        redirect("/dashboard/help")
     }
 
     const Icon = category.icon;
@@ -80,37 +80,12 @@ export default function HelpCategoryDetailPage({ params }: { params: Promise<{ s
                 ))}
             </motion.div>
 
-            {/* Pro Tip Card */}
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-primary/5 border border-primary/20 rounded-4xl p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden"
-            >
-                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                    <Lightbulb className="w-32 h-32 text-primary" />
-                </div>
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-                    <Lightbulb className="w-8 h-8 text-primary" />
-                </div>
-                <div className="space-y-2">
-                    <h4 className="text-lg font-black text-slate-900">Pro Tip de Memo</h4>
-                    <p className="text-slate-600 text-sm font-medium">
-                        ¿Sabías que puedes arrastrar y soltar múltiples archivos a la vez en cualquier Workspace? Memo los organizará por ti.
-                    </p>
-                </div>
-                <Button className="bg-primary text-white font-bold rounded-2xl h-12 flex gap-2 ml-auto shadow-lg shadow-primary/20">
-                    Ir a mis Workspaces
-                    <ArrowRight className="w-4 h-4" />
-                </Button>
-            </motion.div>
-
             {/* CTA Footer */}
             <div className="pt-10 text-center border-t border-slate-100">
                 <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">¿Te sirvió esta información?</p>
                 <div className="flex items-center justify-center gap-4">
-                    <Button variant="ghost" className="rounded-2xl h-12 px-8 font-bold text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">Sí, fue útil</Button>
-                    <Button variant="ghost" className="rounded-2xl h-12 px-8 font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50">No, necesito ayuda</Button>
+                    <Link href="/dashboard/help"><Button variant="ghost" className="rounded-2xl h-12 px-8 font-bold text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">Sí, fue útil</Button></Link>
+                    <Link href="/dashboard/help"><Button variant="ghost" className="rounded-2xl h-12 px-8 font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50">No, necesito ayuda</Button></Link>
                 </div>
             </div>
         </div>

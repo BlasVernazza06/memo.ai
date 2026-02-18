@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, boolean, integer, jsonb } from "drizzle-orm/pg-core";
+import { type InferSelectModel, type InferInsertModel } from "drizzle-orm";
 
 // ============================================================
 // AUTH TABLES (Better Auth)
@@ -13,6 +14,9 @@ export const user = pgTable("user", {
 	createdAt: timestamp('created_at').notNull(),
 	updatedAt: timestamp('updated_at').notNull()
 });
+
+export type DbUser = InferSelectModel<typeof user>;
+export type NewUser = InferInsertModel<typeof user>;
 
 export const session = pgTable("session", {
 	id: text("id").primaryKey(),
@@ -80,6 +84,9 @@ export const workspace = pgTable("workspace", {
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export type DbWorkspace = InferSelectModel<typeof workspace>;
+export type NewWorkspace = InferInsertModel<typeof workspace>;
+
 /**
  * document - Archivos alojados en Uploadthing.
  * Incluye preferencias de estudio que el usuario seleccionó al subirlo.
@@ -102,6 +109,9 @@ export const document = pgTable("document", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type DbDocument = InferSelectModel<typeof document>;
+export type NewDocument = InferInsertModel<typeof document>;
 
 /**
  * flashcard_deck - Mazos de flashcards dentro de un workspace.
