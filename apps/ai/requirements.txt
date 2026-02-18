@@ -6,3 +6,6 @@ openai
 langchain
 llama-index
 python-dotenv
+pymupdf
+groq
+
