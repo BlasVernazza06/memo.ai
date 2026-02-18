@@ -1,21 +1,24 @@
 'use client';
 
 import { useState } from "react";
-import Link from "next/link";
+
 import Image from "next/image";
+import Link from "next/link";
+import { redirect, useRouter } from "next/navigation";
+
+import { Mail, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon, Eye, EyeOff, Loader } from "lucide-react";
 import { motion } from "motion/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { authClient } from "@/lib/auth-client";
+import { signIn } from "@/lib/actions/auth-actions";
+import { loginSchema, type LoginFormValues } from "@repo/validators";
+
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Mail, Lock, FileText, Youtube, MessageSquare, BookOpen, Sparkles, Link as LinkIcon, Eye, EyeOff, Loader } from "lucide-react";
 import OAuthButtons from "../components/oauth-buttons";
-import { loginSchema, type LoginFormValues } from "@repo/validators";
-import { authClient } from "@/lib/auth-client"; 
-import { redirect, useRouter } from "next/navigation";
-import { signIn } from "@/lib/actions/auth-actions";
 
 
 export default function LoginPage() {

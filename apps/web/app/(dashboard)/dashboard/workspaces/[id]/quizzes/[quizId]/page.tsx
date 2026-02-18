@@ -1,9 +1,13 @@
 'use client';
 
+// React
 import { useState } from "react";
+
+// Next
+import Link from "next/link";
 import { useParams } from "next/navigation";
-import { motion, AnimatePresence } from "motion/react";
-import { Button } from "@repo/ui/components/ui/button";
+
+// External packages
 import { 
     ChevronLeft, 
     RotateCcw, 
@@ -14,7 +18,10 @@ import {
     AlertCircle,
     Timer
 } from "lucide-react";
-import Link from "next/link";
+import { motion, AnimatePresence } from "motion/react";
+
+// Components
+import { Button } from "@repo/ui/components/ui/button";
 
 export default function QuizGamePage() {
     const params = useParams();

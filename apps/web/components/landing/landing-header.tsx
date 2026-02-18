@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User2, X } from "lucide-react";
-import AuthDesktopButtons from "./auth-components/auth-desktop-buttons";
-import AuthMobileButtons from "./auth-components/auth-mobile-buttons";
+import { Menu, User2, X, Loader2 } from "lucide-react";
+import AuthDesktopButtons from "../auth/auth-desktop-buttons";
+import AuthMobileButtons from "../auth/auth-mobile-buttons";
 import { motion, AnimatePresence } from "motion/react";
-import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/lib/auth-provider";
 
 const navLinks = [
     {
@@ -25,7 +25,7 @@ const navLinks = [
 ]
 
 export default function Header() {
-    const { data: session, isPending: isLoading } = authClient.useSession();
+    const { user, isLoading } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     
@@ -38,7 +38,6 @@ export default function Header() {
     }, []);
 
     const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        // Only trigger smooth scroll if the link is a hash on the current page
         if (href.startsWith('/#')) {
             e.preventDefault();
             const id = href.replace('/#', '');
@@ -48,7 +47,6 @@ export default function Header() {
                 const elementHeight = element.offsetHeight;
                 const viewportHeight = window.innerHeight;
                 
-                // Calculate position to center the element in the viewport
                 const offsetPosition = elementPosition - (viewportHeight / 2) + (elementHeight / 2);
 
                 window.scrollTo({
@@ -59,6 +57,79 @@ export default function Header() {
                 setIsOpen(false);
             }
         }
+    };
+
+    // Render the desktop action buttons based on auth state
+    const renderDesktopActions = () => {
+        if (isLoading) {
+            return (
+                <div className="hidden lg:flex items-center gap-4">
+                    <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                </div>
+            );
+        }
+
+        if (user) {
+            return (
+                <div className="hidden lg:flex items-center gap-4">
+                    <Link href="/dashboard" className="flex items-center gap-2">
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-primary text-sm text-primary-foreground px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-3"
+                        >
+                            Dashboard
+                        </motion.button>
+                    </Link>
+                    <div className="relative border border-muted-foreground/20 rounded-full overflow-hidden flex items-center justify-center">
+                        {user.image ? (
+                            <Image
+                                src={user.image}
+                                alt={user.name}
+                                width={36}
+                                height={36}
+                                className="rounded-full object-cover"
+                            />
+                        ) : (
+                            <User2 className="size-9 p-1 text-muted-foreground" />
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="hidden lg:flex items-center gap-4">
+                <AuthDesktopButtons />
+            </div>
+        );
+    };
+
+    // Render the mobile menu actions based on auth state
+    const renderMobileActions = () => {
+        if (isLoading) {
+            return (
+                <div className="flex items-center justify-center py-4">
+                    <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                </div>
+            );
+        }
+
+        if (user) {
+            return (
+                <div className="space-y-2">
+                    <Link
+                        href="/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="block bg-primary text-center rounded-lg px-4 py-3 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
+                    >
+                        Ir al Dashboard
+                    </Link>
+                </div>
+            );
+        }
+
+        return <AuthMobileButtons onClose={() => setIsOpen(false)} />;
     };
 
     return (
@@ -114,28 +185,8 @@ export default function Header() {
                     </nav>
 
                     {/* Desktop Actions */}
-                    {
-                        session ? (
-                            <div className="hidden lg:flex items-center gap-4">
-                                <Link href="/dashboard" className="flex items-center gap-2">
-                                    <motion.button 
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="bg-primary text-sm text-primary-foreground px-4 py-2 rounded-lg font-semibold  transition-all flex items-center gap-3 text-md"
-                                    >
-                                        Dashboard
-                                    </motion.button>
-                                </Link>
-                                <div className="relative border border-muted-foreground/20 rounded-full overflow-hidden">
-                                    <User2 className="size-9 rounded-full" />
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="hidden lg:flex items-center gap-4">
-                                <AuthDesktopButtons />
-                            </div>
-                        )
-                    }
+                    {renderDesktopActions()}
+
                     {/* Mobile Menu Button */}
                     <button 
                         onClick={() => setIsOpen(!isOpen)}
@@ -169,7 +220,7 @@ export default function Header() {
                             ))}
                             <div className="h-px bg-white/10 mx-2" />
                             <div className="pt-2">
-                                <AuthMobileButtons onClose={() => setIsOpen(false)} />
+                                {renderMobileActions()}
                             </div>
                         </nav>
                     </motion.div>
