@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
+
 import { Search, X } from "lucide-react";
+
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/utils";

@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from "motion/react";
 import { FileText, MessageSquare, Award, Flame, TrendingUp } from "lucide-react";
+import { motion } from "motion/react";
 
 const STATS = [
     { label: "Documentos", value: "48", icon: FileText, color: "text-blue-500", bg: "bg-blue-50" },

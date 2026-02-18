@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { 
-    Bot,
-    User,
-    ChevronLeft
-} from "lucide-react";
-import { Button } from "@repo/ui/components/ui/button";
+
 import Link from "next/link";
-import InputChat from "@/components/workspace/new/input-chat";
+
+import { Bot, User, ChevronLeft } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+
 import { ChatMessage } from "@/types/workspace-chat-types";
+
 import { LocalFile } from "@/hooks/use-file-upload";
+
+import { Button } from "@repo/ui/components/ui/button";
+import InputChat from "@/components/workspace/new/input-chat";
 import AttachmentCard from "@/components/workspace/new/attachment-card";
 
 export default function NewWorkspaceChatPage() {

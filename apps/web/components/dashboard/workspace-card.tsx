@@ -1,6 +1,8 @@
-import { ChevronRight, Heart, MoreVertical, Files, LucideIcon, BookOpen, Brain, Files as FilesIcon, Pencil, Archive, Trash2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+
 import Link from "next/link";
+
+import { ChevronRight, Heart, MoreVertical, Files, LucideIcon, BookOpen, Brain, Files as FilesIcon, Pencil, Archive, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export type Workspace = {

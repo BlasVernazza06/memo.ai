@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from "motion/react";
 import { Clock, BookOpen, Award, FileText, Calendar, ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
 
 const ACTIVITY = [
     { action: "Estudiaste Anatomía II", date: "Hace 20 min", icon: BookOpen, color: "text-blue-500" },

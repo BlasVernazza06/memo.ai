@@ -1,28 +1,14 @@
-import { 
-    Trophy, 
-    Flame, 
-    BookOpen, 
-    Clock, 
-    FileText, 
-    MessageSquare, 
-    Award, 
-    TrendingUp, 
-    Calendar,
-    ChevronRight,
-    Brain,
-    Sparkles,
-    Share2,
-    Edit3,
-    Lock,
-    Zap,
-    GraduationCap
-} from "lucide-react";
-import { Button } from "@repo/ui/components/ui/button";
-import { getSession } from "@/lib/auth-session";
-import { redirect } from "next/navigation";
-import { getInitials } from "@/hooks/use-Initials";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { Sparkles, Share2, Edit3 } from "lucide-react";
+
+import { getSession } from "@/lib/auth-session";
+
+import { getInitials } from "@/hooks/use-Initials";
+
+import { Button } from "@repo/ui/components/ui/button";
 import { ProfileStats } from "@/components/profile/profile-stats";
 import { ProfileAchievements } from "@/components/profile/profile-achievements";
 import { ProfileActivity } from "@/components/profile/profile-activity";

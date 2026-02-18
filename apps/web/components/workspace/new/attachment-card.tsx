@@ -1,7 +1,8 @@
 'use client'
 
-import { motion } from "motion/react";
 import { X } from "lucide-react";
+import { motion } from "motion/react";
+
 import { LocalFile } from "@/hooks/use-file-upload";
 import { getFileIcon } from "@/hooks/use-get-icon";
 import { formatFileSize } from "@/hooks/use-file-size";

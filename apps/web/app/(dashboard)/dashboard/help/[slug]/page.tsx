@@ -1,12 +1,19 @@
 'use client';
 
+// React
 import { use } from "react";
-import { HELP_CATEGORIES } from "../components/help-categories";
-import { redirect } from "next/navigation";
-import { motion } from "motion/react";
-import { ChevronLeft, ArrowRight, Lightbulb } from "lucide-react";
+
+// Next
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+// External packages
+import { ChevronLeft, ArrowRight, Lightbulb } from "lucide-react";
+import { motion } from "motion/react";
+
+// Components
 import { Button } from "@repo/ui/components/ui/button";
+import { HELP_CATEGORIES } from "../../../../../components/help/help-categories";
 
 export default function HelpCategoryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);

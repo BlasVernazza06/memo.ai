@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from "motion/react";
+import { useState } from "react";
+
 import { 
     MessageCircle, 
     LifeBuoy, 
@@ -8,10 +9,11 @@ import {
     Sparkles,
     Mail
 } from "lucide-react";
+import { motion } from "motion/react";
+
 import { Button } from "@repo/ui/components/ui/button";
-import { useState } from "react";
-import { HELP_CATEGORIES, HelpCategory } from "./components/help-categories";
-import HelpCategoryCard from "./components/help-category-card";
+import { HELP_CATEGORIES, HelpCategory } from "@/components/help/help-categories";
+import HelpCategoryCard from "@/components/help/help-category-card";
 import SearchInput from "@/components/shared/search-input";
 
 const FAQS = [

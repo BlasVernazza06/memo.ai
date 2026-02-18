@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+
+import Link from "next/link";
+
 import { 
     Grid, 
     List, 
@@ -9,8 +11,9 @@ import {
     Layers,
     Plus
 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+
 import { Button } from "@repo/ui/components/ui/button";
-import Link from "next/link";
 import WorkspaceCard, { Workspace } from "@/components/dashboard/workspace-card";
 
 import SearchInput from "@/components/shared/search-input";

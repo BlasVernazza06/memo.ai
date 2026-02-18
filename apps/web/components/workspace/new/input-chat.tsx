@@ -1,11 +1,14 @@
 'use client'
 
 import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
+
 import { Send, FileText } from "lucide-react";
-import AttachmentCard from "./attachment-card";
+import { motion, AnimatePresence } from "motion/react";
+
 import { useAutoResize } from "@/hooks/use-auto-resize";
 import { useFileUpload, LocalFile } from "@/hooks/use-file-upload";
+
+import AttachmentCard from "./attachment-card";
 
 interface InputChatProps {
     onSend: (message: string, files: LocalFile[]) => void;

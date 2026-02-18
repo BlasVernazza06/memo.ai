@@ -1,7 +1,9 @@
 'use client';
 
+import Image from "next/image";
 import Link from "next/link";
-import { motion } from "motion/react";
+import { useRouter, usePathname } from "next/navigation";
+
 import { 
     HelpCircle, 
     LayoutDashboard, 
@@ -9,11 +11,12 @@ import {
     Settings,
     Loader2
 } from "lucide-react";
+import { motion } from "motion/react";
+
 import { authClient } from "@/lib/auth-client";
-import { useRouter, usePathname } from "next/navigation";
-import { getInitials } from "@/hooks/use-Initials";
-import Image from "next/image";
 import { useAuth } from "@/lib/auth-provider";
+
+import { getInitials } from "@/hooks/use-Initials";
 
 const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard"},

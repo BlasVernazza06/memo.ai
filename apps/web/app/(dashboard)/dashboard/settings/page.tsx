@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+
 import { 
     User, 
     Bell, 
@@ -24,6 +24,8 @@ import {
     Laptop,
     Trash2
 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";

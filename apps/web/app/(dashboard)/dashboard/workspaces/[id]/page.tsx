@@ -1,6 +1,12 @@
 'use client';
 
+// React
 import { useState } from "react";
+
+// Next
+import Link from "next/link";
+
+// External packages
 import { 
     FileText, 
     Layers, 
@@ -15,9 +21,10 @@ import {
     Heart,
     ChevronLeft,
 } from "lucide-react";
-import { Button } from "@repo/ui/components/ui/button";
-import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
+
+// Components
+import { Button } from "@repo/ui/components/ui/button";
 import WorkspaceSettingsModal from "../../../../../components/dashboard/workspace-settings-modal";
 import SearchInput from "@/components/shared/search-input";
 

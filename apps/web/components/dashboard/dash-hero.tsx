@@ -1,9 +1,12 @@
 'use client'
 
+import { useState } from "react";
+
+import Link from "next/link";
+
 import { BookOpen, FileText, Plus, Sparkles, X, Brain, Zap, Target } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
-import Link from "next/link";
+
 import { Button } from "@repo/ui/components/ui/button";
 
 export default function DashHero() {

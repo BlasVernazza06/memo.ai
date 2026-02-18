@@ -1,7 +1,8 @@
 'use client';
 
-import { motion } from "motion/react";
 import { Trophy, Brain, BookOpen, Flame, Sparkles, Lock, ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
+
 import { Button } from "@repo/ui/components/ui/button";
 
 const BADGES = [

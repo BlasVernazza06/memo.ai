@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from "react";
+
+import Link from "next/link";
+
 import { FolderPlus, Grid, List, Layers } from "lucide-react";
 import { motion } from "motion/react";
-import Link from "next/link";
+
 import { Button } from "@repo/ui/components/ui/button";
 import WorkspaceCard, { Workspace } from "./workspace-card";
 import SearchInput from "@/components/shared/search-input";

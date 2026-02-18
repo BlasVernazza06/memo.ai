@@ -1,9 +1,13 @@
 import { ReactNode } from "react";
+
+import { redirect } from "next/navigation";
+
+import { User } from "better-auth";
+
+import { getSession } from "@/lib/auth-session";
+
 import DashAside from "@/components/shared/dash-aside";
 import UserMenu from "@/components/shared/user-menu";
-import { getSession } from "@/lib/auth-session";
-import { redirect } from "next/navigation";
-import { User } from "better-auth";
 
 interface DashboardLayoutProps {
     children: ReactNode;

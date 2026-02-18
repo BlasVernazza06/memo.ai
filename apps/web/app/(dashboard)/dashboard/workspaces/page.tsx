@@ -1,8 +1,7 @@
-import { 
-    Plus, 
-    Layers
-} from "lucide-react";
 import Link from "next/link";
+
+import { Plus, Layers } from "lucide-react";
+
 import WorkspacesClient from "../../../../components/dashboard/workspaces-client";
 import { Workspace } from "../../../../components/dashboard/workspace-card";
 

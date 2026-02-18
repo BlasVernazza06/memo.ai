@@ -1,7 +1,8 @@
 'use client';
 
-import { motion, AnimatePresence } from "motion/react";
 import { X, Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+
 import { Button } from "@repo/ui/components/ui/button";
 
 interface WorkspaceSettingsModalProps {

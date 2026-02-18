@@ -1,15 +1,20 @@
 'use client';
 
 import { useState, useRef, useCallback } from "react";
-import { useClickOutside } from "@/hooks/use-click-outside";
-import Link from "next/link";
-import { Bell, Loader2, Sparkles, Brain, Clock, CheckCircle2 } from "lucide-react";
+
 import Image from "next/image";
-import { useAuth } from "@/lib/auth-provider";
-import { getInitials } from "@/hooks/use-Initials";
+import Link from "next/link";
+
+import { Bell, Loader2, Sparkles, Brain, Clock, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { Button } from "@repo/ui/components/ui/button";
 import { User } from "better-auth";
+
+import { useAuth } from "@/lib/auth-provider";
+
+import { useClickOutside } from "@/hooks/use-click-outside";
+import { getInitials } from "@/hooks/use-Initials";
+
+import { Button } from "@repo/ui/components/ui/button";
 
 const MOCK_NOTIFICATIONS = [
     {

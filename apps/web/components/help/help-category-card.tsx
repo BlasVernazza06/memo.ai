@@ -1,6 +1,7 @@
+import Link from "next/link";
+
 import { LucideIcon, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
-import Link from "next/link";
 
 interface HelpCategoryCardProps {
     title: string;
