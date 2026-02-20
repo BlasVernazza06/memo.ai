@@ -8,6 +8,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import { UsersModule } from './users/users.module';
+import { AiModule } from './ai/ai.module';
 import { APP_GUARD } from '@nestjs/core';
 
 @Module({
@@ -30,6 +31,7 @@ import { APP_GUARD } from '@nestjs/core';
       inject: [DATABASE_CONNECTION, ConfigService],
     }),
     UsersModule,
+    AiModule,
   ],
   controllers: [],
   providers: [

@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+pydantic
+openai
+langchain
+llama-index
+python-dotenv
+pymupdf
+groq
+

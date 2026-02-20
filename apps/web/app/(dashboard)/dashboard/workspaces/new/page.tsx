@@ -26,30 +26,57 @@ export default function NewWorkspaceChatPage() {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const handleSend = async (content: string, files: LocalFile[]) => {
-        // 1. Mostrar el mensaje del usuario en el chat inmediatamente
-        const newMessage: ChatMessage = {
+        console.log("SEND BUTTON CLICKED", { content, filesCount: files.length });
+        
+        const userMessage: ChatMessage = {
             id: Date.now().toString(),
             role: 'user',
             attachments: files.length > 0 ? files : undefined,
             content
         };
-        setMessages(prev => [...prev, newMessage]);
+        setMessages(prev => [...prev, userMessage]);
 
-        // 2. Aquí iría la subida real de los archivos (UploadThing + Server Action)
-        // for (const localFile of files) {
-        //     const uploaded = await startUpload([localFile.file]);
-        //     await saveToDb({ name: localFile.name, url: uploaded.url, ... });
-        // }
+        try {
+            const formData = new FormData();
+            formData.append('userContext', content);
+            
+            // Si hay un archivo, lo enviamos (tomamos el primero para la demo)
+            if (files[0]) {
+                formData.append('file', files[0].file);
+            }
 
-        // 3. Mock AI response
-        setTimeout(() => {
+            const response = await fetch('http://localhost:3000/ai/process', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include', // <--- Envía las cookies de sesión
+            });
+
+            console.log("BACKEND RESPONSE STATUS:", response.status);
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                console.error("errorData", errorData)
+                throw new Error(`Error ${response.status}: ${errorData}`);
+            }
+
+            const aiData = await response.json();
+            
             const aiResponse: ChatMessage = {
                 id: (Date.now() + 1).toString(),
                 role: 'ai',
-                content: "Entendido. He procesado la información y los archivos. Estoy configurando el entorno de aprendizaje óptimo para este tema. ¿Quieres que genere algunas flashcards iniciales o prefieres empezar explorando los documentos?"
+                content: `¡Procesado con éxito! 🧠\n\n**Resumen:** ${aiData.summary}\n\nHe generado ${aiData.flashcards.length} flashcards y ${aiData.quizzes.length} preguntas de quiz para ti.`
             };
             setMessages(prev => [...prev, aiResponse]);
-        }, 1500);
+
+        } catch (error) {
+            console.error("FRONTEND AI ERROR:", error);
+            const errorMsg: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                role: 'ai',
+                content: "Lo siento, hubo un error al conectar con mis motores de IA. ¿Podrías intentarlo de nuevo?"
+            };
+            setMessages(prev => [...prev, errorMsg]);
+        }
     };
 
     return (
