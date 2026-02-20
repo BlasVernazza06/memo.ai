@@ -1,135 +1,72 @@
-# Turborepo starter
+# 🧠 Memo AI
 
-This Turborepo starter is maintained by the Turborepo core team.
+**Memo AI** es una plataforma inteligente diseñada para transformar tus documentos de estudio en materiales de aprendizaje interactivos como flashcards y quices, utilizando inteligencia artificial de vanguardia.
 
-## Using this example
+## 🚀 Arquitectura del Proyecto
 
-Run the following command:
+Este es un monorepo gestionado con **Turborepo** y **pnpm**, dividido en las siguientes aplicaciones y paquetes:
 
-```sh
-npx create-turbo@latest
-```
+### Aplicaciones (Apps)
 
-## What's inside?
+- `web`: Frontend desarrollado con **Next.js**, **Tailwind CSS** y **Lucide React**. Interfaz de usuario intuitiva para subir documentos y estudiar.
+- `api`: Backend robusto construido con **NestJS**. Maneja la lógica de negocio, autenticación y comunicación entre servicios.
+- `ai`: Microservicio de Inteligencia Artificial desarrollado en **Python** con **FastAPI**. Utiliza **Groq (Llama 3.3)** para procesar documentos y generar contenido educativo de forma instantánea.
 
-This Turborepo includes the following packages/apps:
+### Paquetes compartidos (Packages)
 
-### Apps and Packages
+- `db`: Esquema de base de datos y cliente gestionado con **Drizzle ORM**.
+- `ui`: Biblioteca de componentes de UI compartidos.
+- `validators`: Esquemas de validación comunes utilizando **Zod**.
+- `typescript-config` & `eslint-config`: Configuraciones compartidas de desarrollo.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 🛠️ Stack Tecnológico
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Frontend**: Next.js 14+, Tailwind CSS, Framer Motion.
+- **Backend**: NestJS, Node.js.
+- **IA**: Python, FastAPI, Groq Cloud API (Llama 3).
+- **Base de Datos**: PostgreSQL con Drizzle ORM.
+- **Monorepo**: Turborepo, pnpm.
 
-### Utilities
+## ⚙️ Configuración e Instalación
 
-This Turborepo has some additional tools already setup for you:
+### Requisitos previos
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- [Node.js](https://nodejs.org/) (v18 o superior)
+- [pnpm](https://pnpm.io/)
+- [Python 3.10+](https://www.python.org/) (para el servicio de IA)
 
-### Build
+### Pasos para comenzar
 
-To build all apps and packages, run the following command:
+1.  **Clonar el repositorio:**
 
-```
-cd my-turborepo
+    ```sh
+    git clone https://github.com/BlasVernazza06/memo.ai.git
+    cd memo-ai
+    ```
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+2.  **Instalar dependencias:**
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+    ```sh
+    pnpm install
+    ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+3.  **Configurar variables de entorno:**
+    Crea archivos `.env` en las carpetas correspondientes:
+    - `apps/api/.env`
+    - `apps/web/.env`
+    - `apps/ai/.env` (Necesitas una `GROQ_API_KEY`)
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+4.  **Ejecutar el proyecto en desarrollo:**
+    ```sh
+    pnpm dev
+    ```
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## 📖 Cómo funciona
 
-### Develop
+1.  **Sube un documento**: Carga tus PDFs o archivos de texto en la plataforma.
+2.  **Procesamiento IA**: El servicio de Python extrae el contenido y lo envía a Llama 3 para generar preguntas clave.
+3.  **Estudia**: Recibe automáticamente flashcards y quices personalizados para reforzar tu aprendizaje.
 
-To develop all apps and packages, run the following command:
+---
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+Desarrollado con ❤️ por [Blas Vernazza](https://github.com/BlasVernazza06)
