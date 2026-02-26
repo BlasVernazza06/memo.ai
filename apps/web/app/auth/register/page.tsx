@@ -17,7 +17,7 @@ import { registerSchema, type RegisterFormValues } from "@repo/validators";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import OAuthButtons from "../components/oauth-buttons";
+import OAuthButtons from "../../../components/auth/oauth-buttons";
  
 export default function RegisterPage() {
     const { data: session, isPending: isLoading } = authClient.useSession();
