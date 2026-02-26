@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import HeroSection from "@/components/landing/hero-section";
 import Header from "@/components/landing/landing-header";
 import TrustSection from "@/components/landing/trust-section";
@@ -9,6 +13,8 @@ import Footer from "@/components/landing/footer";
 import CTASection from "@/components/landing/cta-section";
 
 export default function Home() {
+  const [isSandboxOpen, setIsSandboxOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
       {/* Background gradient blobs */}
@@ -25,10 +31,25 @@ export default function Home() {
         style={{ background: 'hsla(199, 89%, 48%, 0.08)' }}
       />
       
-      <Header />
+      <AnimatePresence>
+        {!isSandboxOpen && (
+          <motion.div 
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="fixed top-0 left-0 right-0 z-50 pt-4 px-4"
+          >
+            <Header />
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <main className="pt-24 sm:pt-28 lg:pt-32 relative z-10">
-        <HeroSection />
+        <HeroSection 
+            isSandboxOpen={isSandboxOpen} 
+            setIsSandboxOpen={setIsSandboxOpen} 
+        />
         <TrustSection />
         <FeaturesSection />
         <HowItWorkSection />

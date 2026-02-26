@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User2, X, Loader2 } from "lucide-react";
+import { Menu, X, Loader2, ChevronRight } from "lucide-react";
 import AuthDesktopButtons from "../auth/auth-desktop-buttons";
 import AuthMobileButtons from "../auth/auth-mobile-buttons";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/lib/auth-provider";
+import UserModalLanding from "./user-modal-landing";
 
 const navLinks = [
     {
@@ -28,14 +29,26 @@ export default function Header() {
     const { user, isLoading } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [userModal, setUserModal] = useState(false);
     
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
         window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+        
+        // Lock scroll when mobile menu is open
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
 
     const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
         if (href.startsWith('/#')) {
@@ -81,18 +94,34 @@ export default function Header() {
                             Dashboard
                         </motion.button>
                     </Link>
-                    <div className="relative border border-muted-foreground/20 rounded-full overflow-hidden flex items-center justify-center">
-                        {user.image ? (
-                            <Image
-                                src={user.image}
-                                alt={user.name}
-                                width={36}
-                                height={36}
-                                className="rounded-full object-cover"
-                            />
-                        ) : (
-                            <User2 className="size-9 p-1 text-muted-foreground" />
-                        )}
+                    <div 
+                        className="relative cursor-pointer group/avatar"
+                        onClick={() => setUserModal(!userModal)}
+                    >
+                        <div className={`p-0.5 rounded-full border-2 transition-all ${userModal ? 'border-primary ring-4 ring-primary/10' : 'border-transparent group-hover/avatar:border-primary/30'}`}>
+                            {user.image ? (
+                                <Image
+                                    src={user.image}
+                                    alt={user.name}
+                                    width={38}
+                                    height={38}
+                                    className="rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="size-9 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">
+                                    {user.name.charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+
+                        <AnimatePresence>
+                            {userModal && (
+                                <UserModalLanding 
+                                    user={user} 
+                                    onClose={() => setUserModal(false)} 
+                                />
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             );
@@ -133,99 +162,120 @@ export default function Header() {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 pt-4 px-4 pointer-events-none">
-            <motion.div 
-                initial={{ y: -100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className={`
-                    mx-auto max-w-7xl h-16 pointer-events-auto
-                    transition-all duration-300 ease-in-out
-                    border border-white/10
-                    ${scrolled 
-                        ? 'bg-white/10 dark:bg-black/10 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] rounded-2xl px-6 h-14' 
-                        : 'bg-transparent border-transparent rounded-none px-4'
-                    }
-                `}
-            >
-                <div className="flex items-center justify-between h-full">
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <div className="relative">
+        <div 
+            className={`
+                mx-auto max-w-7xl h-16 pointer-events-auto
+                transition-all duration-300 ease-in-out
+                ${scrolled || isOpen
+                    ? 'bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.03)] border border-white/40 rounded-2xl px-6 h-14' 
+                    : 'bg-transparent border-transparent rounded-none px-4'
+                }
+            `}
+        >
+            <div className="flex items-center justify-between h-full">
+                {/* Logo */}
+                <Link href="/" className="flex items-center gap-3 group">
+                    <div className="relative">
+                        <motion.div 
+                            className="absolute -inset-1 bg-primary/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
+                        <Image 
+                            src="/logo.webp" 
+                            alt="Memo.ai Logo" 
+                            width={32} 
+                            height={32} 
+                            className="rounded-lg relative z-10"
+                        />
+                    </div>
+                    <span className="text-xl font-extrabold tracking-tight">
+                        memo<span className="text-primary">.ai</span>
+                    </span>
+                </Link>
+
+                {/* Desktop Navigation */}
+                <nav className="hidden lg:flex items-center gap-1">
+                    {navLinks.map((link) => (
+                        <Link 
+                            key={link.name} 
+                            href={link.href} 
+                            onClick={(e) => handleScroll(e, link.href)}
+                            className="relative px-5 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-all group"
+                        >
+                            <span>{link.name}</span>
                             <motion.div 
-                                className="absolute -inset-1 bg-primary/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary rounded-full group-hover:w-4 transition-all"
                             />
-                            <Image 
-                                src="/logo.webp" 
-                                alt="Memo.ai Logo" 
-                                width={32} 
-                                height={32} 
-                                className="rounded-lg relative z-10"
-                            />
-                        </div>
-                        <span className="text-xl font-extrabold tracking-tight">
-                            memo<span className="text-primary">.ai</span>
-                        </span>
-                    </Link>
+                        </Link>
+                    ))}
+                </nav>
 
-                    {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center gap-1">
-                        {navLinks.map((link) => (
-                            <Link 
-                                key={link.name} 
-                                href={link.href} 
-                                onClick={(e) => handleScroll(e, link.href)}
-                                className="relative px-5 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-all group"
-                            >
-                                <span>{link.name}</span>
-                                <motion.div 
-                                    className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary rounded-full group-hover:w-4 transition-all"
-                                />
-                            </Link>
-                        ))}
-                    </nav>
+                {/* Desktop Actions */}
+                {renderDesktopActions()}
 
-                    {/* Desktop Actions */}
-                    {renderDesktopActions()}
-
-                    {/* Mobile Menu Button */}
-                    <button 
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="lg:hidden p-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors"
-                        aria-label="Toggle menu"
-                    >
-                        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                    </button>
-                </div>
-            </motion.div>
+                {/* Mobile Menu Button */}
+                <button 
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="lg:hidden p-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors"
+                    aria-label="Toggle menu"
+                >
+                    {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                </button>
+            </div>
 
             {/* Mobile Menu Overlay */}
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        className="lg:hidden absolute top-20 left-4 right-4 p-6 bg-white/95 dark:bg-black/95 backdrop-blur-2xl border border-white/10 rounded-4xl shadow-2xl pointer-events-auto"
-                    >
-                        <nav className="space-y-4">
-                            {navLinks.map((link) => (
-                                <Link 
-                                    key={link.name} 
-                                    href={link.href}
-                                    onClick={(e) => handleScroll(e, link.href)}
-                                    className="block p-4 rounded-2xl hover:bg-primary/5 text-lg font-bold tracking-tight transition-colors"
+                    <>
+                        {/* Backdrop */}
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsOpen(false)}
+                            className="lg:hidden fixed inset-0 bg-white/40 backdrop-blur-md z-[-1] pointer-events-auto"
+                        />
+                        
+                        {/* Menu Container */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                            className="lg:hidden absolute top-[85px] left-4 right-4 p-4 bg-white/80 backdrop-blur-2xl border border-white/60 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] pointer-events-auto overflow-hidden"
+                        >
+                            <nav className="flex flex-col gap-1">
+                                {navLinks.map((link, i) => (
+                                    <motion.div
+                                        key={link.name}
+                                        initial={{ opacity: 0, x: -5 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                    >
+                                        <Link 
+                                            href={link.href}
+                                            onClick={(e) => handleScroll(e, link.href)}
+                                            className="flex items-center justify-between p-4 rounded-2xl hover:bg-black/5 group transition-colors"
+                                        >
+                                            <span className="text-base font-bold text-slate-800 tracking-tight">{link.name}</span>
+                                            <ChevronRight className="size-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                                        </Link>
+                                    </motion.div>
+                                ))}
+                                
+                                <div className="h-px bg-black/5 my-2 mx-2" />
+                                
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: navLinks.length * 0.05 }}
+                                    className="pt-1"
                                 >
-                                    {link.name}
-                                </Link>
-                            ))}
-                            <div className="h-px bg-white/10 mx-2" />
-                            <div className="pt-2">
-                                {renderMobileActions()}
-                            </div>
-                        </nav>
-                    </motion.div>
+                                    {renderMobileActions()}
+                                </motion.div>
+                            </nav>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
-        </header>
+        </div>
     );
 }

@@ -1,12 +1,23 @@
 'use client';
 
-import { ArrowRight, Sparkles, Brain, FileText, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Sparkles, Brain, FileText, CheckCircle2, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-provider";
+import AiSandbox from "./ai-sandbox";
 
-export default function HeroSection() {
+interface HeroSectionProps {
+    isSandboxOpen: boolean;
+    setIsSandboxOpen: (value: boolean) => void;
+}
+
+export default function HeroSection({ isSandboxOpen, setIsSandboxOpen }: HeroSectionProps) {
+    const { user, isLoading: isAuthLoading } = useAuth();
+
     return (
         <section className="relative pt-8 pb-20 overflow-hidden">
+            <AiSandbox isOpen={isSandboxOpen} onClose={() => setIsSandboxOpen(false)} />
+            
             {/* Floating Elements Backdrop */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
                 <FloatingIcon Icon={Brain} className="top-[10%] left-[15%] text-primary/20" delay={0} duration={5} />
@@ -57,18 +68,27 @@ export default function HeroSection() {
                     
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row items-center gap-4 mt-12">
-                        <Link href="/auth/register" className="flex items-center gap-2">
-                            <motion.button 
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-3 text-md"
-                            >
-                                Comenzar ahora
-                                <ArrowRight className="w-5 h-5" />
-                            </motion.button>
-                        </Link>
+                        {isAuthLoading ? (
+                            <div className="bg-primary/10 px-8 py-4 rounded-2xl flex items-center justify-center">
+                                <Loader2 className="size-6 animate-spin text-primary" />
+                            </div>
+                        ) : (
+                            <Link href={user ? "/dashboard" : "/auth/register"} className="flex items-center gap-2">
+                                <motion.button 
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center gap-3 text-md"
+                                >
+                                    {user ? "Ir al Panel" : "Comenzar ahora"}
+                                    <ArrowRight className="w-5 h-5" />
+                                </motion.button>
+                            </Link>
+                        )}
+                        
                         <motion.button 
-                            whileHover={{ backgroundColor: "rgba(0,0,0,0.03)" }}
+                            onClick={() => setIsSandboxOpen(true)}
+                            whileHover={{ backgroundColor: "rgba(0,0,0,0.03)", scale: 1.05 }}
+                            whileTap={{ scale: 0.98 }}
                             className="bg-background border border-border px-8 py-3 rounded-2xl font-semibold hover:bg-accent transition-all flex items-center gap-3 text-md"
                         >
                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
