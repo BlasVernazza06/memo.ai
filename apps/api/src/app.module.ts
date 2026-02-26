@@ -11,6 +11,8 @@ import { UsersModule } from './users/users.module';
 import { AiModule } from './ai/ai.module';
 import { APP_GUARD } from '@nestjs/core';
 
+import { authSchema } from '@repo/db';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -20,9 +22,20 @@ import { APP_GUARD } from '@nestjs/core';
         auth: betterAuth({
           database: drizzleAdapter(database, {
             provider: 'pg',
+            schema: authSchema,
           }),
           emailAndPassword: {
             enabled: true,
+          },
+          socialProviders: {
+            google: {
+              clientId: configService.get('GOOGLE_CLIENT_ID') || '',
+              clientSecret: configService.get('GOOGLE_CLIENT_SECRET') || '',
+            },
+            github: {
+              clientId: configService.get('GITHUB_CLIENT_ID') || '',
+              clientSecret: configService.get('GITHUB_CLIENT_SECRET') || '',
+            },
           },
           trustedOrigins: [configService.getOrThrow('NEXT_PUBLIC_APP_URL')],
           plugins: [nextCookies()],

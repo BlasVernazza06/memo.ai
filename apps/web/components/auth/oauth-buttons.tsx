@@ -1,11 +1,27 @@
+'use client'
+
+import { useState } from "react";
+
+import { signIn } from "@repo/auth/client";
 import { Button } from "@repo/ui/components/ui/button";
 import { Google, GitHubLight } from "@ridemountainpig/svgl-react";
+
+import { Loader2 } from "lucide-react";
 
 interface OAuthButtonsProps {
     disabled?: boolean;
 }
 
 export default function OAuthButtons({ disabled }: OAuthButtonsProps) {
+    const [isLoading, setIsLoading] = useState<"google" | "github" | null>(null);
+
+    const handleSignIn = async (provider: "google" | "github") => {
+        setIsLoading(provider);
+        const webUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+        await signIn.social({ provider, callbackURL: `${webUrl}` });
+        setIsLoading(null);
+    }
+    
     return (
         <div className="grid grid-cols-2 gap-3 w-full font-sans">
             <Button
@@ -13,8 +29,9 @@ export default function OAuthButtons({ disabled }: OAuthButtonsProps) {
                 type="button"
                 disabled={disabled}
                 className="bg-white border-[#E2E8F0] hover:bg-[#FAFBFC] h-12 rounded-xl transition-all hover:border-primary/20 flex items-center justify-center gap-2 shadow-sm"
+                onClick={() => handleSignIn("google")}
             >
-                <Google className="size-5" />
+                {isLoading === "google" ? <Loader2 className="size-5 animate-spin" /> : <Google className="size-5" />}
                 <span className="text-xs font-semibold text-[#1A1C1E]">Google</span>
             </Button>
             <Button
@@ -22,8 +39,9 @@ export default function OAuthButtons({ disabled }: OAuthButtonsProps) {
                 type="button"
                 disabled={disabled}
                 className="bg-white border-[#E2E8F0] hover:bg-[#FAFBFC] h-12 rounded-xl transition-all hover:border-primary/20 flex items-center justify-center gap-2 shadow-sm"
+                onClick={() => handleSignIn("github")}
             >
-                <GitHubLight className="size-5" />
+                {isLoading === "github" ? <Loader2 className="size-5 animate-spin" /> : <GitHubLight className="size-5" />}
                 <span className="text-xs font-semibold text-[#1A1C1E]">GitHub</span>
             </Button>
         </div>
