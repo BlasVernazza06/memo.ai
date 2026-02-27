@@ -1,198 +1,219 @@
-'use client'
+'use client';
 
-import { useState } from "react";
+import {
+  BookOpen,
+  Brain,
+  FileText,
+  Plus,
+  Sparkles,
+  Target,
+  X,
+  Zap,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useState } from 'react';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import { BookOpen, FileText, Plus, Sparkles, X, Brain, Zap, Target } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
-
-import { Button } from "@repo/ui/components/ui/button";
+import { Button } from '@repo/ui/components/ui/button';
 
 export default function DashHero() {
-    const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
-    const tutorialSteps = [
-        {
-            icon: Brain,
-            title: "Dale contexto",
-            desc: "Cuéntale a la IA qué quieres estudiar y cómo prefieres aprender.",
-            color: "text-blue-500",
-            bg: "bg-blue-50"
-        },
-        {
-            icon: FileText,
-            title: "Sube tu material",
-            desc: "Sube un PDF o texto y deja que la IA lo procese por ti.",
-            color: "text-primary",
-            bg: "bg-primary/10"
-        },
-        {
-            icon: Target,
-            title: "Domina el tema",
-            desc: "Usa los resúmenes, flashcards y tests generados para aprender más rápido.",
-            color: "text-emerald-500",
-            bg: "bg-emerald-50"
-        }
-    ];
+  const tutorialSteps = [
+    {
+      icon: Brain,
+      title: 'Dale contexto',
+      desc: 'Cuéntale a la IA qué quieres estudiar y cómo prefieres aprender.',
+      color: 'text-blue-500',
+      bg: 'bg-blue-50',
+    },
+    {
+      icon: FileText,
+      title: 'Sube tu material',
+      desc: 'Sube un PDF o texto y deja que la IA lo procese por ti.',
+      color: 'text-primary',
+      bg: 'bg-primary/10',
+    },
+    {
+      icon: Target,
+      title: 'Domina el tema',
+      desc: 'Usa los resúmenes, flashcards y tests generados para aprender más rápido.',
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-50',
+    },
+  ];
 
-    return (
-        <section>
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 px-8 py-12 md:px-16 md:py-20 text-white shadow-2xl"
-                >
-                    {/* Background Sprinkles */}
-                    <div className="absolute top-0 right-0 w-[600px] h-full overflow-hidden pointer-events-none opacity-40">
-                        <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-primary rounded-full blur-[100px]" />
-                        <div className="absolute bottom-[-20%] right-[10%] w-[300px] h-[300px] bg-blue-400 rounded-full blur-[80px]" />
+  return (
+    <section>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 px-8 py-12 md:px-16 md:py-20 text-white shadow-2xl"
+      >
+        {/* Background Sprinkles */}
+        <div className="absolute top-0 right-0 w-[600px] h-full overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-primary rounded-full blur-[100px]" />
+          <div className="absolute bottom-[-20%] right-[10%] w-[300px] h-[300px] bg-blue-400 rounded-full blur-[80px]" />
+        </div>
+
+        <div className="relative z-10 max-w-2xl">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider mb-6"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-blue-300" />
+            <span>Bienvenido de vuelta, Blas</span>
+          </motion.div>
+
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+            ¿Qué vamos a <span className="text-primary italic">aprender</span>{' '}
+            hoy?
+          </h1>
+
+          <p className="text-slate-300 text-lg md:text-xl font-medium mb-10 max-w-lg leading-relaxed">
+            Transforma tus apuntes en conocimiento interactivo. Crea un nuevo
+            workspace para empezar a estudiar con IA.
+          </p>
+
+          <div className="flex flex-wrap gap-4">
+            <Link href="/dashboard/workspaces/new">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="group bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-primary/30 flex items-center gap-3 text-md transition-all active:shadow-inner cursor-pointer"
+              >
+                <Plus className="w-6 h-6" />
+                Nuevo Workspace
+              </motion.button>
+            </Link>
+
+            <motion.button
+              onClick={() => setShowTutorial(true)}
+              whileHover={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
+              className="bg-white/5 backdrop-blur-sm border border-white/10 px-8 py-4 rounded-2xl font-bold transition-all flex items-center gap-3 text-md cursor-pointer"
+            >
+              <BookOpen className="w-5 h-5 text-slate-400" />
+              Tutorial rápido
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Decorative Image/Element */}
+        <div className="hidden lg:block absolute right-16 top-1/2 -translate-y-1/2 w-[300px] h-[300px]">
+          <motion.div
+            animate={{
+              rotateY: [0, 10, 0],
+              rotateX: [0, -5, 0],
+              y: [0, -10, 0],
+            }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-full h-full bg-white/5 backdrop-blur-[2px] rounded-3xl border border-white/10 shadow-3xl p-6 flex flex-col justify-between"
+          >
+            <div className="flex justify-between items-start">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                <FileText className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] font-bold"
+                  >
+                    {i}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="h-4 w-3/4 bg-white/20 rounded-full animate-pulse" />
+              <div className="h-4 w-full bg-white/10 rounded-full" />
+              <div className="h-4 w-1/2 bg-white/10 rounded-full" />
+            </div>
+            <div className="pt-4 border-t border-white/10 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              <span>AI Processing...</span>
+              <span className="text-primary">85%</span>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Tutorial Modal */}
+      <AnimatePresence>
+        {showTutorial && (
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowTutorial(false)}
+              className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative bg-white rounded-[2.5rem] w-full max-w-xl overflow-hidden shadow-2xl"
+            >
+              <div className="p-8 md:p-12">
+                <div className="flex justify-between items-center mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                      <Zap className="w-6 h-6" />
                     </div>
+                    <h2 className="text-2xl font-black text-slate-900">
+                      Tutorial Rápido
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => setShowTutorial(false)}
+                    className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
 
-                    <div className="relative z-10 max-w-2xl">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider mb-6"
-                        >
-                            <Sparkles className="w-3.5 h-3.5 text-blue-300" />
-                            <span>Bienvenido de vuelta, Blas</span>
-                        </motion.div>
-
-                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-[1.1]">
-                            ¿Qué vamos a <span className="text-primary italic">aprender</span> hoy?
-                        </h1>
-                        
-                        <p className="text-slate-300 text-lg md:text-xl font-medium mb-10 max-w-lg leading-relaxed">
-                            Transforma tus apuntes en conocimiento interactivo. Crea un nuevo workspace para empezar a estudiar con IA.
+                <div className="space-y-8">
+                  {tutorialSteps.map((step, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * i }}
+                      className="flex gap-5"
+                    >
+                      <div
+                        className={`w-14 h-14 shrink-0 ${step.bg} ${step.color} rounded-2xl flex items-center justify-center shadow-xs`}
+                      >
+                        <step.icon className="w-7 h-7" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="font-bold text-slate-900">
+                          {step.title}
+                        </h3>
+                        <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                          {step.desc}
                         </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
 
-                        <div className="flex flex-wrap gap-4">
-                            <Link href="/dashboard/workspaces/new">
-                                <motion.button 
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="group bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-primary/30 flex items-center gap-3 text-md transition-all active:shadow-inner cursor-pointer"
-                                >
-                                    <Plus className="w-6 h-6" />
-                                    Nuevo Workspace
-                                </motion.button>
-                            </Link>
-                            
-                            <motion.button 
-                                onClick={() => setShowTutorial(true)}
-                                whileHover={{ backgroundColor: "rgba(255,255,255,0.08)" }}
-                                className="bg-white/5 backdrop-blur-sm border border-white/10 px-8 py-4 rounded-2xl font-bold transition-all flex items-center gap-3 text-md cursor-pointer"
-                            >
-                                <BookOpen className="w-5 h-5 text-slate-400" />
-                                Tutorial rápido
-                            </motion.button>
-                        </div>
-                    </div>
-
-                    {/* Decorative Image/Element */}
-                    <div className="hidden lg:block absolute right-16 top-1/2 -translate-y-1/2 w-[300px] h-[300px]">
-                        <motion.div
-                            animate={{ 
-                                rotateY: [0, 10, 0],
-                                rotateX: [0, -5, 0],
-                                y: [0, -10, 0]
-                            }}
-                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                            className="w-full h-full bg-white/5 backdrop-blur-[2px] rounded-3xl border border-white/10 shadow-3xl p-6 flex flex-col justify-between"
-                        >
-                            <div className="flex justify-between items-start">
-                                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-                                    <FileText className="w-6 h-6 text-white" />
-                                </div>
-                                <div className="flex -space-x-2">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="w-8 h-8 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] font-bold">
-                                            {i}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="h-4 w-3/4 bg-white/20 rounded-full animate-pulse" />
-                                <div className="h-4 w-full bg-white/10 rounded-full" />
-                                <div className="h-4 w-1/2 bg-white/10 rounded-full" />
-                            </div>
-                            <div className="pt-4 border-t border-white/10 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                                <span>AI Processing...</span>
-                                <span className="text-primary">85%</span>
-                            </div>
-                        </motion.div>
-                    </div>
-                </motion.div>
-
-                {/* Tutorial Modal */}
-                <AnimatePresence>
-                    {showTutorial && (
-                        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-                            <motion.div 
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={() => setShowTutorial(false)}
-                                className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
-                            />
-                            <motion.div 
-                                initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                                animate={{ scale: 1, opacity: 1, y: 0 }}
-                                exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                                className="relative bg-white rounded-[2.5rem] w-full max-w-xl overflow-hidden shadow-2xl"
-                            >
-                                <div className="p-8 md:p-12">
-                                    <div className="flex justify-between items-center mb-8">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                                                <Zap className="w-6 h-6" />
-                                            </div>
-                                            <h2 className="text-2xl font-black text-slate-900">Tutorial Rápido</h2>
-                                        </div>
-                                        <button 
-                                            onClick={() => setShowTutorial(false)}
-                                            className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-colors"
-                                        >
-                                            <X className="w-6 h-6" />
-                                        </button>
-                                    </div>
-
-                                    <div className="space-y-8">
-                                        {tutorialSteps.map((step, i) => (
-                                            <motion.div 
-                                                key={i}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: 0.1 * i }}
-                                                className="flex gap-5"
-                                            >
-                                                <div className={`w-14 h-14 shrink-0 ${step.bg} ${step.color} rounded-2xl flex items-center justify-center shadow-xs`}>
-                                                    <step.icon className="w-7 h-7" />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <h3 className="font-bold text-slate-900">{step.title}</h3>
-                                                    <p className="text-sm text-slate-500 font-medium leading-relaxed">{step.desc}</p>
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                    </div>
-
-                                    <div className="mt-12 pt-8 border-t border-slate-50">
-                                        <Button 
-                                            onClick={() => setShowTutorial(false)}
-                                            className="w-full h-14 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800"
-                                        >
-                                            ¡Entendido, vamos a estudiar!
-                                        </Button>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </div>
-                    )}
-                </AnimatePresence>
-            </section>
-    );
+                <div className="mt-12 pt-8 border-t border-slate-50">
+                  <Button
+                    onClick={() => setShowTutorial(false)}
+                    className="w-full h-14 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800"
+                  >
+                    ¡Entendido, vamos a estudiar!
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
 }

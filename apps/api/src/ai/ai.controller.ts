@@ -1,4 +1,10 @@
-import { Controller, Post, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+  Body,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AiService } from './ai.service';
 
@@ -15,7 +21,7 @@ export class AiController {
     console.log('--- BACKEND REQUEST RECEIVED ---');
     console.log('Context:', userContext);
     console.log('File:', file ? file.originalname : 'No file');
-    
+
     return this.aiService.processDocument(file, userContext);
   }
 }

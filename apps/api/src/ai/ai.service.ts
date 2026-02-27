@@ -13,7 +13,7 @@ export class AiService {
         const blob = new Blob([file.buffer], { type: file.mimetype });
         formData.append('file', blob, file.originalname);
       }
-      
+
       formData.append('user_context', userContext);
       formData.append('flashcard_count', '5');
       formData.append('quiz_count', '3');
@@ -29,7 +29,9 @@ export class AiService {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Python Service Error Response:', errorText);
-        throw new Error(`Python Service Error: ${response.status} - ${errorText}`);
+        throw new Error(
+          `Python Service Error: ${response.status} - ${errorText}`,
+        );
       }
 
       const result = await response.json();
@@ -38,7 +40,7 @@ export class AiService {
       console.error('DETAILED AI SERVICE ERROR:', {
         message: error.message,
         stack: error.stack,
-        cause: error.cause
+        cause: error.cause,
       });
       throw new InternalServerErrorException(
         'Error al procesar el documento con IA: ' + error.message,

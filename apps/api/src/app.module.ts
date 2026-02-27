@@ -18,7 +18,10 @@ import { authSchema } from '@repo/db';
     ConfigModule.forRoot(),
     AuthModule.forRootAsync({
       imports: [DatabaseModule, ConfigModule],
-      useFactory: (database: NeonHttpDatabase, configService: ConfigService) => ({
+      useFactory: (
+        database: NeonHttpDatabase,
+        configService: ConfigService,
+      ) => ({
         auth: betterAuth({
           database: drizzleAdapter(database, {
             provider: 'pg',

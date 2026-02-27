@@ -1,34 +1,35 @@
-import { db as defaultDb, authSchema } from "@repo/db";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 
-export const getAuthConfig = (options: { 
+import { authSchema, db as defaultDb } from '@repo/db';
+
+export const getAuthConfig = (options: {
   db?: any;
   secret: string;
   baseURL: string;
   env: {
-    googleClientId?: string; 
+    googleClientId?: string;
     googleClientSecret?: string;
     githubClientId?: string;
     githubClientSecret?: string;
-  }
+  };
 }) => ({
-    secret: options.secret,
-    baseURL: options.baseURL,
-    database: drizzleAdapter(options.db || defaultDb, {
-        provider: "pg",
-        schema: authSchema
-    }),
-    emailAndPassword: {
-        enabled: true
+  secret: options.secret,
+  baseURL: options.baseURL,
+  database: drizzleAdapter(options.db || defaultDb, {
+    provider: 'pg',
+    schema: authSchema,
+  }),
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: {
+    google: {
+      clientId: options.env.googleClientId || '',
+      clientSecret: options.env.googleClientSecret || '',
     },
-    socialProviders: {
-        google: {
-            clientId: options.env.googleClientId || "",
-            clientSecret: options.env.googleClientSecret || "",
-        },
-        github: {
-            clientId: options.env.githubClientId || "",
-            clientSecret: options.env.githubClientSecret || "",
-        },
+    github: {
+      clientId: options.env.githubClientId || '',
+      clientSecret: options.env.githubClientSecret || '',
     },
+  },
 });

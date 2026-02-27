@@ -1,52 +1,52 @@
-import { ReactNode } from "react";
+import { User } from 'better-auth';
+import { ReactNode } from 'react';
 
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
-import { User } from "better-auth";
-
-import { getSession } from "@/lib/auth-session";
-
-import DashAside from "@/components/shared/dash-aside";
-import UserMenu from "@/components/shared/user-menu";
+import DashAside from '@/components/shared/dash-aside';
+import UserMenu from '@/components/shared/user-menu';
+import { getSession } from '@/lib/auth-session';
 
 interface DashboardLayoutProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
-export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-    const session = await getSession();
-    const user = session?.user;
+export default async function DashboardLayout({
+  children,
+}: DashboardLayoutProps) {
+  const session = await getSession();
+  const user = session?.user;
 
-    if (!user) {
-        return redirect("/auth/login");
-    }
+  if (!user) {
+    return redirect('/auth/login');
+  }
 
-    return (
-        <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-primary/10 overflow-x-hidden">
-            {/* Background elements */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-                <div 
-                    className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full blur-[120px] opacity-20" 
-                    style={{ background: 'hsla(199, 89%, 48%, 0.4)' }}
-                />
-                <div 
-                    className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full blur-[150px] opacity-20" 
-                    style={{ background: 'hsla(217, 91%, 60%, 0.4)' }}
-                />
-            </div>
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-primary/10 overflow-x-hidden">
+      {/* Background elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div
+          className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full blur-[120px] opacity-20"
+          style={{ background: 'hsla(199, 89%, 48%, 0.4)' }}
+        />
+        <div
+          className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full blur-[150px] opacity-20"
+          style={{ background: 'hsla(217, 91%, 60%, 0.4)' }}
+        />
+      </div>
 
-            {/* Global User Menu (Floating Top-Right) */}
-            <UserMenu user={user as User} />
+      {/* Global User Menu (Floating Top-Right) */}
+      <UserMenu user={user as User} />
 
-            {/* Sidebar & Mobile Nav */}
-            <DashAside />
+      {/* Sidebar & Mobile Nav */}
+      <DashAside />
 
-            {/* Main Content Area */}
-            <main className="lg:pl-32 pt-10 min-h-screen relative">
-                <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pb-20">
-                    {children}
-                </div>
-            </main>
+      {/* Main Content Area */}
+      <main className="lg:pl-32 pt-10 min-h-screen relative">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pb-20">
+          {children}
         </div>
-    );
+      </main>
+    </div>
+  );
 }
