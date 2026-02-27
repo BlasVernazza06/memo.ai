@@ -1,10 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';

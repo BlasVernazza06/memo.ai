@@ -1,5 +1,9 @@
 'use client';
 
+import Link from 'next/link';
+
+import { useEffect, useState } from 'react';
+
 import {
   ArrowRight,
   Brain,
@@ -9,9 +13,6 @@ import {
   X,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
-
-import Link from 'next/link';
 
 interface Flashcard {
   question: string;

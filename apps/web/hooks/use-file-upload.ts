@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 
-import { getFileType } from '@/hooks/use-file-type';
 import { type LocalFile } from '@repo/validators';
+
+import { getFileType } from '@/hooks/use-file-type';
+
 export type { LocalFile };
 
 export function useFileUpload() {

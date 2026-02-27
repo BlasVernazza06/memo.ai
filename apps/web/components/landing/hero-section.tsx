@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import {
   ArrowRight,
   Brain,
@@ -9,8 +11,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-
-import Link from 'next/link';
 
 import { useAuth } from '@/lib/auth-provider';
 

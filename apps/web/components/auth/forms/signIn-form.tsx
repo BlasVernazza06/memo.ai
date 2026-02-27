@@ -1,12 +1,13 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Loader, Lock, Mail } from 'lucide-react';
-import { motion } from 'motion/react';
+import Link from 'next/link';
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import Link from 'next/link';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff, Loader, Lock, Mail } from 'lucide-react';
+import { motion } from 'motion/react';
 
 import { authClient } from '@repo/auth/client';
 import { Button } from '@repo/ui/components/ui/button';

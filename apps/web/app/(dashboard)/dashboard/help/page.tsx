@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import {
   ExternalLink,
   LifeBuoy,
@@ -8,7 +10,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
 
 import { Button } from '@repo/ui/components/ui/button';
 

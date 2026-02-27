@@ -2,6 +2,12 @@
 
 // React
 // External packages
+// Next
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+
+import { useState } from 'react';
+
 import {
   AlertCircle,
   ArrowRight,
@@ -15,11 +21,6 @@ import {
   Zap,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
-
-// Next
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
 
 // Components
 import { Button } from '@repo/ui/components/ui/button';

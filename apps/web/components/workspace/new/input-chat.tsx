@@ -1,8 +1,9 @@
 'use client';
 
+import { useRef, useState } from 'react';
+
 import { FileText, Send } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useRef, useState } from 'react';
 
 import { useAutoResize } from '@/hooks/use-auto-resize';
 import { LocalFile, useFileUpload } from '@/hooks/use-file-upload';

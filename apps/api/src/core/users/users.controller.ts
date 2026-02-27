@@ -1,9 +1,10 @@
+import { Controller, Get, UseGuards } from '@nestjs/common';
+
 import {
   AuthGuard,
   Session,
   type UserSession,
 } from '@thallesp/nestjs-better-auth';
-import { Controller, Get, UseGuards } from '@nestjs/common';
 
 @Controller('users')
 @UseGuards(AuthGuard)

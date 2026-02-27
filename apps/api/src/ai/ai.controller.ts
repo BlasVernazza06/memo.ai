@@ -1,11 +1,12 @@
 import {
+  Body,
   Controller,
   Post,
   UploadedFile,
   UseInterceptors,
-  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+
 import { AiService } from './ai.service';
 
 @Controller('ai')

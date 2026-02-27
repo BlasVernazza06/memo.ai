@@ -1,9 +1,9 @@
 'use client';
 
+import Link from 'next/link';
+
 import { Check, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
-
-import Link from 'next/link';
 
 import { Button } from '@repo/ui/components/ui/button';
 

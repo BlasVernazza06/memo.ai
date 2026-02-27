@@ -1,10 +1,11 @@
 'use client';
 
-import { Filter, Grid, Layers, List, Plus } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import Link from 'next/link';
+
 import { useState } from 'react';
 
-import Link from 'next/link';
+import { Filter, Grid, Layers, List, Plus } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 

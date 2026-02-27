@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+
 import { GitHubLight, Google } from '@ridemountainpig/svgl-react';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
 
 import { signIn } from '@repo/auth/client';
 import { Button } from '@repo/ui/components/ui/button';

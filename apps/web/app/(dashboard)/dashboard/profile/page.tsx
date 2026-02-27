@@ -1,8 +1,8 @@
-import { Edit3, Share2, Sparkles } from 'lucide-react';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+
+import { Edit3, Share2, Sparkles } from 'lucide-react';
 
 import { Button } from '@repo/ui/components/ui/button';
 

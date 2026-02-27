@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-
 import { Outfit } from 'next/font/google';
+
+import type { Metadata } from 'next';
 
 import { ThemeProvider } from '@repo/ui/components/theme-provider';
 

@@ -1,7 +1,8 @@
 'use client';
 
-import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
+
+import { AnimatePresence, motion } from 'motion/react';
 
 import CTASection from '@/components/landing/cta-section';
 import FeaturesSection from '@/components/landing/features-section';

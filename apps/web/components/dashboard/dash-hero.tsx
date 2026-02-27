@@ -1,5 +1,9 @@
 'use client';
 
+import Link from 'next/link';
+
+import { useState } from 'react';
+
 import {
   BookOpen,
   Brain,
@@ -11,9 +15,6 @@ import {
   Zap,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
-
-import Link from 'next/link';
 
 import { Button } from '@repo/ui/components/ui/button';
 

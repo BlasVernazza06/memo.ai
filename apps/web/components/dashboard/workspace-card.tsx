@@ -1,3 +1,7 @@
+import Link from 'next/link';
+
+import { useEffect, useRef, useState } from 'react';
+
 import {
   Archive,
   BookOpen,
@@ -12,9 +16,6 @@ import {
   Trash2,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
-
-import Link from 'next/link';
 
 export type Workspace = {
   id: string;

@@ -1,7 +1,8 @@
-import { User } from 'better-auth';
+import { redirect } from 'next/navigation';
+
 import { ReactNode } from 'react';
 
-import { redirect } from 'next/navigation';
+import { User } from 'better-auth';
 
 import DashAside from '@/components/shared/dash-aside';
 import UserMenu from '@/components/shared/user-menu';

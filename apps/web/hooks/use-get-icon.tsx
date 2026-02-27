@@ -1,6 +1,7 @@
+import { type JSX } from 'react';
+
 import { MicrosoftWord, PDF } from '@ridemountainpig/svgl-react';
 import { FileText } from 'lucide-react';
-import { type JSX } from 'react';
 
 export function getFileIcon(fileType: string, size: number = 18): JSX.Element {
   switch (fileType) {

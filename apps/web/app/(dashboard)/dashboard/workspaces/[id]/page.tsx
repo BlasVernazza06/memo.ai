@@ -2,6 +2,11 @@
 
 // React
 // External packages
+// Next
+import Link from 'next/link';
+
+import { useState } from 'react';
+
 import {
   BarChart3,
   Brain,
@@ -17,10 +22,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
-
-// Next
-import Link from 'next/link';
 
 // Components
 import { Button } from '@repo/ui/components/ui/button';

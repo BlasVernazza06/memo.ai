@@ -1,10 +1,11 @@
 'use client';
 
-import { Bot, ChevronLeft, User } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import Link from 'next/link';
+
 import { useRef, useState } from 'react';
 
-import Link from 'next/link';
+import { Bot, ChevronLeft, User } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 

@@ -1,11 +1,12 @@
 'use client';
 
-import { ChevronRight, LayoutDashboard, LogOut, Settings } from 'lucide-react';
-import { motion } from 'motion/react';
-import { useRef } from 'react';
-
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+
+import { useRef } from 'react';
+
+import { ChevronRight, LayoutDashboard, LogOut, Settings } from 'lucide-react';
+import { motion } from 'motion/react';
 
 import { useClickOutside } from '@/hooks/use-click-outside';
 import { authClient } from '@/lib/auth-client';

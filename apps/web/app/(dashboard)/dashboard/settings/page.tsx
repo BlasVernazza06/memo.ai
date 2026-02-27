@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import {
   Bell,
   Camera,
@@ -23,7 +25,6 @@ import {
   User,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
 
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';

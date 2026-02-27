@@ -1,5 +1,9 @@
 'use client';
 
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+
 import {
   HelpCircle,
   LayoutDashboard,
@@ -8,10 +12,6 @@ import {
   Settings,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 
 import { getInitials } from '@/hooks/use-Initials';
 import { authClient } from '@/lib/auth-client';

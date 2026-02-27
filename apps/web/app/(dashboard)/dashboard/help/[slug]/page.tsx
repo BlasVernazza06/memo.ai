@@ -2,13 +2,14 @@
 
 // React
 // External packages
-import { ArrowRight, ChevronLeft, Lightbulb } from 'lucide-react';
-import { motion } from 'motion/react';
-import { use } from 'react';
-
 // Next
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+
+import { use } from 'react';
+
+import { ArrowRight, ChevronLeft, Lightbulb } from 'lucide-react';
+import { motion } from 'motion/react';
 
 // Components
 import { Button } from '@repo/ui/components/ui/button';
