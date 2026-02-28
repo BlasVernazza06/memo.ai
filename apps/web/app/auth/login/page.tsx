@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,19 +29,15 @@ import { Label } from '@repo/ui/components/ui/label';
 import { type LoginFormValues, loginSchema } from '@repo/validators';
 
 import OAuthButtons from '@/components/auth/oauth-buttons';
-import { signIn } from '@/lib/actions/auth-actions';
 import { authClient } from '@/lib/auth-client';
 
 export default function LoginPage() {
-  const { data: session, isPending: isLoading } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  if (session) {
-    redirect('/');
-  }
-
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
   const {
     register,
@@ -51,6 +47,11 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
+  if (session) {
+    router.replace(callbackUrl);
+    return null;
+  }
+
   const onSubmit = async (formData: LoginFormValues) => {
     setIsLoadingForm(true);
     try {
@@ -58,6 +59,7 @@ export default function LoginPage() {
         email: formData.email,
         password: formData.password,
       });
+      router.push(callbackUrl);
     } catch (error) {
       console.error(error);
     } finally {
@@ -209,14 +211,14 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <OAuthButtons />
+              <OAuthButtons callbackUrl={callbackUrl} />
             </motion.form>
 
             <div className="mt-8 text-center pt-4 border-t border-[#F1F5F9]">
               <p className="text-sm text-muted-foreground font-medium">
                 ¿No tienes una cuenta?{' '}
                 <Link
-                  href="/auth/register"
+                  href={`/auth/register${callbackUrl !== '/dashboard' ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}`}
                   className="text-primary font-bold hover:underline transition-all"
                 >
                   Crea una aquí

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const protectedRoutes = ['/dashboard'];
+  const protectedRoutes = ['/dashboard', '/checkout'];
 
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
     const sessionCookie = request.cookies.get(
@@ -11,7 +11,12 @@ export async function middleware(request: NextRequest) {
     )?.value;
 
     if (!sessionCookie) {
-      return NextResponse.redirect(new URL('/', request.url));
+      const loginUrl = new URL('/auth/login', request.url);
+      loginUrl.searchParams.set(
+        'callbackUrl',
+        request.nextUrl.pathname + request.nextUrl.search,
+      );
+      return NextResponse.redirect(loginUrl);
     }
   }
 
@@ -19,5 +24,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard', '/dashboard/:path*', '/checkout', '/checkout/:path*'],
 };

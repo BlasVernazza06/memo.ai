@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -31,15 +31,13 @@ import { authClient } from '@/lib/auth-client';
 import OAuthButtons from '../../../components/auth/oauth-buttons';
 
 export default function RegisterPage() {
-  const { data: session, isPending: isLoading } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  if (session) {
-    redirect('/');
-  }
-
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+
   const {
     register,
     handleSubmit,
@@ -47,6 +45,11 @@ export default function RegisterPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
+
+  if (session) {
+    router.replace(callbackUrl);
+    return null;
+  }
 
   const onSubmit = async (formData: RegisterFormValues) => {
     setIsLoadingForm(true);
@@ -57,6 +60,7 @@ export default function RegisterPage() {
         password: formData.password,
         name: formData.name,
       });
+      router.push(callbackUrl);
     } catch (error) {
       console.error(error);
     } finally {
@@ -349,14 +353,14 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <OAuthButtons />
+              <OAuthButtons callbackUrl={callbackUrl} />
             </motion.form>
 
             <div className="mt-8 text-center pt-4 border-t border-[#F1F5F9]">
               <p className="text-sm text-muted-foreground font-medium">
                 ¿Ya tienes una cuenta?{' '}
                 <Link
-                  href="/auth/login"
+                  href={`/auth/login${callbackUrl !== '/dashboard' ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}`}
                   className="text-primary font-bold hover:underline transition-all"
                 >
                   Inicia sesión

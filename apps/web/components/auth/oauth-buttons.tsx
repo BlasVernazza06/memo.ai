@@ -10,15 +10,20 @@ import { Button } from '@repo/ui/components/ui/button';
 
 interface OAuthButtonsProps {
   disabled?: boolean;
+  callbackUrl?: string;
 }
 
-export default function OAuthButtons({ disabled }: OAuthButtonsProps) {
+export default function OAuthButtons({
+  disabled,
+  callbackUrl,
+}: OAuthButtonsProps) {
   const [isLoading, setIsLoading] = useState<'google' | 'github' | null>(null);
 
   const handleSignIn = async (provider: 'google' | 'github') => {
     setIsLoading(provider);
     const webUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-    await signIn.social({ provider, callbackURL: `${webUrl}` });
+    const redirectTo = callbackUrl ? `${webUrl}${callbackUrl}` : webUrl;
+    await signIn.social({ provider, callbackURL: redirectTo });
     setIsLoading(null);
   };
 
