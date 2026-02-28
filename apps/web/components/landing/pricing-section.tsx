@@ -2,45 +2,64 @@
 
 import Link from 'next/link';
 
+import { useEffect, useState } from 'react';
+
 import { Check, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
+interface Plan {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  stripePriceId: string;
+  features: string[];
+  popular: boolean;
+  icon: any;
+  cta: string;
+}
+
 export default function PricingSection() {
-  const plans = [
-    {
-      name: 'Estudiante',
-      description: 'Ideal para empezar tus estudios',
-      price: '0',
-      features: [
-        'Hasta 5 PDFs por mes',
-        'Generación básica de flashcards',
-        'Roadmaps de estudio estándar',
-        'Acceso desde cualquier dispositivo',
-        'Soporte comunitario',
-      ],
-      popular: false,
-      cta: 'Comenzar gratis',
-      icon: Zap,
-    },
-    {
-      name: 'Pro Master',
-      description: 'Para estudiantes de alto rendimiento',
-      price: '9.99',
-      features: [
-        'PDFs ilimitados cada mes',
-        'Flashcards avanzadas con IA',
-        'Quizzes personalizados infinitos',
-        'Exportación a PDF/Notion/Anki',
-        'Soporte prioritario 24/7',
-        'Modo Offline total',
-      ],
-      popular: true,
-      cta: 'Obtener Pro ahora',
-      icon: Sparkles,
-    },
-  ];
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await fetch('api/payments/plans');
+        if (!response.ok) throw new Error('Failed to fetch plans');
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          const mappedPlans = data.map((p: any) => ({
+            ...p,
+            price: (p.price / 100).toString(),
+            icon: p.id === 'pro' ? Sparkles : Zap,
+            cta: p.id === 'pro' ? 'Obtener Pro ahora' : 'Comenzar gratis',
+            stripePriceId: p.stripePriceId,
+          }));
+          setPlans(mappedPlans);
+        }
+      } catch (error) {
+        console.error('Error fetching plans:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="py-24 text-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
+      </div>
+    );
+  }
 
   return (
     <section
@@ -151,7 +170,13 @@ export default function PricingSection() {
                     : 'bg-muted hover:bg-muted/80 text-foreground shadow-none'
                 }`}
               >
-                <Link href={`/checkout?plan=${plan.name.toLowerCase()}`}>
+                <Link
+                  href={
+                    plan.popular
+                      ? `/checkout?plan=${plan.stripePriceId}`
+                      : '/dashboard'
+                  }
+                >
                   {plan.cta}
                 </Link>
               </Button>

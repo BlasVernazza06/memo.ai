@@ -4,9 +4,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 
-import { authSchema } from '@repo/db';
+import {
+  activitySchema,
+  authSchema,
+  chatSchema,
+  planSchema,
+  workspaceSchema,
+} from '@repo/db';
 
-import { DATABASE_CONNECTION } from '@/database/database-connection';
+import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
 @Global()
 @Module({
@@ -19,6 +25,10 @@ import { DATABASE_CONNECTION } from '@/database/database-connection';
         return drizzle(pg, {
           schema: {
             ...authSchema,
+            ...workspaceSchema,
+            ...activitySchema,
+            ...chatSchema,
+            ...planSchema,
           },
         });
       },

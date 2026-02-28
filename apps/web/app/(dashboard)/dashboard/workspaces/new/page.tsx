@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Bot, ChevronLeft, User } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
@@ -15,17 +15,48 @@ import { LocalFile } from '@/hooks/use-file-upload';
 import { ChatMessage } from '@/types/workspace-chat-types';
 
 export default function NewWorkspaceChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      role: 'ai',
-      content:
-        '¡Hola! Soy Memo. Estoy listo para ayudarte a crear un nuevo workspace de estudio inteligente. 🧠\n\n¿De qué trata este nuevo proyecto? Cuéntame un poco o sube directamente el material (PDFs, vídeos o imágenes) que quieras que analicemos juntos.',
-    },
-  ]);
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // 1. Inicializar la sesión de chat al cargar la página
+  useEffect(() => {
+    const initChat = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/chats`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'creation' }),
+            credentials: 'include',
+          },
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setChatId(data.id);
+
+          // Mensaje inicial de bienvenida (No viene de la DB usualmente, o podemos guardarlo)
+          setMessages([
+            {
+              id: '1',
+              role: 'ai',
+              content:
+                '¡Hola! Soy Memo. Estoy listo para ayudarte a crear un nuevo workspace de estudio inteligente. 🧠\n\n¿De qué trata este nuevo proyecto? Cuéntame un poco o sube directamente el material (PDFs, vídeos o imágenes) que quieras que analicemos juntos.',
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error initializing chat:', error);
+      }
+    };
+
+    initChat();
+  }, []);
+
   const handleSend = async (content: string, files: LocalFile[]) => {
+    if (!chatId) return;
+
     console.log('SEND BUTTON CLICKED', { content, filesCount: files.length });
 
     const userMessage: ChatMessage = {
@@ -38,24 +69,23 @@ export default function NewWorkspaceChatPage() {
 
     try {
       const formData = new FormData();
-      formData.append('userContext', content);
+      formData.append('content', content);
 
-      // Si hay un archivo, lo enviamos (tomamos el primero para la demo)
       if (files[0]) {
         formData.append('file', files[0].file);
       }
 
-      const response = await fetch('http://localhost:3000/ai/process', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include', // <--- Envía las cookies de sesión
-      });
-
-      console.log('BACKEND RESPONSE STATUS:', response.status);
+      const response = await fetch(
+        `http://localhost:3000/chats/${chatId}/messages`,
+        {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('errorData', errorData);
         throw new Error(`Error ${response.status}: ${errorData}`);
       }
 
@@ -64,7 +94,7 @@ export default function NewWorkspaceChatPage() {
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: `¡Procesado con éxito! 🧠\n\n**Resumen:** ${aiData.summary}\n\nHe generado ${aiData.flashcards.length} flashcards y ${aiData.quizzes.length} preguntas de quiz para ti.`,
+        content: aiData.content,
       };
       setMessages((prev) => [...prev, aiResponse]);
     } catch (error) {

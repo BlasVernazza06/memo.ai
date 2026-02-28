@@ -3,9 +3,16 @@ import { NestFactory } from '@nestjs/core';
 import 'dotenv/config';
 
 import { AppModule } from '@/app.module';
+import { HttpExceptionFilter } from '@/common/filters/http-exception.filter';
+import { LoggingInterceptor } from '@/common/interceptors/logging.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  console.log('--- Starting API Bootstrap ---');
+  const app = await NestFactory.create(AppModule, { rawBody: true });
+
+  app.setGlobalPrefix('api');
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Habilitar CORS para que el Frontend pueda comunicarse con el Backend
   app.enableCors({

@@ -1,4 +1,8 @@
-import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
+import {
+  type InferInsertModel,
+  type InferSelectModel,
+  relations,
+} from 'drizzle-orm';
 import {
   boolean,
   integer,
@@ -20,6 +24,11 @@ export const user = pgTable('user', {
   image: text('image'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
+  plan: text('plan', { enum: ['free', 'pro'] })
+    .default('free')
+    .notNull(),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
 });
 
 export type DbUser = InferSelectModel<typeof user>;
@@ -65,12 +74,44 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updated_at'),
 });
 
-export const authSchema = {
-  user,
-  session,
-  account,
-  verification,
-};
+// RELATIONS - AUTH
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  workspaces: many(workspace),
+  activities: many(userActivity),
+  notifications: many(notification),
+  chats: many(chat),
+  quizAttempts: many(quizAttempt),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, { fields: [session.userId], references: [user.id] }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, { fields: [account.userId], references: [user.id] }),
+}));
+
+// ============================================================
+// PLANS TABLES
+// ============================================================
+
+export const plan = pgTable('plan', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  price: integer('price').notNull(),
+  stripePriceId: text('stripe_price_id'),
+  description: text('description'), // Para mostrar información detallada
+  popular: boolean('popular').default(false), // Marca el plan recomendado
+  features: jsonb('features').notNull(),
+  limits: jsonb('limits').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type DbPlan = InferSelectModel<typeof plan>;
+export type NewPlan = InferInsertModel<typeof plan>;
 
 // ============================================================
 // WORKSPACE TABLES
@@ -143,6 +184,9 @@ export const flashcardDeck = pgTable('flashcard_deck', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export type DbFlashcardDeck = InferSelectModel<typeof flashcardDeck>;
+export type NewFlashcardDeck = InferInsertModel<typeof flashcardDeck>;
+
 /**
  * flashcard - Cartas individuales dentro de un mazo.
  */
@@ -210,6 +254,59 @@ export const quizAttempt = pgTable('quiz_attempt', {
   completedAt: timestamp('completed_at').defaultNow().notNull(),
 });
 
+// RELATIONS - WORKSPACE
+export const workspaceRelations = relations(workspace, ({ one, many }) => ({
+  user: one(user, { fields: [workspace.userId], references: [user.id] }),
+  documents: many(document),
+  flashcardDecks: many(flashcardDeck),
+  quizzes: many(quiz),
+  chats: many(chat),
+  activities: many(userActivity),
+}));
+
+export const documentRelations = relations(document, ({ one }) => ({
+  workspace: one(workspace, {
+    fields: [document.workspaceId],
+    references: [workspace.id],
+  }),
+}));
+
+export const flashcardDeckRelations = relations(
+  flashcardDeck,
+  ({ one, many }) => ({
+    workspace: one(workspace, {
+      fields: [flashcardDeck.workspaceId],
+      references: [workspace.id],
+    }),
+    flashcards: many(flashcard),
+  }),
+);
+
+export const flashcardRelations = relations(flashcard, ({ one }) => ({
+  deck: one(flashcardDeck, {
+    fields: [flashcard.deckId],
+    references: [flashcardDeck.id],
+  }),
+}));
+
+export const quizRelations = relations(quiz, ({ one, many }) => ({
+  workspace: one(workspace, {
+    fields: [quiz.workspaceId],
+    references: [workspace.id],
+  }),
+  questions: many(quizQuestion),
+  attempts: many(quizAttempt),
+}));
+
+export const quizQuestionRelations = relations(quizQuestion, ({ one }) => ({
+  quiz: one(quiz, { fields: [quizQuestion.quizId], references: [quiz.id] }),
+}));
+
+export const quizAttemptRelations = relations(quizAttempt, ({ one }) => ({
+  quiz: one(quiz, { fields: [quizAttempt.quizId], references: [quiz.id] }),
+  user: one(user, { fields: [quizAttempt.userId], references: [user.id] }),
+}));
+
 // ============================================================
 // ACTIVITY & NOTIFICATIONS TABLES
 // ============================================================
@@ -243,6 +340,7 @@ export type NewUserActivity = InferInsertModel<typeof userActivity>;
 
 /**
  * notification - Notificaciones del usuario.
+
  * Generadas automáticamente por eventos de actividad o por el sistema.
  *
  * Tipos:
@@ -269,6 +367,73 @@ export const notification = pgTable('notification', {
 export type DbNotification = InferSelectModel<typeof notification>;
 export type NewNotification = InferInsertModel<typeof notification>;
 
+// RELATIONS - ACTIVITY
+export const userActivityRelations = relations(userActivity, ({ one }) => ({
+  user: one(user, { fields: [userActivity.userId], references: [user.id] }),
+  workspace: one(workspace, {
+    fields: [userActivity.workspaceId],
+    references: [workspace.id],
+  }),
+}));
+
+export const notificationRelations = relations(notification, ({ one }) => ({
+  user: one(user, { fields: [notification.userId], references: [user.id] }),
+}));
+
+// ============================================================
+// CHAT TABLES
+// ============================================================
+
+/**
+ * chat - Sesiones de chat entre el usuario y la IA.
+ * Puede ser para la creación de un workspace o para consultas dentro de uno.
+ */
+export const chat = pgTable('chat', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id),
+  workspaceId: text('workspace_id').references(() => workspace.id),
+  title: text('title'),
+  type: text('type').default('creation').notNull(), // "creation" | "study"
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type DbChat = InferSelectModel<typeof chat>;
+export type NewChat = InferInsertModel<typeof chat>;
+
+/**
+ * message - Mensajes individuales dentro de un chat.
+ */
+export const message = pgTable('message', {
+  id: text('id').primaryKey(),
+  chatId: text('chat_id')
+    .notNull()
+    .references(() => chat.id),
+  role: text('role').notNull(), // "user" | "assistant"
+  content: text('content').notNull(),
+  attachments: jsonb('attachments'), // [{ name, url, type }]
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type DbMessage = InferSelectModel<typeof message>;
+export type NewMessage = InferInsertModel<typeof message>;
+
+// RELATIONS - CHAT
+export const chatRelations = relations(chat, ({ one, many }) => ({
+  user: one(user, { fields: [chat.userId], references: [user.id] }),
+  workspace: one(workspace, {
+    fields: [chat.workspaceId],
+    references: [workspace.id],
+  }),
+  messages: many(message),
+}));
+
+export const messageRelations = relations(message, ({ one }) => ({
+  chat: one(chat, { fields: [message.chatId], references: [chat.id] }),
+}));
+
 // ============================================================
 // EXPORTS
 // ============================================================
@@ -281,9 +446,39 @@ export const workspaceSchema = {
   quiz,
   quizQuestion,
   quizAttempt,
+  workspaceRelations,
+  documentRelations,
+  flashcardDeckRelations,
+  flashcardRelations,
+  quizRelations,
+  quizQuestionRelations,
+  quizAttemptRelations,
 };
 
 export const activitySchema = {
   userActivity,
   notification,
+  userActivityRelations,
+  notificationRelations,
+};
+
+export const chatSchema = {
+  chat,
+  message,
+  chatRelations,
+  messageRelations,
+};
+
+export const authSchema = {
+  user,
+  session,
+  account,
+  verification,
+  userRelations,
+  sessionRelations,
+  accountRelations,
+};
+
+export const planSchema = {
+  plan,
 };

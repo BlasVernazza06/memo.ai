@@ -2,10 +2,10 @@ import { redirect } from 'next/navigation';
 
 import { LoginFormValues, RegisterFormValues } from '@repo/validators';
 
-import { BACKEND_URL } from '@/lib/constants/constants';
+import { API_URL } from '@/lib/constants/constants';
 
 export async function signUp(formData: RegisterFormValues) {
-  const response = await fetch(`${BACKEND_URL}/auth/sign-up`, {
+  const response = await fetch(`${API_URL}/auth/sign-up`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export async function signUp(formData: RegisterFormValues) {
 }
 
 export async function signIn(formData: LoginFormValues) {
-  const response = await fetch(`${BACKEND_URL}/auth/sign-in`, {
+  const response = await fetch(`${API_URL}/auth/sign-in`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
