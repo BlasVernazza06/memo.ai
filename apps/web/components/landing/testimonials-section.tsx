@@ -6,7 +6,7 @@ const testimonials = [
     role: 'Estudiante de Medicina',
     university: 'Universidad Complutense',
     content:
-      'StudyFlow me ayudó a organizar todo el temario de anatomía. Las flashcards generadas automáticamente son increíbles.',
+      'Memo.ai me ayudó a organizar todo el temario de anatomía. Las flashcards generadas automáticamente son increíbles.',
     rating: 5,
   },
   {
