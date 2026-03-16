@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { Edit3, Share2, Sparkles } from 'lucide-react';
+import { Edit3, Sparkles } from 'lucide-react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
@@ -25,7 +25,7 @@ export default async function ProfilePage() {
       {/* Top Profile Section */}
       <div className="flex flex-col lg:flex-row gap-8 items-stretch">
         {/* User Card */}
-        <div className="lg:w-1/3 bg-white border border-slate-200/60 rounded-4xl p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden">
+        <div className="lg:w-1/3 bg-card border border-border rounded-4xl p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-br from-primary/10 to-blue-500/5" />
 
           <div className="relative mt-4">
@@ -39,7 +39,7 @@ export default async function ProfilePage() {
                   className="w-full h-full rounded-[1.25rem] object-cover"
                 />
               ) : (
-                <div className="w-full h-full rounded-[1.25rem] bg-white flex items-center justify-center">
+                <div className="w-full h-full rounded-[1.25rem] bg-background flex items-center justify-center">
                   <span className="text-5xl font-black text-primary italic">
                     {getInitials(user.name)}
                   </span>
@@ -52,10 +52,10 @@ export default async function ProfilePage() {
           </div>
 
           <div className="mt-6 space-y-2">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl font-black text-foreground tracking-tight">
               {user.name}
             </h1>
-            <p className="text-xs text-slate-400 font-medium">{user.email}</p>
+            <p className="text-xs text-muted-foreground font-medium">{user.email}</p>
             <p className="text-sm font-bold text-primary/80 uppercase tracking-widest px-4 py-1.5 bg-primary/5 rounded-full inline-block mt-2">
               Pro Member
             </p>

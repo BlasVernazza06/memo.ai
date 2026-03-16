@@ -53,10 +53,10 @@ export default function HelpPage() {
             <LifeBuoy className="w-4 h-4" />
             Centro de Ayuda
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
             ¿Cómo podemos <span className="text-primary italic">ayudarte?</span>
           </h1>
-          <p className="text-slate-500 font-medium text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground font-medium text-lg max-w-2xl mx-auto">
             Busca en nuestra base de conocimientos o explora las categorías para
             resolver tus dudas rápidamente.
           </p>
@@ -87,7 +87,7 @@ export default function HelpPage() {
       {/* FAQs & Contact */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 pt-10">
         <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+          <h2 className="text-2xl font-black text-foreground flex items-center gap-3">
             <MessageCircle className="w-6 h-6 text-primary" />
             Preguntas Frecuentes
           </h2>
@@ -95,10 +95,10 @@ export default function HelpPage() {
             {FAQS.map((faq, i) => (
               <div
                 key={i}
-                className="bg-white border border-slate-100 rounded-3xl p-6 hover:border-primary/20 transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-primary/40 transition-colors shadow-sm"
               >
-                <h4 className="font-bold text-slate-900 mb-2">{faq.q}</h4>
-                <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                <h4 className="font-bold text-foreground mb-2">{faq.q}</h4>
+                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
                   {faq.a}
                 </p>
               </div>
@@ -107,23 +107,23 @@ export default function HelpPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-slate-900 rounded-4xl p-8 text-white relative overflow-hidden shadow-2xl">
+          <div className="bg-foreground rounded-4xl p-8 text-background relative overflow-hidden shadow-2xl">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[60px]" />
             <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
               ¿Aún tienes dudas?
             </h3>
-            <p className="text-slate-400 text-sm font-medium mb-8 leading-relaxed">
+            <p className="text-background/70 text-sm font-medium mb-8 leading-relaxed">
               Nuestro equipo de soporte está disponible 24/7 para ayudarte con
               lo que necesites.
             </p>
-            <div className="space-y-3">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl h-12 flex gap-2">
+            <div className="space-y-3 relative z-10">
+              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl h-12 flex gap-2">
                 <Mail className="w-4 h-4" />
                 Contactar Soporte
               </Button>
               <Button
                 variant="ghost"
-                className="w-full text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl h-12 flex gap-2"
+                className="w-full text-background/60 hover:text-background hover:bg-background/10 rounded-2xl h-12 flex gap-2"
               >
                 <ExternalLink className="w-4 h-4" />
                 Comunidad Discord
@@ -131,14 +131,14 @@ export default function HelpPage() {
             </div>
           </div>
 
-          <div className="bg-primary/5 border border-primary/10 rounded-4xl p-8 space-y-4">
+          <div className="bg-card border border-border rounded-4xl p-8 space-y-4 shadow-sm">
             <div className="w-10 h-10 bg-primary/20 text-primary rounded-xl flex items-center justify-center">
               <Sparkles className="w-5 h-5" />
             </div>
-            <h4 className="font-bold text-slate-900">Estado del Sistema</h4>
+            <h4 className="font-bold text-foreground">Estado del Sistema</h4>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-tight">
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">
                 Todos los sistemas operativos
               </span>
             </div>

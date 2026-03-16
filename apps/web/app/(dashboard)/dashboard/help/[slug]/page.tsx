@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 
 import { use } from 'react';
 
-import { ArrowRight, ChevronLeft, Lightbulb } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { motion } from 'motion/react';
 
 // Components
@@ -35,7 +35,7 @@ export default function HelpCategoryDetailPage({
       {/* Nav Back */}
       <Link
         href="/dashboard/help"
-        className="inline-flex items-center gap-2 text-slate-500 hover:text-primary font-bold text-xs uppercase tracking-widest transition-colors mb-4 group"
+        className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary font-bold text-xs uppercase tracking-widest transition-colors mb-4 group"
       >
         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         Volver al Centro de Ayuda
@@ -55,7 +55,7 @@ export default function HelpCategoryDetailPage({
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight"
+            className="text-4xl md:text-5xl font-black text-foreground tracking-tight"
           >
             {category.content.title}
           </motion.h1>
@@ -63,7 +63,7 @@ export default function HelpCategoryDetailPage({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-slate-500 text-lg font-medium leading-relaxed max-w-2xl"
+            className="text-muted-foreground text-lg font-medium leading-relaxed max-w-2xl"
           >
             {category.content.text}
           </motion.p>
@@ -80,15 +80,15 @@ export default function HelpCategoryDetailPage({
         {category.content.sections.map((section, idx) => (
           <div
             key={idx}
-            className="bg-white border border-slate-100 rounded-4xl p-8 hover:border-primary/20 transition-all shadow-sm"
+            className="bg-card border border-border rounded-4xl p-8 hover:border-primary/40 transition-all shadow-sm"
           >
-            <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-[12px] font-black text-slate-400">
+            <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-3">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-[12px] font-black text-muted-foreground">
                 {idx + 1}
               </span>
               {section.subtitle}
             </h3>
-            <p className="text-slate-600 font-medium leading-relaxed">
+            <p className="text-muted-foreground font-medium leading-relaxed">
               {section.body}
             </p>
           </div>
@@ -96,15 +96,15 @@ export default function HelpCategoryDetailPage({
       </motion.div>
 
       {/* CTA Footer */}
-      <div className="pt-10 text-center border-t border-slate-100">
-        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-6">
+      <div className="pt-10 text-center border-t border-border">
+        <p className="text-muted-foreground font-bold text-xs uppercase tracking-widest mb-6">
           ¿Te sirvió esta información?
         </p>
         <div className="flex items-center justify-center gap-4">
           <Link href="/dashboard/help">
             <Button
               variant="ghost"
-              className="rounded-2xl h-12 px-8 font-bold text-slate-500 hover:text-emerald-600 hover:bg-emerald-50"
+              className="rounded-2xl h-12 px-8 font-bold text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:text-emerald-400 dark:hover:bg-emerald-950"
             >
               Sí, fue útil
             </Button>
@@ -112,7 +112,7 @@ export default function HelpCategoryDetailPage({
           <Link href="/dashboard/help">
             <Button
               variant="ghost"
-              className="rounded-2xl h-12 px-8 font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50"
+              className="rounded-2xl h-12 px-8 font-bold text-muted-foreground hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-950"
             >
               No, necesito ayuda
             </Button>

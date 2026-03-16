@@ -47,13 +47,13 @@ export function ProfileAchievements() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-slate-200/60 rounded-4xl p-8 shadow-sm space-y-8"
+      className="bg-card border border-border rounded-4xl p-8 shadow-sm space-y-8"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-black text-slate-900 flex items-center gap-3">
+        <h3 className="text-xl font-black text-foreground flex items-center gap-3">
           <Trophy className="w-6 h-6 text-yellow-500" />
           Logros
-          <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
             {unlockedCount}/{BADGES.length}
           </span>
         </h3>
@@ -77,19 +77,19 @@ export function ProfileAchievements() {
             <div
               className={`w-16 h-16 rounded-2xl bg-linear-to-br ${badge.color} p-0.5 shadow-lg group-hover:scale-110 transition-transform relative`}
             >
-              <div className="w-full h-full rounded-[0.9rem] bg-white flex items-center justify-center">
-                <badge.icon className="w-8 h-8 text-slate-800" />
+              <div className="w-full h-full rounded-[0.9rem] bg-background flex items-center justify-center">
+                <badge.icon className="w-8 h-8 text-foreground" />
               </div>
               {!badge.unlocked && (
-                <div className="absolute inset-0 rounded-2xl bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                  <Lock className="w-5 h-5 text-slate-400" />
+                <div className="absolute inset-0 rounded-2xl bg-background/60 backdrop-blur-[1px] flex items-center justify-center">
+                  <Lock className="w-5 h-5 text-muted-foreground" />
                 </div>
               )}
             </div>
             <div className="space-y-0.5">
-              <p className="font-bold text-slate-900 text-xs">{badge.name}</p>
+              <p className="font-bold text-foreground text-xs">{badge.name}</p>
               {!badge.unlocked && (
-                <p className="text-[10px] text-slate-400 font-medium">
+                <p className="text-[10px] text-muted-foreground font-medium">
                   Bloqueado
                 </p>
               )}
@@ -99,13 +99,13 @@ export function ProfileAchievements() {
       </div>
 
       {/* Progress hint */}
-      <div className="bg-slate-50 rounded-2xl p-4 flex items-center gap-3">
+      <div className="bg-muted rounded-2xl p-4 flex items-center gap-3">
         <div className="w-8 h-8 bg-yellow-100 rounded-xl flex items-center justify-center shrink-0">
           <Sparkles className="w-4 h-4 text-yellow-600" />
         </div>
-        <p className="text-xs text-slate-500 font-medium">
-          Completa <span className="font-bold text-slate-700">5 quizzes</span>{' '}
-          para desbloquear "Curioso Pro"
+        <p className="text-xs text-muted-foreground font-medium">
+          Completa <span className="font-bold text-foreground">5 quizzes</span>{' '}
+          para desbloquear &quot;Curioso Pro&quot;
         </p>
       </div>
     </motion.div>
