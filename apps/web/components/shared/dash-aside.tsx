@@ -10,8 +10,8 @@ import {
   Loader2,
   LogOut,
   Settings,
+  Sparkles,
 } from 'lucide-react';
-import { motion } from 'motion/react';
 
 import { getInitials } from '@/hooks/use-Initials';
 import { authClient } from '@/lib/auth-client';
@@ -19,6 +19,7 @@ import { useAuth } from '@/lib/auth-provider';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+  { icon: Sparkles, label: 'IA Tools', href: '/dashboard/tools' }, // Added placeholder for visual density
   { icon: Settings, label: 'Ajustes', href: '/dashboard/settings' },
 ];
 
@@ -27,16 +28,24 @@ export default function DashAside() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const blockedPathnames = ['/dashboard/workspaces', 'dashboard/help'];
+
+  for (const blockedPath of blockedPathnames) {
+    if (pathname.includes(blockedPath)) {
+      return null;
+    }
+  }
+
   const handleSignOut = async () => {
     await authClient.signOut();
     router.push('/');
   };
 
-  const renderMobileAvatar = () => {
+  const renderAvatar = () => {
     if (isLoading) {
       return (
-        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
         </div>
       );
     }
@@ -48,13 +57,13 @@ export default function DashAside() {
           alt={user?.name ?? 'Usuario'}
           width={40}
           height={40}
-          className="w-10 h-10 rounded-full object-cover"
+          className="w-10 h-10 rounded-xl object-cover ring-2 ring-white shadow-sm"
         />
       );
     }
 
     return (
-      <div className="w-10 h-10 bg-linear-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+      <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-black text-xs border border-primary/20">
         {getInitials(user?.name ?? 'JD')}
       </div>
     );
@@ -62,72 +71,111 @@ export default function DashAside() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <motion.aside
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-        className="fixed left-6 top-1/2 -translate-y-1/2 z-30 hidden lg:block"
-      >
-        <nav className="bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-4xl p-4 flex flex-col items-center gap-6 py-8 w-20">
-          <Link href="/" className="mb-4">
-            <div className="w-12 h-12 bg-primary flex items-center justify-center rounded-2xl shadow-lg shadow-primary/20">
-              <span className="text-white text-xl font-black italic">m.</span>
+      {/* Desktop Professional Sidebar */}
+      <aside className="hidden lg:flex flex-col w-[260px] h-[calc(100vh-2rem)] my-4 ml-4 rounded-[2.5rem] bg-card/80 backdrop-blur-2xl border border-border/80 sticky top-4 z-40 shrink-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
+        {/* Brand Header */}
+        <div className="p-8 pb-4">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="bg-white p-1.5 rounded-xl shadow-xs border border-transparent dark:border-white/10 flex items-center justify-center">
+              <Image
+                src={'/logo.webp'}
+                width={22}
+                height={22}
+                alt="Logo Memo.ai"
+                className="rounded-md"
+              />
             </div>
+            <span className="text-xl font-black text-foreground tracking-tight">
+              memo.ai
+            </span>
           </Link>
+        </div>
 
-          <div className="flex flex-col gap-4 flex-1">
-            {navItems.map((item, idx) => (
-              <Link key={idx} href={item.href}>
-                <div
-                  className={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${pathname === item.href ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  {/* Tooltip */}
-                  <div className="absolute left-16 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    {item.label}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-4 pt-6 border-t border-slate-100">
-            <Link
-              href="/dashboard/help"
-              className="group relative flex items-center justify-center w-12 h-12 rounded-2xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
-            >
-              <HelpCircle className="w-5 h-5" />
-              <div className="absolute left-16 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                Ayuda
+        {/* Main Nav Items */}
+        <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto">
+          <p className="px-3 pb-3 text-[10px] font-black text-muted-foreground/70 uppercase tracking-[0.2em]">
+            Principal
+          </p>
+          {navItems.map((item, idx) => (
+            <Link key={idx} href={item.href} className="block group">
+              <div
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 font-bold ${
+                  pathname === item.href
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <item.icon
+                  className={`w-4 h-4 ${pathname === item.href ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground/70'}`}
+                />
+                <span className="text-sm">{item.label}</span>
               </div>
             </Link>
-            <button
-              onClick={handleSignOut}
-              className="group relative flex items-center justify-center w-12 h-12 rounded-2xl text-red-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
-            >
-              <LogOut className="w-5 h-5" />
-              <div className="absolute left-16 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                Cerrar sesión
+          ))}
+
+          <div className="pt-6 mt-6 border-t border-border/50">
+            <p className="px-3 pb-3 text-[10px] font-black text-muted-foreground/70 uppercase tracking-[0.2em]">
+              Soporte
+            </p>
+            <Link href="/dashboard/help" className="block group">
+              <div
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 font-bold ${
+                  pathname === '/dashboard/help'
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <HelpCircle
+                  className={`w-4 h-4 ${pathname === '/dashboard/help' ? 'text-primary' : 'text-muted-foreground/70 group-hover:text-foreground/70'}`}
+                />
+                <span className="text-sm tracking-tight">Ayuda</span>
               </div>
-            </button>
+            </Link>
           </div>
         </nav>
-      </motion.aside>
 
-      {/* Mobile Nav */}
-      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-sm">
-        <nav className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-4xl p-3 flex justify-around items-center">
+        {/* User Profile Footer */}
+        <div className="p-6 pt-0 mt-auto">
+          <Link
+            href={'/dashboard/profile'}
+            className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-muted/40 border border-border/60 shadow-xs hover:bg-muted/80 transition-colors"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              {renderAvatar()}
+              <div className="min-w-0">
+                <p className="text-xs font-black text-foreground truncate">
+                  {user?.name ?? 'JD'}
+                </p>
+                <p className="text-[10px] font-bold text-muted-foreground truncate uppercase tracking-tight">
+                  Free Plan
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </Link>
+        </div>
+      </aside>
+
+      {/* Mobile Glass Bottom Nav */}
+      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm">
+        <nav className="bg-card/85 dark:bg-card/95 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-[2.5rem] p-3 flex justify-around items-center">
           {navItems.map((item, idx) => (
             <Link key={idx} href={item.href}>
               <div
-                className={`p-3 rounded-2xl transition-all ${pathname === item.href ? 'bg-primary text-white' : 'text-slate-400'}`}
+                className={`p-3.5 rounded-2xl transition-all ${pathname === item.href ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 <item.icon className="w-5 h-5" />
               </div>
             </Link>
           ))}
-          <Link href="/dashboard/profile">{renderMobileAvatar()}</Link>
+          <Link href="/dashboard/profile" className="p-1 px-3">
+            {renderAvatar()}
+          </Link>
         </nav>
       </div>
     </>
