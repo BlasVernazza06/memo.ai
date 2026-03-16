@@ -90,9 +90,9 @@ export default function FeaturesSection() {
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0, delay: index * 0.1 }}
               whileHover={{ y: -5 }}
-              className={`${feature.className} group relative bg-card border border-border/50 rounded-3xl p-6 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/20 hover:bg-white/2`}
+              className={`${feature.className} group relative bg-card border border-black/12 rounded-3xl p-6 overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-primary/20 hover:bg-white/2`}
             >
               {/* Decorative gradient corner */}
               <div className="absolute -top-10 -right-10 w-20 h-20 bg-linear-to-br from-primary/10 to-transparent blur-2xl group-hover:scale-150 transition-transform duration-700" />

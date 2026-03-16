@@ -8,11 +8,10 @@ import { useEffect, useState } from 'react';
 import { ChevronRight, Loader2, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
+import AuthDesktopButtons from '@/components/auth/auth-desktop-buttons';
+import AuthMobileButtons from '@/components/auth/auth-mobile-buttons';
+import UserModalLanding from '@/components/landing/user-modal-landing';
 import { useAuth } from '@/lib/auth-provider';
-
-import AuthDesktopButtons from '../auth/auth-desktop-buttons';
-import AuthMobileButtons from '../auth/auth-mobile-buttons';
-import UserModalLanding from './user-modal-landing';
 
 const navLinks = [
   {
@@ -179,7 +178,7 @@ export default function Header() {
                 transition-all duration-300 ease-in-out
                 ${
                   scrolled || isOpen
-                    ? 'bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.03)] border border-white/40 rounded-2xl px-6 h-14'
+                    ? 'bg-white/10 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.03)] border border-white/20 rounded-2xl px-6 h-14'
                     : 'bg-transparent border-transparent rounded-none px-4'
                 }
             `}

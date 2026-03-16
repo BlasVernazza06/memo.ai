@@ -1,11 +1,6 @@
 import { redirect } from 'next/navigation';
-
 import { ReactNode } from 'react';
-
-import { User } from 'better-auth';
-
 import DashAside from '@/components/shared/dash-aside';
-import UserMenu from '@/components/shared/user-menu';
 import { getSession } from '@/lib/auth-session';
 
 interface DashboardLayoutProps {
@@ -23,30 +18,21 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-primary/10 overflow-x-hidden">
-      {/* Background elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div
-          className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full blur-[120px] opacity-20"
-          style={{ background: 'hsla(199, 89%, 48%, 0.4)' }}
-        />
-        <div
-          className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full blur-[150px] opacity-20"
-          style={{ background: 'hsla(217, 91%, 60%, 0.4)' }}
-        />
-      </div>
-
-      {/* Global User Menu (Floating Top-Right) */}
-      <UserMenu user={user as User} />
-
-      {/* Sidebar & Mobile Nav */}
+    <div className="min-h-screen bg-background text-foreground flex overflow-hidden font-sans selection:bg-primary/20">
+      {/* Sidebar Area */}
       <DashAside />
 
       {/* Main Content Area */}
-      <main className="lg:pl-32 pt-10 min-h-screen relative">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pb-20">
-          {children}
+      <main className="flex-1 relative overflow-y-auto h-screen custom-scrollbar">
+        {/* Subtle top bar for User Context if needed, or just padding */}
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 py-10 lg:py-16">
+          <div className="relative z-10 w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {children}
+          </div>
         </div>
+        
+        {/* Subtle Decorative Element (just one, very controlled) */}
+        <div className="fixed top-0 right-0 w-1/3 h-1/2 bg-linear-to-bl from-primary/5 via-transparent to-transparent pointer-events-none -z-10" />
       </main>
     </div>
   );

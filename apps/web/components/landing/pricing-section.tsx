@@ -9,6 +9,8 @@ import { motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
+import { apiFetchClient } from '@/lib/api-client';
+
 interface Plan {
   id: string;
   name: string;
@@ -28,13 +30,10 @@ export default function PricingSection() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await fetch('api/payments/plans');
-        if (!response.ok) throw new Error('Failed to fetch plans');
+        const response = await apiFetchClient<Plan[]>('/plans');
 
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          const mappedPlans = data.map((p: any) => ({
+        if (Array.isArray(response)) {
+          const mappedPlans = response.map((p: any) => ({
             ...p,
             price: (p.price / 100).toString(),
             icon: p.id === 'pro' ? Sparkles : Zap,

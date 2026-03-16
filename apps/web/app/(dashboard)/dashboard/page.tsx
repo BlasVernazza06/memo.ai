@@ -1,18 +1,19 @@
+import { Suspense } from 'react';
+
 import DashHero from '@/components/dashboard/dash-hero';
-import DashWorkspacesSec from '@/components/dashboard/dash-workspaces-sec';
-import { Workspace } from '@/components/dashboard/workspace-card';
-import { apiFetch } from '@/lib/api-fetch';
+import WorkspacesList from '@/components/dashboard/workspaces-list';
+import WorkspacesSkeleton from '@/components/dashboard/workspaces-skeleton';
 
-export default async function DashboardPage() {
-  const workspaces = await apiFetch<Workspace[]>('/workspaces');
-
+export default function DashboardPage() {
   return (
     <div className="space-y-12 py-6">
-      {/* Dashboard Hero */}
+      {/* Dashboard Hero - Carga al instante */}
       <DashHero />
 
-      {/* Workspaces Section */}
-      <DashWorkspacesSec initialWorkspaces={workspaces} />
+      {/* Workspaces Section - Carga en segundo plano */}
+      <Suspense fallback={<WorkspacesSkeleton />}>
+        <WorkspacesList />
+      </Suspense>
     </div>
   );
 }

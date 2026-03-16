@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 
@@ -12,6 +12,7 @@ import { Button } from '@repo/ui/components/ui/button';
 import HeaderCheckout from '@/components/landing/checkout/header-checkout';
 import LeftPanelCheckout from '@/components/landing/checkout/left-panel-checkout';
 import RightPanelCheckout from '@/components/landing/checkout/right-panel-checkout';
+import { apiFetchClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-provider';
 
 interface PlanData {
@@ -27,7 +28,6 @@ interface PlanData {
 function CheckoutContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const planParam = searchParams.get('plan');
 
   const [plan, setPlan] = useState<PlanData | null>(null);
@@ -44,10 +44,9 @@ function CheckoutContent() {
 
     const fetchPlan = async () => {
       try {
-        const response = await fetch(`/api/payments/plan/${planParam}`);
-        if (!response.ok) throw new Error('Plan no encontrado');
-        const data = await response.json();
-        setPlan(data);
+        const response = await apiFetchClient<PlanData>(`/plans/${planParam}`);
+
+        setPlan(response);
       } catch (err) {
         console.error('Error fetching plan:', err);
         setError('No se pudo cargar la información del plan');
@@ -60,24 +59,36 @@ function CheckoutContent() {
   }, [planParam]);
 
   const handleCheckout = useCallback(async () => {
-    if (!user || !planParam) return;
+    if (!user || !plan) return;
 
     setCheckoutLoading(true);
+    setError(null);
+
     try {
-      const response = await fetch(`/api/payments/checkout/${planParam}`);
+      const data = await apiFetchClient<{ url: string }>(
+        '/checkout/create-session',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            planId: plan.stripePriceId,
+          }),
+        },
+      );
 
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+      if (data.url) {
+        window.location.href = data.url;
       }
-
-      const data = await response.json();
-      router.push(data.url);
     } catch (err) {
+      const errorMsg =
+        err instanceof Error ? err.message : 'Error al crear la sesión';
       console.error('Error creating checkout session:', err);
-      setError('Error al crear la sesión de pago. Inténtalo de nuevo.');
+      setError(
+        errorMsg || 'Error al crear la sesión de pago. Inténtalo de nuevo.',
+      );
+    } finally {
       setCheckoutLoading(false);
     }
-  }, [user, planParam, router]);
+  }, [user, plan]);
 
   // Loading state
   if (loading) {
@@ -101,7 +112,7 @@ function CheckoutContent() {
           <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
             <Zap className="w-8 h-8 text-destructive" />
           </div>
-          <h2 className="text-xl font-bold">{error || 'Plan no encontrado'}</h2>
+          <h2 className="text-xl font-bold">{'Plan no encontrado'}</h2>
           <p className="text-muted-foreground text-sm">
             Verifica el enlace o vuelve a la página de precios.
           </p>
@@ -128,12 +139,12 @@ function CheckoutContent() {
       />
 
       {/* Header */}
-      <HeaderCheckout />
 
       {/* Main content */}
       <div className="relative z-10 memo-container py-8 md:py-16">
         <div className="max-w-5xl mx-auto">
           {/* Title */}
+          <HeaderCheckout />
           <div className="text-center mb-10">
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
               Finaliza tu suscripción
