@@ -42,7 +42,7 @@ export default function InputChat({ onSend }: InputChatProps) {
         accept=".pdf,.doc,.docx,.odt"
       />
 
-      <div className="bg-white border border-slate-200/60 rounded-4xl shadow-2xl p-3 space-y-3 relative group">
+      <div className="bg-card border border-border rounded-4xl shadow-2xl p-3 space-y-3 relative group">
         {/* Previews de archivos seleccionados (locales, sin subir) */}
         <AnimatePresence>
           {files.length > 0 && (
@@ -77,14 +77,14 @@ export default function InputChat({ onSend }: InputChatProps) {
               }}
               rows={1}
               placeholder="Escribe el nombre del workspace o cuéntame qué quieres estudiar..."
-              className="w-full bg-transparent border-none focus:ring-0 outline-none focus:outline-none resize-none px-4 py-3 text-base font-semibold text-slate-900 placeholder:text-slate-300 overflow-y-auto max-h-[200px] scrollbar-hide ease-out duration-200"
+              className="w-full bg-transparent border-none focus:ring-0 outline-none focus:outline-none resize-none px-4 py-3 text-base font-semibold text-foreground placeholder:text-muted-foreground overflow-y-auto max-h-[200px] scrollbar-hide ease-out duration-200"
             />
             <div className="flex w-full justify-between items-center gap-2 px-1 pb-1">
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2.5 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-blue-500 transition-all active:scale-90 cursor-pointer"
+                  className="p-2.5 hover:bg-muted rounded-xl text-muted-foreground hover:text-primary transition-all active:scale-90 cursor-pointer"
                   title="Adjuntar Archivo"
                 >
                   <FileText className="w-5 h-5" />
@@ -106,7 +106,7 @@ export default function InputChat({ onSend }: InputChatProps) {
           </div>
         </div>
       </div>
-      <p className="text-center text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-4">
+      <p className="text-center text-[10px] font-bold text-muted-foreground/70 uppercase tracking-widest mt-4">
         Memo IA puede cometer errores. Verifica la información importante.
       </p>
     </div>

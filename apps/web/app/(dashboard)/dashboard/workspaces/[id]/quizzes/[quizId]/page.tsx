@@ -134,24 +134,24 @@ export default function QuizGamePage() {
         </motion.div>
 
         <div className="space-y-4">
-          <h1 className="text-4xl font-black text-slate-900">
+          <h1 className="text-4xl font-black text-foreground">
             {percentage >= 70 ? '¡Excelente Trabajo!' : 'Buen Intento'}
           </h1>
-          <p className="text-slate-500 font-medium text-lg max-w-md mx-auto">
+          <p className="text-muted-foreground font-medium text-lg max-w-md mx-auto">
             Has completado el quiz. Aquí tienes un resumen de tu desempeño.
           </p>
         </div>
 
-        <div className="bg-white border border-slate-100 p-8 rounded-[2rem] w-full shadow-sm">
+        <div className="bg-card border border-border p-8 rounded-4xl w-full shadow-sm">
           <div className="flex justify-center items-end gap-2 mb-2">
-            <span className="text-6xl font-black text-slate-900">
+            <span className="text-6xl font-black text-foreground">
               {percentage}%
             </span>
-            <span className="text-xl font-bold text-slate-400 mb-2">
+            <span className="text-xl font-bold text-muted-foreground mb-2">
               Aciertos
             </span>
           </div>
-          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden mb-6">
+          <div className="w-full bg-muted h-3 rounded-full overflow-hidden mb-6">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${percentage}%` }}
@@ -159,7 +159,7 @@ export default function QuizGamePage() {
               className={`h-full ${percentage >= 70 ? 'bg-emerald-500' : 'bg-orange-500'}`}
             />
           </div>
-          <div className="flex justify-between mt-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+          <div className="flex justify-between mt-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             <span>{correctAnswers} Correctas</span>
             <span>{incorrectAnswers} Incorrectas</span>
           </div>
@@ -169,7 +169,7 @@ export default function QuizGamePage() {
           <Button
             onClick={restartQuiz}
             variant="outline"
-            className="flex-1 h-14 rounded-2xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:text-slate-900 transition-colors"
+            className="flex-1 h-14 rounded-2xl border-border text-muted-foreground font-bold hover:bg-muted hover:text-foreground transition-colors"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Repetir Quiz
@@ -197,14 +197,14 @@ export default function QuizGamePage() {
       <div className="flex items-center justify-between">
         <Link
           href={`/dashboard/workspaces/${workspaceId}`}
-          className="group flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors font-bold text-sm"
+          className="group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-bold text-sm"
         >
-          <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-slate-100 flex items-center justify-center transition-colors">
+          <div className="w-8 h-8 rounded-full bg-muted group-hover:bg-muted/80 flex items-center justify-center transition-colors">
             <ChevronLeft className="w-4 h-4" />
           </div>
           <span>Salir</span>
         </Link>
-        <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+        <div className="flex items-center gap-2 text-muted-foreground font-bold text-xs uppercase tracking-wider bg-muted px-3 py-1 rounded-full border border-border">
           <Timer className="w-4 h-4" />
           <span>Tiempo: 05:23</span>
         </div>
@@ -212,11 +212,11 @@ export default function QuizGamePage() {
 
       {/* Progress Bar moved below header */}
       <div className="space-y-2">
-        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           <span>Pregunta {currentQuestionIndex + 1}</span>
           <span>{questions.length} Total</span>
         </div>
-        <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full">
+        <div className="h-2 bg-muted rounded-full overflow-hidden w-full">
           <motion.div
             initial={{ width: 0 }}
             animate={{
@@ -229,7 +229,7 @@ export default function QuizGamePage() {
 
       {/* Question Card */}
       <div className="space-y-8">
-        <h2 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
+        <h2 className="text-2xl md:text-3xl font-black text-foreground leading-tight">
           {currentQuestion.question}
         </h2>
 
@@ -240,17 +240,17 @@ export default function QuizGamePage() {
             const showResult = isAnswered;
 
             let cardClass =
-              'bg-white border-2 border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-600';
+              'bg-card border-2 border-border hover:border-primary/50 hover:bg-muted text-foreground';
             if (showResult) {
               if (isCorrect)
                 cardClass =
-                  'bg-emerald-50 border-emerald-200 text-emerald-800 ring-2 ring-emerald-100 shadow-lg shadow-emerald-500/10';
+                  'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 ring-2 ring-emerald-500/20 shadow-lg shadow-emerald-500/10';
               else if (isSelected && !isCorrect)
                 cardClass =
-                  'bg-red-50 border-red-200 text-red-800 opacity-80 ring-2 ring-red-100';
+                  'bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 opacity-80 ring-2 ring-red-500/20';
               else
                 cardClass =
-                  'bg-slate-50 border-slate-100 text-slate-400 opacity-50';
+                  'bg-muted border-border text-muted-foreground opacity-50';
             } else if (isSelected) {
               cardClass =
                 'bg-primary/5 border-primary text-primary ring-2 ring-primary/20';
@@ -299,7 +299,7 @@ export default function QuizGamePage() {
                   <div className="w-4 h-4 rounded-full bg-primary shrink-0" />
                 )}
                 {!showResult && !isSelected && (
-                  <div className="w-4 h-4 rounded-full border-2 border-slate-200 group-hover:border-slate-300 shrink-0" />
+                  <div className="w-4 h-4 rounded-full border-2 border-border group-hover:border-primary/50 shrink-0" />
                 )}
               </motion.button>
             );
@@ -315,13 +315,13 @@ export default function QuizGamePage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="bg-blue-50/50 border border-blue-100 p-6 rounded-3xl space-y-4"
+              className="bg-blue-500/10 border border-blue-500/20 p-6 rounded-3xl space-y-4"
             >
-              <div className="flex items-center gap-2 text-blue-600 font-black text-xs uppercase tracking-widest mb-1">
+              <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black text-xs uppercase tracking-widest mb-1">
                 <AlertCircle className="w-4 h-4" />
                 Explicación
               </div>
-              <p className="text-blue-900 font-medium leading-relaxed text-sm md:text-base">
+              <p className="text-blue-900 dark:text-blue-300 font-medium leading-relaxed text-sm md:text-base">
                 {currentQuestion.explanation}
               </p>
               <div className="flex justify-end pt-2">

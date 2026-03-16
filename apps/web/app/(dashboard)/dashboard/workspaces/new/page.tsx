@@ -1,42 +1,60 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useEffect, useRef, useState } from 'react';
 
 import { Bot, ChevronLeft, User } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { z } from 'zod';
 
 import { Button } from '@repo/ui/components/ui/button';
+import { CreateWorkspaceSchema } from '@repo/validators';
 
 import AttachmentCard from '@/components/workspace/new/attachment-card';
 import InputChat from '@/components/workspace/new/input-chat';
 import { LocalFile } from '@/hooks/use-file-upload';
+import { apiFetchClient } from '@/lib/api-client';
 import { ChatMessage } from '@/types/workspace-chat-types';
 
+export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceSchema>;
+
 export default function NewWorkspaceChatPage() {
-  const [chatId, setChatId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const queryChatId = searchParams.get('chatId');
+
+  const [chatId, setChatId] = useState<string | null>(queryChatId);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [pendingWorkspaceData, setPendingWorkspaceData] =
+    useState<CreateWorkspaceInput | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  // 1. Inicializar la sesión de chat al cargar la página
+  // 1. Inicializar la sesión de chat o cargar historia
   useEffect(() => {
-    const initChat = async () => {
+    const initOrLoadChat = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/chats`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 'creation' }),
-            credentials: 'include',
-          },
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setChatId(data.id);
+        // Si ya tenemos un chatId en la URL, cargamos el historial
+        if (queryChatId) {
+          const history = await apiFetchClient<ChatMessage[]>(
+            `/chats/${queryChatId}`,
+          );
+          if (history && history.length > 0) {
+            setMessages(history);
+            return;
+          }
+        }
 
-          // Mensaje inicial de bienvenida (No viene de la DB usualmente, o podemos guardarlo)
+        // Si no hay chatId o el historial está vacío, creamos uno nuevo o mostramos bienvenida
+        const newChat = await apiFetchClient<{ id: string }>(`/chats`, {
+          method: 'POST',
+          body: JSON.stringify({ type: 'creation' }),
+        });
+        if (newChat) {
+          setChatId(newChat.id);
+
           setMessages([
             {
               id: '1',
@@ -51,13 +69,11 @@ export default function NewWorkspaceChatPage() {
       }
     };
 
-    initChat();
-  }, []);
+    initOrLoadChat();
+  }, [queryChatId]);
 
   const handleSend = async (content: string, files: LocalFile[]) => {
     if (!chatId) return;
-
-    console.log('SEND BUTTON CLICKED', { content, filesCount: files.length });
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -67,6 +83,7 @@ export default function NewWorkspaceChatPage() {
     };
     setMessages((prev) => [...prev, userMessage]);
 
+    setIsAiLoading(true);
     try {
       const formData = new FormData();
       formData.append('content', content);
@@ -75,21 +92,10 @@ export default function NewWorkspaceChatPage() {
         formData.append('file', files[0].file);
       }
 
-      const response = await fetch(
-        `http://localhost:3000/chats/${chatId}/messages`,
-        {
-          method: 'POST',
-          body: formData,
-          credentials: 'include',
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Error ${response.status}: ${errorData}`);
-      }
-
-      const aiData = await response.json();
+      const aiData = await apiFetchClient<any>(`/chats/${chatId}/messages`, {
+        method: 'POST',
+        body: formData,
+      });
 
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -97,6 +103,11 @@ export default function NewWorkspaceChatPage() {
         content: aiData.content,
       };
       setMessages((prev) => [...prev, aiResponse]);
+
+      // Si la IA devolvió data de workspace, la guardamos para que el usuario pueda confirmar
+      if (aiData.data) {
+        setPendingWorkspaceData(aiData.data);
+      }
     } catch (error) {
       console.error('FRONTEND AI ERROR:', error);
       const errorMsg: ChatMessage = {
@@ -106,6 +117,23 @@ export default function NewWorkspaceChatPage() {
           'Lo siento, hubo un error al conectar con mis motores de IA. ¿Podrías intentarlo de nuevo?',
       };
       setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const handleCreateWorkspace = async () => {
+    if (!pendingWorkspaceData) return;
+
+    try {
+      const data = await apiFetchClient<{ id: string }>(`/workspaces`, {
+        method: 'POST',
+        body: JSON.stringify(pendingWorkspaceData),
+      });
+
+      router.push(`/dashboard/workspaces/${data.id}`);
+    } catch (error) {
+      console.error('ERROR CREATING WORKSPACE:', error);
     }
   };
 
@@ -116,14 +144,14 @@ export default function NewWorkspaceChatPage() {
         <Link href="/dashboard">
           <Button
             variant="ghost"
-            className="rounded-2xl gap-2 font-bold text-slate-400 hover:text-slate-900 transition-colors"
+            className="rounded-2xl gap-2 font-bold text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Volver
           </Button>
         </Link>
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-black text-slate-900">Nuevo Workspace</h1>
+          <h1 className="text-xl font-black text-foreground">Nuevo Workspace</h1>
         </div>
         <div className="w-20" /> {/* Spacer for balance */}
       </div>
@@ -148,7 +176,7 @@ export default function NewWorkspaceChatPage() {
                   className={`w-10 h-10 shrink-0 rounded-2xl flex items-center justify-center shadow-sm ${
                     message.role === 'ai'
                       ? 'bg-primary text-white'
-                      : 'bg-white border border-slate-200 text-slate-600'
+                      : 'bg-card border border-border text-foreground'
                   }`}
                 >
                   {message.role === 'ai' ? (
@@ -169,7 +197,7 @@ export default function NewWorkspaceChatPage() {
                     <div
                       className={`p-5 rounded-3xl text-sm font-medium leading-relaxed shadow-sm ${
                         message.role === 'ai'
-                          ? 'bg-white border border-slate-100 text-slate-700 rounded-tl-none'
+                          ? 'bg-muted border border-transparent text-foreground rounded-tl-none'
                           : 'bg-primary text-white rounded-tr-none'
                       }`}
                     >
@@ -184,11 +212,51 @@ export default function NewWorkspaceChatPage() {
               </div>
             </motion.div>
           ))}
+          {isAiLoading && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex justify-start"
+            >
+              <div className="flex gap-4">
+                <div className="w-10 h-10 shrink-0 rounded-2xl bg-primary text-white flex items-center justify-center shadow-sm">
+                  <Bot className="w-5 h-5 animate-pulse" />
+                </div>
+                <div className="bg-muted border border-transparent p-4 rounded-3xl rounded-tl-none shadow-sm flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
+                </div>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
       {/* Input Area */}
-      <InputChat onSend={handleSend} />
+      <div className="relative">
+        <AnimatePresence>
+          {pendingWorkspaceData && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="absolute -top-20 left-0 right-0 flex justify-center px-4"
+            >
+              <Button
+                onClick={handleCreateWorkspace}
+                className="bg-primary hover:bg-primary/90 text-white rounded-2xl px-8 py-6 shadow-2xl shadow-primary/30 flex items-center gap-3 font-bold group border-white/20 border cursor-pointer active:scale-95 transition-all"
+              >
+                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
+                  <span className="text-lg">✨</span>
+                </div>
+                Confirmar y Crear Workspace
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <InputChat onSend={handleSend} />
+      </div>
     </div>
   );
 }

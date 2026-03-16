@@ -4,30 +4,27 @@
 // External packages
 // Next
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 import { useState } from 'react';
 
 import {
-  AlertCircle,
   ArrowRight,
   Check,
   ChevronLeft,
-  Clock,
   HelpCircle,
   RotateCcw,
   Trophy,
   X,
   Zap,
 } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 
 // Components
 import { Button } from '@repo/ui/components/ui/button';
 
 export default function FlashcardGamePage() {
   const params = useParams();
-  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [gameState, setGameState] = useState<'playing' | 'completed'>(
@@ -35,7 +32,6 @@ export default function FlashcardGamePage() {
   );
   const [score, setScore] = useState({ known: 0, unknown: 0 });
 
-  const deckId = params.deckId as string;
   const workspaceId = params.id as string;
 
   // Mock data based on deckId logic could be here
@@ -95,34 +91,34 @@ export default function FlashcardGamePage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 10 }}
-          className="w-24 h-24 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mb-4 mx-auto shadow-xl shadow-yellow-500/20"
+          className="w-24 h-24 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-full flex items-center justify-center mb-4 mx-auto shadow-xl shadow-yellow-500/10"
         >
           <Trophy className="w-12 h-12" />
         </motion.div>
 
         <div className="space-y-2">
-          <h1 className="text-4xl font-black text-slate-900">
+          <h1 className="text-4xl font-black text-foreground">
             ¡Sesión Completada!
           </h1>
-          <p className="text-slate-500 font-medium text-lg">
+          <p className="text-muted-foreground font-medium text-lg">
             Has repasado {cards.length} tarjetas.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 w-full px-4 md:px-0">
-          <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-3xl space-y-1">
-            <p className="text-4xl font-black text-emerald-600">
+          <div className="bg-emerald-500/5 border border-emerald-500/20 p-6 rounded-3xl space-y-1">
+            <p className="text-4xl font-black text-emerald-600 dark:text-emerald-400">
               {score.known}
             </p>
-            <p className="text-xs font-bold uppercase text-emerald-400 tracking-widest">
+            <p className="text-xs font-bold uppercase text-emerald-600 dark:text-emerald-500 tracking-widest">
               Dominadas
             </p>
           </div>
-          <div className="bg-orange-50 border border-orange-100 p-6 rounded-3xl space-y-1">
-            <p className="text-4xl font-black text-orange-600">
+          <div className="bg-orange-500/5 border border-orange-500/20 p-6 rounded-3xl space-y-1">
+            <p className="text-4xl font-black text-orange-600 dark:text-orange-400">
               {score.unknown}
             </p>
-            <p className="text-xs font-bold uppercase text-orange-400 tracking-widest">
+            <p className="text-xs font-bold uppercase text-orange-600 dark:text-orange-500 tracking-widest">
               A repasar
             </p>
           </div>
@@ -132,7 +128,7 @@ export default function FlashcardGamePage() {
           <Button
             onClick={restartGame}
             variant="outline"
-            className="flex-1 h-14 rounded-2xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:text-slate-900 transition-colors"
+            className="flex-1 h-14 rounded-2xl border-border text-muted-foreground font-bold hover:bg-muted hover:text-foreground transition-colors"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Repetir Mazo
@@ -158,25 +154,25 @@ export default function FlashcardGamePage() {
       <div className="flex items-center justify-between">
         <Link
           href={`/dashboard/workspaces/${workspaceId}`}
-          className="group flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors font-bold text-sm"
+          className="group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-bold text-sm"
         >
-          <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-slate-100 flex items-center justify-center transition-colors">
+          <div className="w-8 h-8 rounded-full bg-muted group-hover:bg-muted/80 flex items-center justify-center transition-colors">
             <ChevronLeft className="w-4 h-4" />
           </div>
           <span>Salir</span>
         </Link>
-        <div className="flex items-center gap-3 bg-white border border-slate-100 rounded-full pl-4 pr-1 py-1 shadow-sm">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <div className="flex items-center gap-3 bg-card border border-border rounded-full pl-4 pr-1 py-1 shadow-sm">
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
             Progreso
           </span>
-          <div className="bg-slate-100 px-3 py-1 rounded-full text-xs font-black text-slate-900">
+          <div className="bg-muted px-3 py-1 rounded-full text-xs font-black text-foreground">
             {currentIndex + 1} / {cards.length}
           </div>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full">
+      <div className="h-2 bg-muted rounded-full overflow-hidden w-full">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${((currentIndex + 1) / cards.length) * 100}%` }}
@@ -203,35 +199,35 @@ export default function FlashcardGamePage() {
         >
           {/* Front */}
           <div
-            className="absolute inset-0 backface-hidden bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center text-center z-10"
+            className="absolute inset-0 backface-hidden bg-card border border-border rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center text-center z-10"
             style={{ backfaceVisibility: 'hidden' }}
           >
-            <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-8 shadow-sm">
+            <div className="w-14 h-14 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-8 shadow-sm">
               <HelpCircle className="w-7 h-7" />
             </div>
-            <h3 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight max-w-lg">
+            <h3 className="text-2xl md:text-3xl font-black text-foreground leading-tight max-w-lg">
               {currentCard?.question}
             </h3>
-            <p className="absolute bottom-10 text-slate-300 font-bold text-xs uppercase tracking-[0.2em] animate-pulse">
+            <p className="absolute bottom-10 text-muted-foreground/70 font-bold text-xs uppercase tracking-[0.2em] animate-pulse">
               Tocá para ver respuesta
             </p>
           </div>
 
           {/* Back */}
           <div
-            className="absolute inset-0 backface-hidden bg-slate-900 text-white rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center text-center"
+            className="absolute inset-0 backface-hidden bg-foreground text-background rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center text-center"
             style={{
               transform: 'rotateY(180deg)',
               backfaceVisibility: 'hidden',
             }}
           >
-            <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
+            <div className="w-14 h-14 bg-background/10 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
               <Check className="w-7 h-7 text-emerald-400" />
             </div>
             <h3 className="text-xl md:text-2xl font-medium leading-relaxed max-w-lg">
               {currentCard?.answer}
             </h3>
-            <p className="absolute bottom-10 text-white/20 font-bold text-xs uppercase tracking-[0.2em]">
+            <p className="absolute bottom-10 text-background/20 font-bold text-xs uppercase tracking-[0.2em]">
               Respuesta Correcta
             </p>
           </div>
@@ -250,11 +246,11 @@ export default function FlashcardGamePage() {
               e.stopPropagation();
               handleNext(false);
             }}
-            className="w-16 h-16 rounded-3xl bg-white border-2 border-orange-100 text-orange-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 shadow-lg shadow-orange-500/10 transition-all duration-300 flex items-center justify-center p-0"
+            className="w-16 h-16 rounded-3xl bg-card border-2 border-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-primary-foreground hover:border-orange-500 shadow-lg shadow-orange-500/10 transition-all duration-300 flex items-center justify-center p-0"
           >
             <X className="w-8 h-8" />
           </Button>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">
             Difícil
           </span>
         </motion.div>
@@ -266,7 +262,7 @@ export default function FlashcardGamePage() {
                 e.stopPropagation();
                 handleFlip();
               }}
-              className="w-24 h-24 rounded-[2rem] bg-indigo-600 hover:bg-indigo-500 text-white shadow-2xl shadow-indigo-600/30 flex items-center justify-center p-0 border-4 border-slate-50"
+              className="w-24 h-24 rounded-4xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-2xl shadow-indigo-600/30 flex items-center justify-center p-0 border-4 border-background"
             >
               <div className="flex flex-col items-center gap-1">
                 {isFlipped ? (
@@ -292,11 +288,11 @@ export default function FlashcardGamePage() {
               e.stopPropagation();
               handleNext(true);
             }}
-            className="w-16 h-16 rounded-3xl bg-white border-2 border-emerald-100 text-emerald-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 shadow-lg shadow-emerald-500/10 transition-all duration-300 flex items-center justify-center p-0"
+            className="w-16 h-16 rounded-3xl bg-card border-2 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-primary-foreground hover:border-emerald-500 shadow-lg shadow-emerald-500/10 transition-all duration-300 flex items-center justify-center p-0"
           >
             <Check className="w-8 h-8" />
           </Button>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">
             Fácil
           </span>
         </motion.div>

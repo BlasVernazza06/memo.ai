@@ -4,8 +4,9 @@
 // External packages
 // Next
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   BarChart3,
@@ -26,53 +27,64 @@ import { AnimatePresence, motion } from 'motion/react';
 // Components
 import { Button } from '@repo/ui/components/ui/button';
 
+import type { WorkspaceWithRelations, DbDocument } from '@repo/db';
 import SearchInput from '@/components/shared/search-input';
+import { apiFetchClient } from '@/lib/api-client';
 
 import WorkspaceSettingsModal from '../../../../../components/dashboard/workspace-settings-modal';
-
-// ============================================================
-// MOCK DATA
-// ============================================================
-
-const MOCK_WORKSPACE = {
-  id: 'ws-1',
-  name: 'Anatomía Humana: Sistema Óseo',
-  description:
-    'Estudio del sistema esquelético humano, incluyendo huesos y articulaciones.',
-  customContext:
-    'Enfocarse mucho en los huesos del cráneo para el parcial del lunes.',
-  category: 'Medicina',
-  icon: '🦴',
-  coverImage:
-    'https://images.unsplash.com/photo-1530210124550-912dc1381cb8?q=80&w=2070',
-  isFavorite: true,
-};
-
-const MOCK_DOCS = [
-  {
-    id: 'doc-1',
-    name: 'Sistema_Oseo_Completo.pdf',
-    type: 'pdf',
-    size: '4.2 MB',
-    date: 'Hoy',
-  },
-];
 
 // ============================================================
 // COMPONENTS
 // ============================================================
 
 export default function WorkspaceDetailPage() {
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState<
     'docs' | 'flashcards' | 'quizzes' | 'analysis'
   >('docs');
-  const [isFav, setIsFav] = useState(MOCK_WORKSPACE.isFavorite);
+  const [workspace, setWorkspace] = useState<WorkspaceWithRelations | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFav, setIsFav] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  useEffect(() => {
+    const fetchWorkspace = async () => {
+      try {
+        setIsLoading(true);
+        const data = await apiFetchClient<WorkspaceWithRelations>(`/workspaces/${id}`);
+        setWorkspace(data);
+        setIsFav(data.isFavorite);
+      } catch (error) {
+        console.error('Error fetching workspace:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchWorkspace();
+    }
+  }, [id]);
+
   const TABS = [
-    { id: 'docs' as const, label: 'Documentos', count: 12, icon: FileText },
-    { id: 'flashcards' as const, label: 'Flashcards', count: 48, icon: Layers },
-    { id: 'quizzes' as const, label: 'Quizzes', count: 4, icon: Brain },
+    {
+      id: 'docs' as const,
+      label: 'Documentos',
+      count: workspace?.documents?.length || 0,
+      icon: FileText,
+    },
+    {
+      id: 'flashcards' as const,
+      label: 'Flashcards',
+      count: workspace?.flashcardDecks?.length || 0,
+      icon: Layers,
+    },
+    {
+      id: 'quizzes' as const,
+      label: 'Quizzes',
+      count: workspace?.quizzes?.length || 0,
+      icon: Brain,
+    },
     {
       id: 'analysis' as const,
       label: 'Análisis',
@@ -81,217 +93,235 @@ export default function WorkspaceDetailPage() {
     },
   ];
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-20 pt-4 px-4 overflow-hidden">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-4">
-        <Link
-          href="/dashboard/workspaces"
-          className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5 text-slate-500" />
-        </Link>
-        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-          <Link
-            href="/dashboard/workspaces"
-            className="hover:text-primary transition-colors"
-          >
-            Workspaces
-          </Link>
-          <span>/</span>
-          <span className="text-slate-900">{MOCK_WORKSPACE.category}</span>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <Brain className="w-12 h-12 text-primary animate-pulse" />
+          <p className="text-slate-500 font-black uppercase tracking-widest text-xs">
+            Cargando Workspace...
+          </p>
         </div>
       </div>
+    );
+  }
 
-      {/* Optional Cover Banner */}
-      {MOCK_WORKSPACE.coverImage && (
-        <div className="relative h-48 md:h-64 w-full rounded-4xl overflow-hidden shadow-2xl shadow-slate-200/50 border border-slate-200">
-          <img
-            src={MOCK_WORKSPACE.coverImage}
-            className="w-full h-full object-cover"
-            alt="Cover"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-slate-900/40 via-transparent to-transparent" />
+  if (!workspace) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Workspace no encontrado</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-8 pb-32 pt-6 px-4 md:px-8">
+      {/* Top Actions & Breadcrumb */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 hover:text-foreground transition-colors bg-card border border-border py-2.5 px-5 rounded-full shadow-sm"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Workspaces
+          </Link>
+          <span className="opacity-40">/</span>
+          <span className="text-foreground shrink-0">{workspace.category || 'General'}</span>
         </div>
-      )}
-
-      {/* Header Area */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2">
-        <div className="flex gap-6 items-start">
-          <div className="w-24 h-24 bg-white border border-slate-200 shadow-xl rounded-3xl flex items-center justify-center text-5xl shrink-0 -mt-12 md:-mt-16 relative z-10 select-none">
-            {MOCK_WORKSPACE.icon}
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none">
-              {MOCK_WORKSPACE.name}
-            </h1>
-            <p className="text-slate-500 font-medium text-sm max-w-xl">
-              {MOCK_WORKSPACE.description}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
+        
+        <div className="flex items-center gap-2">
           <Button
             onClick={() => setIsFav(!isFav)}
             variant="ghost"
-            className={`rounded-2xl h-14 w-14 p-0 shadow-sm border border-slate-200/60 transition-all active:scale-95 ${
+            className={`rounded-full w-12 h-12 p-0 shadow-sm transition-all active:scale-95 ${
               isFav
-                ? 'bg-rose-50 border-rose-100 text-rose-500'
-                : 'bg-white text-slate-400 hover:text-rose-500'
+                ? 'bg-rose-500/10 border border-rose-500/20 text-rose-500'
+                : 'bg-card border border-border text-muted-foreground hover:text-rose-500'
             }`}
           >
-            <Heart className={`w-6 h-6 ${isFav ? 'fill-current' : ''}`} />
-          </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-white font-black rounded-2xl h-14 px-8 gap-3 shadow-xl shadow-primary/25 transition-all active:scale-95">
-            <Sparkles className="w-5 h-5" />
-            Estudiar Ahora
+            <Heart className={`w-5 h-5 ${isFav ? 'fill-current' : ''}`} />
           </Button>
           <Button
             onClick={() => setShowSettings(true)}
             variant="ghost"
-            className="rounded-2xl h-14 w-14 p-0 bg-white border border-slate-200/60 text-slate-400 hover:text-slate-600 shadow-sm transition-all active:scale-95"
+            className="rounded-full w-12 h-12 p-0 bg-card border border-border text-muted-foreground hover:text-foreground shadow-sm transition-all active:scale-95"
           >
-            <Settings className="w-6 h-6" />
+            <Settings className="w-5 h-5" />
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pt-6">
-        {/* Main Content */}
-        <div className="lg:col-span-8 space-y-10">
-          {/* Mastery Card */}
-          <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm flex flex-col md:flex-row items-center gap-8">
-            <div className="relative w-28 h-28 flex items-center justify-center">
-              {/* Simple Radial Progress SVG */}
-              <svg className="w-full h-full -rotate-90">
-                <circle
-                  cx="56"
-                  cy="56"
-                  r="50"
-                  className="stroke-slate-100 fill-none"
-                  strokeWidth="12"
-                />
-                <circle
-                  cx="56"
-                  cy="56"
-                  r="50"
-                  className="stroke-primary fill-none"
-                  strokeWidth="12"
-                  strokeDasharray="314"
-                  strokeDashoffset="47"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-2xl font-black text-slate-900">
-                85%
-              </span>
-            </div>
-            <div className="flex-1 text-center md:text-left space-y-2">
-              <h3 className="text-xl font-black text-slate-900">
-                Dominio del Contenido
-              </h3>
-              <p className="text-slate-500 text-sm font-medium leading-relaxed">
-                Estás a un **15%** de convertirte en un experto en este mazo.
-                ¡Sigue practicando las flashcards marcadas como difíciles!
-              </p>
-              <div className="flex flex-wrap gap-2 pt-2 justify-center md:justify-start">
-                <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-                  32 Dominadas
-                </span>
-                <span className="px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-                  12 Pendientes
-                </span>
-              </div>
-            </div>
+      {/* Compact Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden">
+        {workspace.coverImage && (
+          <div
+            className="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none"
+            style={{
+              backgroundImage: `url(${workspace.coverImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              maskImage: 'linear-gradient(to left, black, transparent)',
+              WebkitMaskImage: 'linear-gradient(to left, black, transparent)'
+            }}
+          />
+        )}
+        <div className="flex items-center gap-5 relative z-10">
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-background border border-border rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-sm shrink-0">
+            {workspace.icon || '📚'}
+          </div>
+          <div className="space-y-1.5">
+            <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
+              {workspace.name}
+            </h1>
+            <p className="text-muted-foreground font-medium text-sm md:text-base">
+              {workspace.description || 'Transforma tus apuntes en conocimiento interactivo con IA.'}
+            </p>
+          </div>
+        </div>
+        <div className="shrink-0 relative z-10">
+          <Button className="w-full md:w-auto bg-primary text-primary-foreground font-black rounded-xl h-12 px-6 gap-2 shadow-sm transition-all active:scale-95">
+            <Sparkles className="w-4 h-4" />
+            Estudiar Ahora
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        {/* Left Column - Content & Stats */}
+        <div className="xl:col-span-8 space-y-8">
+          {/* Navigation Pills */}
+          <div className="flex flex-wrap items-center gap-2 bg-card border border-border p-2 rounded-2xl shadow-sm">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2.5 px-5 py-3 rounded-xl transition-all duration-200 text-sm font-bold flex-1 md:flex-none justify-center ${
+                  activeTab === tab.id
+                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+              >
+                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'opacity-100' : 'opacity-70'}`} />
+                <span>{tab.label}</span>
+                {tab.count !== null && (
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-black ${
+                    activeTab === tab.id 
+                    ? 'bg-white/20 text-white' 
+                    : 'bg-muted/80 text-foreground'
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
 
-          {/* Tabs Section */}
-          <div className="space-y-6">
-            <div className="flex bg-slate-100/60 backdrop-blur-sm p-1.5 rounded-4xl w-full md:w-fit overflow-x-auto gap-1 no-scrollbar">
-              {TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-6 py-3.5 rounded-3xl text-xs font-black uppercase tracking-widest transition-all shrink-0 ${
-                    activeTab === tab.id
-                      ? 'bg-white text-primary shadow-lg shadow-slate-200/50'
-                      : 'text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  <tab.icon
-                    className={`w-4 h-4 ${activeTab === tab.id ? 'text-primary' : 'text-slate-400'}`}
-                  />
-                  <span>{tab.label}</span>
-                  {tab.count !== null && (
-                    <span
-                      className={`px-2 py-0.5 rounded-lg text-[10px] ${
-                        activeTab === tab.id
-                          ? 'bg-primary/10 text-primary'
-                          : 'bg-slate-200/60 text-slate-500'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-
+          {/* Tab Content Display */}
+          <div className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm min-h-[400px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="min-h-[400px]"
+                initial={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
+                transition={{ duration: 0.25 }}
+                className="h-full"
               >
-                {activeTab === 'docs' && <DocsList />}
-                {activeTab !== 'docs' && <EmptyTabState />}
+                {activeTab === 'docs' && (
+                  <DocsList docs={workspace.documents || []} />
+                )}
+                {activeTab !== 'docs' && <EmptyTabState tabName={TABS.find(t => t.id === activeTab)?.label || ''} />}
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* Context Card */}
-          {MOCK_WORKSPACE.customContext && (
-            <div className="bg-amber-50/40 border border-amber-100 rounded-4xl p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5">
-                <MessageSquare className="w-20 h-20 text-amber-600" />
+        {/* Right Column - Secondary Context */}
+        <div className="xl:col-span-4 space-y-8">
+          
+          {/* Progress Card */}
+          <div className="bg-card border border-border rounded-3xl p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden group">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
+            <h3 className="text-foreground text-xl font-black mb-6 relative z-10">
+              Dominio General
+            </h3>
+            <div className="relative w-36 h-36 flex items-center justify-center mb-6 z-10">
+              <svg className="w-full h-full -rotate-90 drop-shadow-sm">
+                <circle
+                  cx="72"
+                  cy="72"
+                  r="60"
+                  className="stroke-muted fill-none"
+                  strokeWidth="12"
+                />
+                <circle
+                  cx="72"
+                  cy="72"
+                  r="60"
+                  className="stroke-primary fill-none transition-all duration-1000"
+                  strokeWidth="12"
+                  strokeDasharray="377"
+                  strokeDashoffset="120"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-3xl font-black text-foreground">68%</span>
+                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-wider">
+                  Precisión
+                </span>
               </div>
-              <h3 className="text-amber-800 text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                <MessageSquare className="w-3.5 h-3.5" />
-                Contexto del Estudiante
+            </div>
+            <p className="text-muted-foreground text-sm font-medium leading-relaxed relative z-10">
+              ¡Excelente ritmo! Sigue repasando tus flashcards para alcanzar el 100% de retención antes de tu examen.
+            </p>
+          </div>
+
+          {/* Context Note */}
+          {workspace.customContext && (
+            <div className="bg-card border border-border rounded-3xl p-8 shadow-sm relative overflow-hidden group transition-all hover:border-amber-500/30">
+              <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                <MessageSquare className="w-24 h-24 text-foreground" />
+              </div>
+              <h3 className="text-foreground text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+                <MessageSquare className="w-3.5 h-3.5 text-amber-500" />
+                Contexto Manual
               </h3>
-              <p className="text-amber-900/70 text-sm font-medium leading-relaxed italic relative z-10">
-                &quot;{MOCK_WORKSPACE.customContext}&quot;
+              <p className="text-muted-foreground text-sm font-medium leading-relaxed italic relative z-10 border-l-2 border-amber-500/50 pl-4">
+                &quot;{workspace.customContext}&quot;
               </p>
             </div>
           )}
 
-          <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white space-y-6 shadow-2xl shadow-slate-900/30 group">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Brain className="w-6 h-6 text-primary" />
+          {/* AI Banner */}
+          <div className="bg-foreground rounded-3xl p-8 text-background space-y-6 shadow-lg relative overflow-hidden group">
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-primary/20 backdrop-blur-md rounded-2xl flex items-center justify-center ring-1 ring-primary/30 group-hover:scale-110 transition-transform">
+                  <Brain className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg">Asistente Activo</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <p className="text-background/50 text-[10px] font-bold uppercase tracking-widest">
+                      En línea
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h3 className="font-black text-lg">Memo AI</h3>
-                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">
-                  Asistente Activo
-                </p>
-              </div>
+              <p className="text-background/70 text-sm font-medium leading-relaxed bg-background/5 p-5 rounded-3xl border border-background/10 backdrop-blur-sm">
+                &quot;He procesado los últimos documentos. Te recomiendo empezar con el quiz de recién agregados.&quot;
+              </p>
+              <Button className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-2xl h-14 gap-2 border border-primary/50 shadow-lg shadow-primary/20 transition-all active:scale-95">
+                <MessageSquare className="w-4 h-4" />
+                Abrir Chat
+              </Button>
             </div>
-            <p className="text-white/60 text-sm font-medium leading-relaxed bg-white/5 p-5 rounded-3xl border border-white/5">
-              &quot;He procesado el archivo del **Sistema Óseo**. Te recomiendo
-              empezar con el quiz de los huesos del cráneo, ya que es lo que
-              marcaste como prioridad.&quot;
-            </p>
-            <Button className="w-full bg-primary hover:bg-primary/90 text-white font-black rounded-2xl h-14 gap-2">
-              Charlar con Memo
-            </Button>
           </div>
         </div>
       </div>
@@ -300,93 +330,97 @@ export default function WorkspaceDetailPage() {
       <WorkspaceSettingsModal
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
-        workspace={MOCK_WORKSPACE}
+        workspace={workspace}
       />
     </div>
   );
 }
 
-function DocsList() {
-  const [filteredDocs, setFilteredDocs] = useState(MOCK_DOCS);
+function DocsList({ docs }: { docs: DbDocument[] }) {
+  const [filteredDocs, setFilteredDocs] = useState(docs);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <SearchInput
-        data={MOCK_DOCS}
+        data={docs}
         onResultsChange={setFilteredDocs}
-        placeholder="Buscar documentos en este workspace..."
+        placeholder="Buscar documentos..."
         showButton
-        buttonText="Subir Archivo"
+        buttonText="Subir"
         suffix={<Plus className="w-5 h-5 mr-1" />}
       />
 
-      <div className="grid grid-cols-1 gap-4">
-        {filteredDocs.map((doc) => (
-          <div
-            key={doc.id}
-            className="bg-white border border-slate-100 p-6 rounded-4xl flex items-center gap-6 hover:border-primary/30 transition-all cursor-pointer group shadow-xs hover:shadow-lg hover:shadow-slate-100"
-          >
-            <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110">
-              <FileText className="w-8 h-8" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-black text-slate-900 text-lg group-hover:text-primary transition-colors truncate">
-                {doc.name}
-              </h4>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
-                  PDF • {doc.size}
-                </span>
-                <div className="w-1 h-1 rounded-full bg-slate-200" />
-                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
-                  {doc.date}
-                </span>
+      {filteredDocs.length === 0 ? (
+        <div className="py-20 text-center">
+          <p className="text-muted-foreground font-medium">No hay documentos aún.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredDocs.map((doc) => (
+            <div
+              key={doc.id}
+              className="bg-card border border-border p-5 rounded-3xl flex flex-col gap-4 hover:border-primary/40 hover:bg-muted/10 transition-all cursor-pointer group shadow-sm"
+            >
+              <div className="flex items-start justify-between">
+                <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shrink-0">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-xl h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted"
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-xl h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2 mt-auto">
+                <h4 className="font-black text-foreground text-lg group-hover:text-primary transition-colors line-clamp-1">
+                  {doc.name}
+                </h4>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest bg-muted/50 px-3 py-1 rounded-lg">
+                    {doc.type.toUpperCase()} • {doc.sizeBytes ? `${(doc.sizeBytes / 1024 / 1024).toFixed(1)} MB` : '0 MB'}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest">
+                      Procesado
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-xl h-12 w-12 text-slate-300 hover:text-slate-600 hover:bg-slate-50"
-              >
-                <Download className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-xl h-12 w-12 text-slate-300 hover:text-slate-600 hover:bg-slate-50"
-              >
-                <MoreVertical className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function EmptyTabState() {
+function EmptyTabState({ tabName }: { tabName: string }) {
   return (
-    <div className="bg-slate-50/50 border border-slate-100 rounded-5xl p-16 text-center space-y-6">
-      <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center mx-auto text-slate-200 border border-slate-50">
-        <Sparkles className="w-10 h-10" />
+    <div className="h-full flex flex-col items-center justify-center py-20 text-center space-y-6">
+      <div className="w-24 h-24 bg-card rounded-full shadow-lg flex items-center justify-center mx-auto text-muted-foreground border border-border relative">
+        <Sparkles className="w-10 h-10 absolute animate-pulse text-primary/50" />
+        <Layers className="w-8 h-8 opacity-50" />
       </div>
       <div className="space-y-2">
-        <h3 className="text-xl font-black text-slate-900">
-          Sección en proceso
+        <h3 className="text-2xl font-black text-foreground">
+          Generando {tabName}
         </h3>
-        <p className="text-sm text-slate-400 max-w-sm mx-auto font-medium">
-          La IA está analizando tus archivos para generar material de estudio
-          personalizado. ¡Recibirás una notificación pronto!
+        <p className="text-sm text-muted-foreground max-w-sm mx-auto font-medium">
+          Nuestra inteligencia artificial está destilando tus documentos para crear este material de estudio optimizado.
         </p>
       </div>
-      <Button
-        variant="outline"
-        className="rounded-2xl h-12 px-6 font-bold border-slate-200"
-      >
-        Acelerar Proceso
-      </Button>
     </div>
   );
 }
