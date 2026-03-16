@@ -26,7 +26,7 @@ export async function apiFetch<T = unknown>(
       ...options?.headers,
       cookie: cookieHeader,
     },
-    cache: options?.cache ?? 'no-store',
+    next: { revalidate: 60 }, // Cachea por 60 segundos por defecto (ISR)
   });
 
   if (!res.ok) {
