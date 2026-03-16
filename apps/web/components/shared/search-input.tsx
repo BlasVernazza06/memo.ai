@@ -14,7 +14,7 @@ interface SearchInputProps<T> {
   searchKeys?: (keyof T)[];
   placeholder?: string;
   className?: string;
-  variant?: 'hero' | 'standard';
+  variant?: 'hero' | 'standard' | 'compact';
   showButton?: boolean;
   buttonText?: string;
   value?: string;
@@ -41,7 +41,6 @@ export default function SearchInput<T>({
   const query = value !== undefined ? value : internalQuery;
   const setQuery = onChange || setInternalQuery;
 
-  // Usamos stringify para que la referencia del array searchKeys no dispare el efecto si el contenido es igual
   const searchKeysDeps = JSON.stringify(searchKeys);
 
   useEffect(() => {
@@ -69,7 +68,6 @@ export default function SearchInput<T>({
       });
     }
 
-    // EVITAR LOOP INFINITO: Solo notificar si el resultado es realmente diferente
     const isSameResult =
       lastResultsRef.current &&
       lastResultsRef.current.length === filtered.length &&
@@ -87,26 +85,56 @@ export default function SearchInput<T>({
     return (
       <div className={cn('relative group w-full max-w-2xl mx-auto', className)}>
         <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="relative bg-white border border-slate-200 shadow-2xl rounded-4xl p-2 flex items-center">
-          <Search className="w-6 h-6 text-slate-400 ml-4" />
+        <div className="relative bg-card border border-border shadow-2xl rounded-4xl p-2 flex items-center">
+          <Search className="w-6 h-6 text-muted-foreground ml-4" />
           <Input
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="bg-transparent border-0 shadow-none h-14 text-lg focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-300 font-medium flex-1 px-4"
+            className="bg-transparent border-0 shadow-none h-14 text-lg focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/30 font-medium flex-1 px-4 text-foreground"
           />
           {query && (
             <button
               onClick={handleClear}
               type="button"
-              className="p-2 mr-2 text-slate-400 hover:text-slate-600 transition-colors"
+              className="p-2 mr-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           )}
-          <Button className="bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl h-12 px-8 shadow-lg shadow-primary/20 active:scale-95 transition-all">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl h-12 px-8 shadow-lg shadow-primary/20 active:scale-95 transition-all">
             {buttonText}
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (variant === 'compact') {
+    return (
+      <div
+        className={cn(
+          'bg-card border border-border p-1.5 rounded-2xl shadow-sm flex items-center',
+          className,
+        )}
+      >
+        <div className="relative flex-1 w-full flex items-center">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder={placeholder}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="pl-9 bg-transparent border-0 shadow-none h-10 focus-visible:ring-0 focus:ring-0 text-foreground text-sm placeholder:text-muted-foreground/50 font-medium flex-1"
+          />
+          {query && (
+            <button
+              onClick={handleClear}
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     );
@@ -115,23 +143,23 @@ export default function SearchInput<T>({
   return (
     <div
       className={cn(
-        'bg-white border border-slate-200/60 p-3 rounded-4xl shadow-sm flex flex-col md:flex-row gap-4 items-center',
+        'bg-card border border-border p-3 rounded-4xl shadow-sm flex flex-col md:flex-row gap-4 items-center',
         className,
       )}
     >
       <div className="relative flex-1 w-full flex items-center">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-12 bg-transparent border-0 shadow-none h-12 focus-visible:ring-0 focus:ring-0 text-slate-900 placeholder:text-slate-400 font-medium flex-1"
+          className="pl-12 bg-transparent border-0 shadow-none h-12 focus-visible:ring-0 focus:ring-0 text-foreground placeholder:text-muted-foreground/50 font-medium flex-1"
         />
         {query && (
           <button
             onClick={handleClear}
             type="button"
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -141,7 +169,7 @@ export default function SearchInput<T>({
         <div className="flex items-center gap-2 w-full md:w-auto md:ml-2">
           {suffix}
           {showButton && (
-            <Button className="bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl h-11 px-6 shadow-sm active:scale-95 transition-all w-full md:w-auto">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl h-11 px-6 shadow-sm active:scale-95 transition-all w-full md:w-auto">
               {buttonText}
             </Button>
           )}

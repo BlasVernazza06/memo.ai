@@ -5,7 +5,6 @@ import Link from 'next/link';
 
 import { useCallback, useRef, useState } from 'react';
 
-import { User } from 'better-auth';
 import {
   Bell,
   Brain,
@@ -16,11 +15,11 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
+import { type DbUser } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
 import { getInitials } from '@/hooks/use-Initials';
 import { useClickOutside } from '@/hooks/use-click-outside';
-import { useAuth } from '@/lib/auth-provider';
 
 const MOCK_NOTIFICATIONS = [
   {
@@ -55,7 +54,7 @@ const MOCK_NOTIFICATIONS = [
   },
 ];
 
-export default function UserMenu({ user }: { user: User | null }) {
+export default function UserMenu({ user }: { user: DbUser | null }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -99,7 +98,7 @@ export default function UserMenu({ user }: { user: User | null }) {
             {user?.name ?? 'Usuario'}
           </p>
           <p className="text-[10px] font-medium text-slate-500 mt-1 uppercase tracking-tight">
-            Pro Plan
+            {user?.plan} Plan
           </p>
         </div>
       </div>

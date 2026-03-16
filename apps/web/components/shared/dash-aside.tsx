@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import {
+  BrainCircuit,
   HelpCircle,
+  Layers,
   LayoutDashboard,
   Loader2,
   LogOut,
   Settings,
-  Sparkles,
 } from 'lucide-react';
 
 import { getInitials } from '@/hooks/use-Initials';
@@ -19,7 +20,8 @@ import { useAuth } from '@/lib/auth-provider';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { icon: Sparkles, label: 'IA Tools', href: '/dashboard/tools' }, // Added placeholder for visual density
+  { icon: Layers, label: 'Flashcards', href: '/dashboard/flashcards' },
+  { icon: BrainCircuit, label: 'Quizzes', href: '/dashboard/quizzes' },
   { icon: Settings, label: 'Ajustes', href: '/dashboard/settings' },
 ];
 
@@ -28,7 +30,7 @@ export default function DashAside() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const blockedPathnames = ['/dashboard/workspaces', 'dashboard/help'];
+  const blockedPathnames = ['/dashboard/workspaces'];
 
   for (const blockedPath of blockedPathnames) {
     if (pathname.includes(blockedPath)) {
@@ -85,8 +87,10 @@ export default function DashAside() {
                 className="rounded-md"
               />
             </div>
+
             <span className="text-xl font-black text-foreground tracking-tight">
-              memo.ai
+              memo
+              <span className="text-primary">.ai</span>
             </span>
           </Link>
         </div>
