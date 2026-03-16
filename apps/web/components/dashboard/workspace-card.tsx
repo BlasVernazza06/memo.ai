@@ -1,47 +1,24 @@
+'use client';
+
+import Image from 'next/image';
 import Link from 'next/link';
 
-import { useEffect, useRef, useState } from 'react';
-
 import {
-  Archive,
   BookOpen,
   Brain,
   ChevronRight,
   Files,
-  Files as FilesIcon,
   Heart,
   LucideIcon,
-  MoreVertical,
-  Pencil,
-  Trash2,
 } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 
-export type Workspace = {
-  id: string;
-  userId: string;
-  name: string;
-  description: string | null;
-  customContext: string | null;
-  category: string | null;
-  icon: string | null;
-  coverImage: string | null;
-  isFavorite: boolean;
-  isArchived: boolean;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-
-  // Virtual/UI fields
-  docs: number;
-  flashcards: number;
-  color: string;
-  lastActive: string;
-};
+import type { Workspace } from '../../types/workspaces';
 
 const ICON_MAP: Record<string, LucideIcon> = {
   'book-open': BookOpen,
   brain: Brain,
-  files: FilesIcon,
+  files: Files,
 };
 
 export default function WorkspaceCard({
@@ -53,93 +30,62 @@ export default function WorkspaceCard({
   idx: number;
   viewMode: 'grid' | 'list';
 }) {
-  const [showOptions, setShowOptions] = useState(false);
-  const optionsRef = useRef<HTMLDivElement>(null);
-  const Icon = ICON_MAP[ws.icon || ''] || FilesIcon;
-
-  // Close options on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        optionsRef.current &&
-        !optionsRef.current.contains(event.target as Node)
-      ) {
-        setShowOptions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleOptionClick = (e: React.MouseEvent, action: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log(`Action: ${action} on workspace ${ws.id}`);
-    setShowOptions(false);
-  };
+  const Icon = ICON_MAP[ws.icon || ''] || Files;
 
   return (
     <div className="relative group/ws h-full">
       <Link href={`/dashboard/workspaces/${ws.id}`} className="block h-full">
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: Math.min(idx * 0.05, 0.3) }}
-          whileHover={viewMode === 'grid' ? { y: -4 } : { x: 4 }}
-          className={`relative bg-white border border-slate-200/60 shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all overflow-hidden h-full ${
+          transition={{ duration: 0.4, delay: Math.min(idx * 0.08, 0.4) }}
+          whileHover={viewMode === 'grid' ? { y: -8, scale: 1.01 } : { x: 6 }}
+          className={`relative bg-card dark:bg-card/40 backdrop-blur-xl border border-border/80 shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_50px_rgba(var(--primary),0.2)] hover:border-primary/40 transition-all overflow-hidden h-full ${
             viewMode === 'grid'
-              ? 'rounded-4xl flex flex-col h-[380px]'
-              : 'rounded-3xl flex flex-row items-center justify-between md:gap-8 min-h-[100px] p-6'
+              ? 'rounded-[2.5rem] flex flex-col h-[400px]'
+              : 'rounded-4xl flex flex-row items-center justify-between md:gap-8 min-h-[110px] p-6'
           }`}
         >
           {/* Favorite Button */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
             }}
-            className={`absolute top-4 right-4 z-20 p-2.5 rounded-2xl backdrop-blur-md border border-white/20 transition-all ${
-              ws.isFavorite
-                ? 'bg-rose-500 text-white fill-current shadow-lg shadow-rose-500/20'
-                : 'bg-white/40 text-white hover:bg-white/60'
-            }`}
+            className="absolute top-6 right-6 z-20 w-10 h-10 rounded-xl bg-background/50 dark:bg-card/50 backdrop-blur-md border border-border/40 flex items-center justify-center text-muted-foreground hover:text-rose-500 hover:scale-110 active:scale-95 transition-all cursor-pointer group/fav"
           >
             <Heart
-              className={`w-4 h-4 ${ws.isFavorite ? 'fill-current' : ''}`}
+              className={`w-5 h-5 ${ws.isFavorite ? 'fill-rose-500 text-rose-500' : ''} group-hover/fav:fill-rose-500 transition-colors`}
             />
-          </motion.button>
+          </button>
 
           {viewMode === 'grid' && (
-            <div className="relative h-40 w-full overflow-hidden shrink-0">
+            <div className="relative h-44 w-full overflow-hidden shrink-0">
               {ws.coverImage ? (
-                <img
+                <Image
                   src={ws.coverImage}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover/ws:scale-105"
+                  width={400}
+                  height={200}
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover/ws:scale-110"
                   alt={ws.name}
                 />
               ) : (
                 <div
-                  className={`w-full h-full bg-linear-to-br ${ws.color} opacity-90 transition-transform duration-700 group-hover/ws:scale-105`}
+                  className={`w-full h-full bg-linear-to-br ${ws.color || 'from-primary to-blue-600'} opacity-90`}
                 />
               )}
-              <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-4">
-                <span className="text-[9px] font-black text-white/90 uppercase tracking-[0.15em] bg-white/10 backdrop-blur-md border border-white/10 px-2 py-1 rounded-lg">
-                  {ws.category}
-                </span>
-              </div>
+              {/* Bottom Fade */}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-card to-transparent" />
             </div>
           )}
 
           <div
-            className={`p-6 flex flex-col justify-between flex-1 ${viewMode === 'grid' ? '' : 'flex-row items-center gap-6'}`}
+            className={`p-8 flex flex-col justify-between flex-1 ${viewMode === 'grid' ? '' : 'flex-row items-center gap-6'}`}
           >
             <div
               className={
                 viewMode === 'grid'
-                  ? 'space-y-3'
+                  ? 'space-y-4'
                   : 'flex flex-row items-center gap-6 flex-1'
               }
             >
@@ -147,30 +93,30 @@ export default function WorkspaceCard({
                 <div
                   className={`flex items-center justify-center shrink-0 ${
                     viewMode === 'grid'
-                      ? 'w-12 h-12 bg-slate-50 border border-slate-100 rounded-2xl shadow-sm'
-                      : 'w-12 h-12 bg-linear-to-br from-slate-100 to-slate-200 rounded-xl'
+                      ? 'w-14 h-14 bg-background border border-border rounded-[1.25rem] shadow-sm group-hover/ws:border-primary/20 transition-colors'
+                      : 'w-14 h-14 bg-background rounded-2xl border border-border shadow-sm'
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${viewMode === 'grid' ? 'text-primary' : 'text-slate-600'}`}
+                    className={`w-6 h-6 ${viewMode === 'grid' ? 'text-primary' : 'text-muted-foreground'}`}
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <h3
-                  className={`font-black text-slate-900 group-hover/ws:text-primary transition-colors line-clamp-1 ${viewMode === 'grid' ? 'text-lg' : 'text-lg'}`}
+                  className={`font-black text-foreground group-hover/ws:text-primary transition-colors line-clamp-1 italic ${viewMode === 'grid' ? 'text-xl' : 'text-xl'}`}
                 >
                   {ws.name}
                 </h3>
-                <div className="flex flex-col gap-1">
-                  <p className="text-[11px] text-slate-400 font-bold flex items-center gap-2 uppercase tracking-tight">
-                    <Files className="w-3.5 h-3.5" />
-                    Documento base listo
+                <div className="flex flex-col gap-1.5">
+                  <p className="text-[11px] text-muted-foreground font-bold flex items-center gap-2.5 uppercase tracking-wide">
+                    <Files className="w-3.5 h-3.5 text-muted-foreground/40" />
+                    Fuente Principal Lista
                   </p>
-                  <p className="text-[10px] text-primary font-black flex items-center gap-2 uppercase tracking-wide">
-                    <Brain className="w-3 h-3" />
-                    {ws.flashcards} Flashcards generadas
+                  <p className="text-[10px] text-primary font-black flex items-center gap-2.5 uppercase tracking-[0.05em]">
+                    <span className="w-1 h-1 rounded-full bg-primary" />
+                    {ws.flashcards || 0} Flashcards Activas
                   </p>
                 </div>
               </div>
@@ -179,19 +125,19 @@ export default function WorkspaceCard({
             <div
               className={
                 viewMode === 'grid'
-                  ? 'pt-4 mt-auto border-t border-slate-50 flex items-center justify-between'
+                  ? 'pt-6 mt-auto border-t border-border flex items-center justify-between'
                   : 'flex items-center gap-8 text-right shrink-0'
               }
             >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Activo {ws.lastActive}
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">
+                  {ws.lastActive || 'Reciente'}
                 </span>
               </div>
 
-              <div className="bg-slate-100 text-slate-900 group-hover/ws:bg-primary group-hover/ws:text-white rounded-xl shadow-sm transition-all active:scale-95 h-9 w-9 flex items-center justify-center">
-                <ChevronRight className="w-5 h-5 group-hover/ws:translate-x-0.5 transition-transform" />
+              <div className="bg-muted text-muted-foreground group-hover/ws:bg-primary group-hover/ws:text-primary-foreground rounded-2xl shadow-sm transition-all duration-300 h-11 w-11 flex items-center justify-center border border-border group-hover/ws:border-primary cursor-pointer">
+                <ChevronRight className="w-6 h-6 group-hover/ws:translate-x-0.5 transition-transform" />
               </div>
             </div>
           </div>
