@@ -1,7 +1,8 @@
 'use client';
 
-import { ReactNode, createContext, useContext } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
+import { apiFetchClient } from './api-client';
 import { authClient } from './auth-client';
 
 export interface AuthUser {
@@ -9,6 +10,11 @@ export interface AuthUser {
   email: string;
   name: string;
   image?: string | null;
+  plan: 'free' | 'pro';
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  stripeSubscriptionStatus?: string | null;
+  stripePriceId?: string | null;
 }
 
 interface AuthContextType {
@@ -26,15 +32,44 @@ export function AuthProvider({
   initialSession?: any;
 }) {
   const { data: session, isPending } = authClient.useSession();
-  // Si el cliente está cargando (isPending), usamos la data del servidor (initialSession)
-  // Si el cliente ya cargó, usamos la data fresca (session)
-  const currentSession = session || initialSession;
-  const user = currentSession?.user ?? null;
+  const [dbUser, setDbUser] = useState<AuthUser | null>(null);
+  const [isFetchingDb, setIsFetchingDb] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchDbUser() {
+      const currentSession = session || initialSession;
+      if (currentSession?.user?.id) {
+        setIsFetchingDb(true);
+        try {
+          const userFromDb = await apiFetchClient<AuthUser>('/users/me');
+          if (isMounted) {
+            setDbUser(userFromDb);
+          }
+        } catch (error) {
+          console.error('Error fetching user data from DB:', error);
+          if (isMounted) setDbUser(null);
+        } finally {
+          if (isMounted) setIsFetchingDb(false);
+        }
+      } else {
+        setDbUser(null);
+      }
+    }
+
+    fetchDbUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [session, session?.user?.id, initialSession]);
+
+  const isLoading = (isPending && !initialSession) || isFetchingDb;
+
 
   return (
-    <AuthContext.Provider
-      value={{ user, isLoading: isPending && !initialSession }}
-    >
+    <AuthContext.Provider value={{ user: dbUser, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -47,3 +82,6 @@ export function useAuth() {
   }
   return context;
 }
+
+
+

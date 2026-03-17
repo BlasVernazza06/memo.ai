@@ -18,6 +18,7 @@ import { getInitials } from '@/hooks/use-Initials';
 import { authClient } from '@/lib/auth-client';
 import { useAuth } from '@/lib/auth-provider';
 
+
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { icon: Layers, label: 'Flashcards', href: '/dashboard/flashcards' },
@@ -42,6 +43,8 @@ export default function DashAside() {
     await authClient.signOut();
     router.push('/');
   };
+
+
 
   const renderAvatar = () => {
     if (isLoading) {
@@ -151,7 +154,7 @@ export default function DashAside() {
                   {user?.name ?? 'JD'}
                 </p>
                 <p className="text-[10px] font-bold text-muted-foreground truncate uppercase tracking-tight">
-                  Free Plan
+                  {user?.plan ? `${user.plan} Plan` : 'Loading...'}
                 </p>
               </div>
             </div>

@@ -15,6 +15,7 @@ import { type RegisterFormValues, registerSchema } from '@repo/validators';
 import OAuthButtons from '@/components/auth/oauth-buttons';
 import { authClient } from '@/lib/auth-client';
 
+
 export default function SignUpForm() {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -42,6 +43,8 @@ export default function SignUpForm() {
       setIsLoadingForm(false);
     }
   };
+
+
   return (
     <motion.form
       initial={{ opacity: 0, y: 10 }}

@@ -7,9 +7,12 @@ import { useEffect, useState } from 'react';
 import { Check, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { type DbUser } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
 import { apiFetchClient } from '@/lib/api-client';
+import { authClient } from '@/lib/auth-client';
+import { useAuth } from '@/lib/auth-provider';
 
 interface Plan {
   id: string;
@@ -24,6 +27,8 @@ interface Plan {
 }
 
 export default function PricingSection() {
+  const { user, isLoading } = useAuth();
+
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -90,103 +95,119 @@ export default function PricingSection() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto px-4">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`relative p-8 rounded-4xl border transition-all duration-500 overflow-hidden group ${
-                plan.popular
-                  ? 'bg-[#0F1115] text-white border-primary shadow-2xl shadow-primary/20 md:transform md:scale-105 z-20'
-                  : 'bg-card border-border hover:border-primary/30 z-10'
-              }`}
-            >
-              {plan.popular && (
-                <>
-                  <div className="absolute top-0 right-0 p-6">
-                    <Sparkles className="w-8 h-8 text-primary opacity-20 group-hover:opacity-40 transition-opacity" />
-                  </div>
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-primary text-white text-[9px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-primary/30">
-                    Recomendado
-                  </div>
-                </>
-              )}
+          {plans.map((plan, index) => {
+            const isProUser = user?.plan === 'pro';
+            const isProCard = plan.id === 'pro';
+            const isDisabled = isProUser && !isProCard;
 
-              <div className="mb-8 space-y-3">
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan.popular ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}
-                >
-                  <plan.icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold tracking-tight">
-                    {plan.name}
-                  </h3>
-                  <p
-                    className={`text-xs mt-1 ${plan.popular ? 'text-white/60' : 'text-muted-foreground'}`}
-                  >
-                    {plan.description}
-                  </p>
-                </div>
-                <div className="pt-2 flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold tracking-tighter">
-                    ${plan.price}
-                  </span>
-                  <span
-                    className={`text-xs ${plan.popular ? 'text-white/40' : 'text-muted-foreground'} font-medium`}
-                  >
-                    USD / mes
-                  </span>
-                </div>
-              </div>
+            const ctaText =
+              isProUser && isProCard ? 'Ir al Dashboard' : plan.cta;
+            const href =
+              isProUser && isProCard
+                ? '/dashboard'
+                : plan.popular
+                  ? `/checkout?plan=${plan.stripePriceId}`
+                  : '/dashboard';
 
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-start gap-2.5 group/item"
-                  >
-                    <div
-                      className={`mt-1 p-0.5 rounded-full ${plan.popular ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}
-                    >
-                      <Check className="w-3 h-3" />
-                    </div>
-                    <span
-                      className={`text-sm ${plan.popular ? 'text-white/80' : 'text-muted-foreground'} font-light group-hover/item:translate-x-1 transition-transform`}
-                    >
-                      {feature}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                asChild
-                className={`w-full py-6 rounded-xl text-md font-bold shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] ${
+            return (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className={`relative p-8 rounded-4xl border transition-all duration-500 overflow-hidden group ${
                   plan.popular
-                    ? 'bg-primary hover:bg-primary/90 text-white shadow-primary/20'
-                    : 'bg-muted hover:bg-muted/80 text-foreground shadow-none'
-                }`}
+                    ? 'bg-[#0F1115] text-white border-primary shadow-2xl shadow-primary/20 md:transform md:scale-105 z-20'
+                    : 'bg-card border-border hover:border-primary/30 z-10'
+                } ${isDisabled ? 'opacity-60' : ''}`}
               >
-                <Link
-                  href={
-                    plan.popular
-                      ? `/checkout?plan=${plan.stripePriceId}`
-                      : '/dashboard'
-                  }
-                >
-                  {plan.cta}
-                </Link>
-              </Button>
+                {plan.popular && (
+                  <>
+                    <div className="absolute top-0 right-0 p-6">
+                      <Sparkles className="w-8 h-8 text-primary opacity-20 group-hover:opacity-40 transition-opacity" />
+                    </div>
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-primary text-white text-[9px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-primary/30">
+                      Recomendado
+                    </div>
+                  </>
+                )}
 
-              {plan.popular && (
-                <p className="text-center mt-4 text-white/30 text-[9px] font-medium uppercase tracking-widest">
-                  Cancela en cualquier momento
-                </p>
-              )}
-            </motion.div>
-          ))}
+                <div className="mb-8 space-y-3">
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan.popular ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}
+                  >
+                    <plan.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold tracking-tight">
+                      {plan.name}
+                    </h3>
+                    <p
+                      className={`text-xs mt-1 ${plan.popular ? 'text-white/60' : 'text-muted-foreground'}`}
+                    >
+                      {plan.description}
+                    </p>
+                  </div>
+                  <div className="pt-2 flex items-baseline gap-1">
+                    <span className="text-4xl font-extrabold tracking-tighter">
+                      ${plan.price}
+                    </span>
+                    <span
+                      className={`text-xs ${plan.popular ? 'text-white/40' : 'text-muted-foreground'} font-medium`}
+                    >
+                      USD / mes
+                    </span>
+                  </div>
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-2.5 group/item"
+                    >
+                      <div
+                        className={`mt-1 p-0.5 rounded-full ${plan.popular ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}
+                      >
+                        <Check className="w-3 h-3" />
+                      </div>
+                      <span
+                        className={`text-sm ${plan.popular ? 'text-white/80' : 'text-muted-foreground'} font-light group-hover/item:translate-x-1 transition-transform`}
+                      >
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  disabled={isDisabled}
+                  className={`w-full py-6 rounded-xl text-md font-bold shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                    plan.popular
+                      ? 'bg-primary hover:bg-primary/90 text-white shadow-primary/20'
+                      : 'bg-muted hover:bg-muted/80 text-foreground shadow-none'
+                  }`}
+                >
+                  {isDisabled ? (
+                    <span>{plan.cta}</span>
+                  ) : (
+                    <Link
+                      href={href}
+                      className="w-full h-full flex items-center justify-center"
+                    >
+                      {ctaText}
+                    </Link>
+                  )}
+                </Button>
+
+                {plan.popular && (
+                  <p className="text-center mt-4 text-white/30 text-[9px] font-medium uppercase tracking-widest">
+                    Cancela en cualquier momento
+                  </p>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
