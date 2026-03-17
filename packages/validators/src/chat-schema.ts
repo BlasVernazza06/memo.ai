@@ -1,5 +1,18 @@
 import { z } from 'zod';
 
+import { DbChat, DbMessage } from '@repo/db';
+
+export const chatAttachmentSchema = z.object({
+  key: z.string(),
+  url: z.string(),
+  name: z.string(),
+  type: z.string(),
+});
+
+export type ChatAttachment = z.infer<typeof chatAttachmentSchema>;
+
+export type ChatWithMessages = DbChat & { messages: DbMessage[] };
+
 export const chatRoleSchema = z.enum(['user', 'ai']);
 export type ChatRole = z.infer<typeof chatRoleSchema>;
 

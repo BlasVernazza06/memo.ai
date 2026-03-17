@@ -5,13 +5,6 @@ const API_URL =
   process.env.API_URL ||
   'http://127.0.0.1:3000';
 
-export interface SessionUser {
-  id: string;
-  name: string;
-  email: string;
-  image: string | null;
-}
-
 export async function getSession() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
@@ -38,7 +31,15 @@ export async function getSession() {
         expiresAt: string;
         token: string;
       };
-      user: SessionUser;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        image?: string | null;
+        emailVerified: boolean;
+        createdAt: string;
+        updatedAt: string;
+      };
     } | null;
   } catch (err) {
     console.error('[auth-session] Error:', err);

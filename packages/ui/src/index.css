@@ -61,7 +61,7 @@
   :root {
     color-scheme: light;
     /* Background colors */
-    --background: oklch(1 0 0);
+    --background: oklch(0.985 0 0);
     --foreground: oklch(0.145 0 0);
 
     /* Card & surfaces */
@@ -100,9 +100,9 @@
     --warning: 38 92% 50%;
     --warning-foreground: 222 47% 11%;
 
-    /* Border & Input */
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
+    /* Border & Input - Slate-like grays for high visibility */
+    --border: oklch(0.88 0.01 240);
+    --input: oklch(0.88 0.01 240);
     --ring: oklch(0.59 0.2 231);
 
     /* Radius */
@@ -137,7 +137,7 @@
 
     /* Primary - memo.ai Blue */
     --primary: oklch(0.59 0.2 231);
-    --primary-foreground: oklch(0.145 0 0);
+    --primary-foreground: oklch(0.985 0 0);
 
     /* Secondary */
     --secondary: oklch(0.269 0 0);
@@ -155,9 +155,9 @@
     --destructive: oklch(0.704 0.191 22.216);
     --destructive-foreground: 210 40% 98%;
 
-    /* Border & Input */
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
+    /* Border & Input - Sleek dark slate */
+    --border: oklch(0.28 0.015 240);
+    --input: oklch(0.28 0.015 240);
     --ring: oklch(0.59 0.2 231);
 
     /* memo.ai specific colors */

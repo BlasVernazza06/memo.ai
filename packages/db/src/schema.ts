@@ -29,6 +29,8 @@ export const user = pgTable('user', {
     .notNull(),
   stripeCustomerId: text('stripe_customer_id'),
   stripeSubscriptionId: text('stripe_subscription_id'),
+  stripeSubscriptionStatus: text('stripe_subscription_status'),
+  stripePriceId: text('stripe_price_id'),
 });
 
 export type DbUser = InferSelectModel<typeof user>;
@@ -219,6 +221,9 @@ export const quiz = pgTable('quiz', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export type DbQuiz = InferSelectModel<typeof quiz>;
+export type NewQuiz = InferInsertModel<typeof quiz>;
 
 /**
  * quiz_question - Preguntas individuales de un quiz.
@@ -434,6 +439,14 @@ export const messageRelations = relations(message, ({ one }) => ({
   chat: one(chat, { fields: [message.chatId], references: [chat.id] }),
 }));
 
+export type WorkspaceWithRelations = DbWorkspace & {
+  user: DbUser;
+  documents: DbDocument[];
+  flashcardDecks: DbFlashcardDeck[];
+  quizzes: DbQuiz[];
+  chats: DbChat[];
+  activities: DbUserActivity[];
+};
 // ============================================================
 // EXPORTS
 // ============================================================
