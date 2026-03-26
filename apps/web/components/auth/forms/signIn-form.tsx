@@ -1,18 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Loader, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import { authClient } from '@repo/auth/client';
 import { Button } from '@repo/ui/components/ui/button';
-
-
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { type LoginFormValues, loginSchema } from '@repo/validators';
@@ -20,8 +19,12 @@ import { type LoginFormValues, loginSchema } from '@repo/validators';
 import OAuthButtons from '@/components/auth/oauth-buttons';
 
 export default function SignInForm() {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
   const {
     register,
@@ -31,6 +34,11 @@ export default function SignInForm() {
     resolver: zodResolver(loginSchema),
   });
 
+  if (session) {
+    router.replace(callbackUrl);
+    return null;
+  }
+
   const onSubmit = async (formData: LoginFormValues) => {
     setIsLoadingForm(true);
     try {
@@ -38,6 +46,7 @@ export default function SignInForm() {
         email: formData.email,
         password: formData.password,
       });
+      router.push(callbackUrl);
     } catch (error) {
       console.error(error);
     } finally {
@@ -45,20 +54,18 @@ export default function SignInForm() {
     }
   };
 
-
-
   return (
     <motion.form
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="space-y-5"
+      className="space-y-4"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label
           htmlFor="email"
-          className="text-xs font-bold text-[#4A4C4E] ml-1 uppercase tracking-wider"
+          className="text-xs font-bold text-muted-foreground/80 ml-1 uppercase tracking-wider"
         >
           Email
         </Label>
@@ -71,7 +78,7 @@ export default function SignInForm() {
             type="email"
             {...register('email')}
             placeholder="ej. blas@memo.ai"
-            className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+            className={`bg-muted/30 border-border h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
           />
         </div>
         {errors.email && (
@@ -81,11 +88,11 @@ export default function SignInForm() {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <div className="flex items-center justify-between ml-1">
           <Label
             htmlFor="password"
-            className="text-xs font-bold text-[#4A4C4E] uppercase tracking-wider"
+            className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider"
           >
             Contraseña
           </Label>
@@ -99,7 +106,7 @@ export default function SignInForm() {
             type={showPassword ? 'text' : 'password'}
             {...register('password')}
             placeholder="••••••••••••"
-            className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+            className={`bg-muted/30 border-border h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
           />
           <button
             type="button"
@@ -131,21 +138,21 @@ export default function SignInForm() {
 
       <Button
         type="submit"
-        className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98]"
+        className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98]"
       >
-        {isLoadingForm ? <Loader className="size-4" /> : 'Iniciar Sesión'}
+        {isLoadingForm ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
       </Button>
 
       <div className="relative py-4">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-[#E2E8F0]" />
+          <span className="w-full border-t border-border/60" />
         </div>
         <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          <span className="bg-white px-4">O inicia con</span>
+          <span className="bg-card px-4">O inicia con</span>
         </div>
       </div>
 
-      <OAuthButtons />
+      <OAuthButtons callbackUrl={callbackUrl} />
     </motion.form>
   );
 }

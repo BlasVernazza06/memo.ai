@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -12,13 +14,15 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { type RegisterFormValues, registerSchema } from '@repo/validators';
 
-import OAuthButtons from '@/components/auth/oauth-buttons';
 import { authClient } from '@/lib/auth-client';
 
-
 export default function SignUpForm() {
+  const { data: session } = authClient.useSession();
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
   const {
     register,
@@ -27,6 +31,11 @@ export default function SignUpForm() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
+
+  if (session) {
+    router.replace(callbackUrl);
+    return null;
+  }
 
   const onSubmit = async (formData: RegisterFormValues) => {
     setIsLoadingForm(true);
@@ -37,6 +46,7 @@ export default function SignUpForm() {
         password: formData.password,
         name: formData.name,
       });
+      router.push(callbackUrl);
     } catch (error) {
       console.error(error);
     } finally {
@@ -44,21 +54,20 @@ export default function SignUpForm() {
     }
   };
 
-
   return (
     <motion.form
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="space-y-4"
+      className="space-y-3"
       onSubmit={handleSubmit(onSubmit, (errors) =>
         console.log('Errores de validación:', errors),
       )}
     >
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label
           htmlFor="name"
-          className="text-xs font-bold text-[#4A4C4E] ml-1 uppercase tracking-wider"
+          className="text-xs font-bold text-muted-foreground/80 ml-1 uppercase tracking-wider"
         >
           Nombre Completo
         </Label>
@@ -71,7 +80,7 @@ export default function SignUpForm() {
             type="text"
             {...register('name')}
             placeholder="Tu nombre"
-            className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+            className={`bg-muted/30 border-border h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
           />
         </div>
         {errors.name && (
@@ -81,10 +90,10 @@ export default function SignUpForm() {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label
           htmlFor="email"
-          className="text-xs font-bold text-[#4A4C4E] ml-1 uppercase tracking-wider"
+          className="text-xs font-bold text-muted-foreground/80 ml-1 uppercase tracking-wider"
         >
           Email
         </Label>
@@ -97,7 +106,7 @@ export default function SignUpForm() {
             type="email"
             {...register('email')}
             placeholder="tu@email.com"
-            className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+            className={`bg-muted/30 border-border h-12 rounded-xl pl-11 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
           />
         </div>
         {errors.email && (
@@ -107,10 +116,10 @@ export default function SignUpForm() {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label
           htmlFor="password"
-          className="text-xs font-bold text-[#4A4C4E] ml-1 uppercase tracking-wider"
+          className="text-xs font-bold text-muted-foreground/80 ml-1 uppercase tracking-wider"
         >
           Contraseña
         </Label>
@@ -123,7 +132,7 @@ export default function SignUpForm() {
             type={showPassword ? 'text' : 'password'}
             {...register('password')}
             placeholder="Mínimo 8 caracteres"
-            className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+            className={`bg-muted/30 border-border h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
           />
           <button
             type="button"
@@ -144,10 +153,10 @@ export default function SignUpForm() {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label
           htmlFor="password"
-          className="text-xs font-bold text-[#4A4C4E] ml-1 uppercase tracking-wider"
+          className="text-xs font-bold text-muted-foreground/80 ml-1 uppercase tracking-wider"
         >
           Confirmar Contraseña
         </Label>
@@ -160,7 +169,7 @@ export default function SignUpForm() {
             type={showPassword ? 'text' : 'password'}
             {...register('confirmPassword')}
             placeholder="Mínimo 8 caracteres"
-            className={`bg-[#FAFBFC] border-[#E2E8F0] h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
+            className={`bg-muted/30 border-border h-12 rounded-xl pl-11 pr-10 focus:ring-primary/10 focus:border-primary transition-all text-sm ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10' : ''}`}
           />
           <button
             type="button"
@@ -183,21 +192,10 @@ export default function SignUpForm() {
 
       <Button
         type="submit"
-        className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98] mt-2"
+        className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98] mt-0.5"
       >
         {isLoadingForm ? 'Creando Cuenta...' : 'Crear Cuenta Gratuita'}
       </Button>
-
-      <div className="relative py-4">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-[#E2E8F0]" />
-        </div>
-        <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          <span className="bg-white px-4">O regístrate con</span>
-        </div>
-      </div>
-
-      <OAuthButtons />
     </motion.form>
   );
 }
