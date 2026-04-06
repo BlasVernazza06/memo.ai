@@ -84,9 +84,20 @@ export default function SearchInput<T>({
   if (variant === 'hero') {
     return (
       <div className={cn('relative group w-full max-w-2xl mx-auto', className)}>
-        <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-blue-500/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="relative bg-card border border-border shadow-2xl rounded-4xl p-2 flex items-center">
-          <Search className="w-6 h-6 text-muted-foreground ml-4" />
+        {/* Aggressive Glow Background */}
+        <div className="absolute -inset-[2px] rounded-4xl bg-linear-to-r from-primary via-blue-500 to-primary opacity-40 blur-md group-hover:opacity-80 transition-opacity duration-500 animate-pulse" />
+        
+        {/* Animated Border Beam (Simulated with rotating gradient) */}
+        <div className="absolute -inset-[1px] rounded-4xl overflow-hidden pointer-events-none">
+          <div className="absolute inset-[-200%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_120deg,var(--primary)_180deg,transparent_240deg)] opacity-60" />
+        </div>
+
+        <div className="relative bg-card/80 backdrop-blur-2xl border border-white/5 shadow-[0_0_40px_-10px_rgba(var(--primary),0.3)] group-hover:shadow-[0_0_60px_-5px_rgba(var(--primary),0.4)] rounded-4xl p-2 flex items-center group overflow-hidden transition-all duration-500">
+          {/* Blurreo Previo / Inset Highlight Rim */}
+          <div className="absolute inset-0 rounded-4xl ring-1 ring-inset ring-white/10 pointer-events-none" />
+          <div className="absolute inset-px rounded-4xl ring-1 ring-inset ring-white/5 pointer-events-none" />
+          
+          <Search className="w-6 h-6 text-muted-foreground ml-4 group-hover:text-primary transition-colors" />
           <Input
             placeholder={placeholder}
             value={query}
@@ -102,7 +113,7 @@ export default function SearchInput<T>({
               <X className="w-5 h-5" />
             </button>
           )}
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl h-12 px-8 shadow-lg shadow-primary/20 active:scale-95 transition-all">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl h-12 px-8 shadow-[0_0_20px_-5px_rgba(var(--primary),0.5)] active:scale-95 transition-all">
             {buttonText}
           </Button>
         </div>
