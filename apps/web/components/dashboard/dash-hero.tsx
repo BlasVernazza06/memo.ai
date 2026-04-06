@@ -19,7 +19,10 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
+import { useAuth } from '@/lib/auth-provider';
+
 export default function DashHero() {
+  const { user } = useAuth();
   const [showTutorial, setShowTutorial] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -59,16 +62,14 @@ export default function DashHero() {
         className="relative overflow-hidden border border-border/80 rounded-[2.5rem] bg-card p-6 md:p-10 text-foreground shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-all"
       >
         {/* Decorative Background Assets */}
-        <div className="absolute inset-0 grain-overlay opacity-[0.03] dark:opacity-[0.05] pointer-events-none" />
-
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          <div className="absolute -top-[10%] -right-[5%] w-[40%] h-full bg-primary/5 dark:bg-primary/10 blur-[100px] rounded-full animate-blob transition-all duration-1000" />
+          <div className="absolute -top-[10%] -right-[5%] w-[50%] h-full bg-primary/10 dark:bg-primary/20 blur-[120px] rounded-full animate-pulse transition-all duration-[3000ms]" />
           <div
-            className="absolute inset-0 opacity-[0.02] dark:opacity-[0.06]"
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08]"
             style={{
               backgroundImage:
-                'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
-              backgroundSize: '32px 32px',
+                'radial-gradient(circle at 1.5px 1.5px, currentColor 1.5px, transparent 0)',
+              backgroundSize: '48px 48px',
             }}
           />
         </div>
@@ -83,21 +84,26 @@ export default function DashHero() {
                 transition={{ delay: 0.1 }}
                 className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground"
               >
-                <Sparkles className="w-3 h-3 text-primary" />
-                <span>Hola de nuevo, Blas</span>
+                <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                <span>Hola de nuevo, {user?.name?.split(' ')[0] || 'Blas'}</span>
               </motion.div>
 
-              <h1 className="text-3xl md:text-5xl font-black tracking-tighter leading-tight italic max-w-xl">
+              <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.95] italic max-w-xl">
                 ¿Qué vamos a{' '}
-                <span className="text-primary not-italic relative inline-block">
+                <span className="text-primary not-italic relative inline-block group/learn">
                   aprender
-                  <span className="absolute -bottom-1 left-1 right-0 h-1 bg-primary/20 rounded-full blur-sm" />
+                  <motion.span 
+                    initial={{ width: 0 }}
+                    animate={{ width: '100%' }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                    className="absolute -bottom-1 left-0 h-1.5 bg-primary/20 rounded-full blur-[2px]" 
+                  />
                 </span>{' '}
                 hoy?
               </h1>
 
-              <p className="text-muted-foreground text-sm md:text-lg font-bold max-w-lg leading-relaxed">
-                Transforma tus apuntes en conocimiento interactivo con IA.
+              <p className="text-muted-foreground text-sm md:text-xl font-medium max-w-lg leading-relaxed opacity-80">
+                Transforma tus apuntes en conocimiento interactivo con el poder de la IA.
               </p>
             </div>
 
@@ -140,13 +146,13 @@ export default function DashHero() {
                   <p className="text-lg font-black">850</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 border-l border-border/30 pl-8">
-                <div className="text-center text-emerald-600 dark:text-emerald-400">
+               <div className="flex items-center gap-3 border-l border-border/30 pl-8">
+                <div className="text-center text-emerald-600 dark:text-emerald-400 group/streak hover:scale-110 transition-transform">
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
                     Racha
                   </p>
-                  <p className="text-lg font-black">
-                    5 <span className="text-[8px] italic font-bold">Días</span>
+                  <p className="text-lg font-black flex items-center gap-1">
+                    5 <span className="text-orange-500 text-xs">🔥</span>
                   </p>
                 </div>
               </div>
@@ -157,40 +163,46 @@ export default function DashHero() {
           <div className="hidden lg:flex shrink-0 pr-4">
             <motion.div
               animate={{
-                rotateY: [0, 5, 0],
-                y: [0, -8, 0],
+                rotateY: [0, 8, 0],
+                rotateX: [0, -5, 0],
+                y: [0, -12, 0],
               }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-[220px] aspect-[4/5] bg-card/50 backdrop-blur-xl rounded-4xl border border-border shadow-[0_20px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.4)] p-6 flex flex-col justify-between overflow-hidden"
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-[240px] aspect-[4/5] bg-card/40 backdrop-blur-[32px] rounded-[3rem] border border-white/20 dark:border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] dark:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.6)] p-7 flex flex-col justify-between overflow-hidden relative group/card"
             >
-              <div className="flex justify-between items-start">
-                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                  <FileText className="w-5 h-5 text-primary-foreground" />
+              <div className="absolute inset-0 bg-linear-to-tr from-primary/10 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-1000" />
+              <div className="flex justify-between items-start relative z-10">
+                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/40 relative">
+                  <div className="absolute inset-0 bg-primary rounded-2xl animate-ping opacity-20" />
+                  <FileText className="w-6 h-6 text-primary-foreground relative z-10" />
                 </div>
-                <div className="flex -space-x-2">
+                <div className="flex -space-x-2.5">
                   {[1, 2, 3].map((i) => (
                     <div
                       key={i}
-                      className="w-6 h-6 rounded-full border-2 border-background bg-muted"
+                      className="w-7 h-7 rounded-full border-2 border-background bg-muted shadow-sm"
                     />
                   ))}
                 </div>
               </div>
-              <div className="space-y-3">
-                <div className="h-2.5 w-3/4 bg-primary/10 rounded-full animate-pulse" />
-                <div className="h-2.5 w-full bg-muted rounded-full" />
-                <div className="h-2.5 w-2/3 bg-muted rounded-full" />
+              <div className="space-y-4 relative z-10">
+                <div className="h-3 w-4/5 bg-primary/20 rounded-full animate-pulse" />
+                <div className="h-3 w-full bg-muted/60 rounded-full" />
+                <div className="h-3 w-3/4 bg-muted/40 rounded-full" />
               </div>
-              <div className="pt-4 border-t border-border/40 space-y-2">
-                <div className="flex justify-between items-center text-[8px] font-black uppercase text-muted-foreground">
-                  <span>Procesando...</span>
-                  <span className="text-primary">85%</span>
+              <div className="pt-5 border-t border-border/20 space-y-3 relative z-10">
+                <div className="flex justify-between items-center text-[9px] font-black uppercase text-muted-foreground tracking-tighter">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Procesando...
+                  </span>
+                  <span className="text-primary font-black">92%</span>
                 </div>
-                <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-muted/40 rounded-full overflow-hidden">
                   <motion.div
                     animate={{ x: ['-100%', '100%'] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-1/3 h-full bg-primary"
+                    transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                    className="w-1/2 h-full bg-linear-to-r from-transparent via-primary to-transparent"
                   />
                 </div>
               </div>

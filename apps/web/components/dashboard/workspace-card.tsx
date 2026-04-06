@@ -40,12 +40,16 @@ export default function WorkspaceCard({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: Math.min(idx * 0.08, 0.4) }}
           whileHover={viewMode === 'grid' ? { y: -8, scale: 1.01 } : { x: 6 }}
-          className={`relative bg-card dark:bg-card/40 backdrop-blur-xl border border-border/80 shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_50px_rgba(var(--primary),0.2)] hover:border-primary/40 transition-all overflow-hidden h-full ${
+          className={`relative bg-card dark:bg-card/45 backdrop-blur-2xl border border-border/60 shadow-[0_12px_45px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:shadow-[0_45px_80px_-25px_rgba(var(--primary),0.2)] hover:border-primary/40 transition-all duration-500 overflow-hidden h-full ${
             viewMode === 'grid'
-              ? 'rounded-[2.5rem] flex flex-col h-[400px]'
-              : 'rounded-4xl flex flex-row items-center justify-between md:gap-8 min-h-[110px] p-6'
+              ? 'rounded-[2.8rem] flex flex-col h-[420px]'
+              : 'rounded-[1.8rem] flex flex-row items-center justify-between md:gap-8 min-h-[120px] p-6'
           }`}
         >
+          {/* Advanced Shine Effect */}
+          <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover/ws:opacity-100 transition-opacity duration-1000" />
+          <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/ws:opacity-100 transition-opacity duration-700 pointer-events-none" />
+          <div className="absolute -inset-[100%] bg-linear-to-r from-transparent via-white/5 to-transparent skew-x-[-25deg] transition-all duration-1000 group-hover/ws:translate-x-[200%] pointer-events-none z-30" />
           {/* Favorite Button */}
           <button
             onClick={(e) => {
@@ -91,14 +95,15 @@ export default function WorkspaceCard({
             >
               <div className="flex items-start justify-between relative">
                 <div
-                  className={`flex items-center justify-center shrink-0 ${
+                  className={`flex items-center justify-center shrink-0 relative overflow-hidden ${
                     viewMode === 'grid'
-                      ? 'w-14 h-14 bg-background border border-border rounded-[1.25rem] shadow-sm group-hover/ws:border-primary/20 transition-colors'
-                      : 'w-14 h-14 bg-background rounded-2xl border border-border shadow-sm'
+                      ? 'w-16 h-16 bg-card border border-border/30 rounded-[1.5rem] shadow-[0_8px_16px_-4px_rgba(0,0,0,0.04)] group-hover/ws:border-primary/40 group-hover/ws:bg-background transition-all duration-500'
+                      : 'w-14 h-14 bg-card rounded-[1.25rem] border border-border/40 shadow-sm'
                   }`}
                 >
+                  <div className="absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover/ws:opacity-100 transition-opacity" />
                   <Icon
-                    className={`w-6 h-6 ${viewMode === 'grid' ? 'text-primary' : 'text-muted-foreground'}`}
+                    className={`w-7 h-7 relative z-10 transition-transform duration-500 group-hover/ws:scale-110 ${viewMode === 'grid' ? 'text-primary' : 'text-primary/70'}`}
                   />
                 </div>
               </div>
@@ -109,14 +114,14 @@ export default function WorkspaceCard({
                 >
                   {ws.name}
                 </h3>
-                <div className="flex flex-col gap-1.5">
-                  <p className="text-[11px] text-muted-foreground font-bold flex items-center gap-2.5 uppercase tracking-wide">
-                    <Files className="w-3.5 h-3.5 text-muted-foreground/40" />
-                    Fuente Principal Lista
+                <div className="flex flex-col gap-2">
+                  <p className="text-[10px] text-muted-foreground font-semibold flex items-center gap-2 uppercase tracking-[0.1em] opacity-60">
+                    <Files className="w-3.5 h-3.5" />
+                    Biblioteca Activa
                   </p>
-                  <p className="text-[10px] text-primary font-black flex items-center gap-2.5 uppercase tracking-[0.05em]">
-                    <span className="w-1 h-1 rounded-full bg-primary" />
-                    {ws.flashcards || 0} Flashcards Activas
+                  <p className="text-[10px] text-primary font-black flex items-center gap-2 uppercase tracking-[0.15em]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]" />
+                    {ws.flashcards || 0} Flashcards
                   </p>
                 </div>
               </div>
@@ -136,8 +141,8 @@ export default function WorkspaceCard({
                 </span>
               </div>
 
-              <div className="bg-muted text-muted-foreground group-hover/ws:bg-primary group-hover/ws:text-primary-foreground rounded-2xl shadow-sm transition-all duration-300 h-11 w-11 flex items-center justify-center border border-border group-hover/ws:border-primary cursor-pointer">
-                <ChevronRight className="w-6 h-6 group-hover/ws:translate-x-0.5 transition-transform" />
+              <div className="bg-muted/50 text-muted-foreground group-hover/ws:bg-primary group-hover/ws:text-primary-foreground group-hover/ws:shadow-lg group-hover/ws:shadow-primary/30 rounded-2xl shadow-sm transition-all duration-500 h-12 w-12 flex items-center justify-center border border-border group-hover/ws:border-primary/50 cursor-pointer">
+                <ChevronRight className="w-6 h-6 group-hover/ws:translate-x-1 transition-transform duration-500" />
               </div>
             </div>
           </div>

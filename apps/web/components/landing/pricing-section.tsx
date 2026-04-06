@@ -7,11 +7,9 @@ import { useEffect, useState } from 'react';
 import { Check, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { type DbUser } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
 import { apiFetchClient } from '@/lib/api-client';
-import { authClient } from '@/lib/auth-client';
 import { useAuth } from '@/lib/auth-provider';
 
 interface Plan {
@@ -27,7 +25,7 @@ interface Plan {
 }
 
 export default function PricingSection() {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
 
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +69,7 @@ export default function PricingSection() {
       id="pricing"
     >
       {/* Background decoration */}
-      <div className="absolute top-[40%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-[40%] left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-primary/[0.03] blur-[100px] rounded-full pointer-events-none" />
 
       <div className="memo-container relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
@@ -112,29 +110,38 @@ export default function PricingSection() {
             return (
               <motion.div
                 key={plan.name}
-                initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative p-8 rounded-4xl border transition-all duration-500 overflow-hidden group ${
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className={`relative p-8 rounded-[2rem] border transition-all duration-500 overflow-hidden group ${
                   plan.popular
-                    ? 'bg-[#0F1115] text-white border-primary shadow-2xl shadow-primary/20 md:transform md:scale-105 z-20'
-                    : 'bg-card border-border hover:border-primary/30 z-10'
-                } ${isDisabled ? 'opacity-60' : ''}`}
+                    ? 'bg-zinc-950 text-white border-primary/50 shadow-2xl md:scale-[1.02] z-20'
+                    : 'bg-card border-border/60 hover:border-border z-10'
+                } ${isDisabled ? 'opacity-60 pointer-events-none' : ''}`}
               >
+                {/* Subtle Background effects for Popular Card */}
                 {plan.popular && (
                   <>
-                    <div className="absolute top-0 right-0 p-6">
-                      <Sparkles className="w-8 h-8 text-primary opacity-20 group-hover:opacity-40 transition-opacity" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent" />
+                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors duration-700" />
+                  </>
+                )}
+
+                {plan.popular && (
+                  <>
+                    <div className="absolute top-6 right-6">
+                      <Sparkles className="w-5 h-5 text-primary/40 group-hover:text-primary/60 transition-colors" />
                     </div>
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-primary text-white text-[9px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-primary/30">
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[9px] font-bold uppercase tracking-wider border border-primary/20">
                       Recomendado
                     </div>
                   </>
                 )}
 
-                <div className="mb-8 space-y-3">
+                <div className="mb-8 space-y-3 relative z-10">
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan.popular ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${plan.popular ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-muted-foreground'}`}
                   >
                     <plan.icon className="w-5 h-5" />
                   </div>
@@ -143,36 +150,36 @@ export default function PricingSection() {
                       {plan.name}
                     </h3>
                     <p
-                      className={`text-xs mt-1 ${plan.popular ? 'text-white/60' : 'text-muted-foreground'}`}
+                      className={`text-xs mt-1 font-medium ${plan.popular ? 'text-zinc-400' : 'text-muted-foreground'}`}
                     >
                       {plan.description}
                     </p>
                   </div>
-                  <div className="pt-2 flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold tracking-tighter">
+                  <div className="pt-2 flex items-baseline gap-2">
+                    <span className="text-5xl font-black tracking-tighter">
                       ${plan.price}
                     </span>
                     <span
-                      className={`text-xs ${plan.popular ? 'text-white/40' : 'text-muted-foreground'} font-medium`}
+                      className={`text-[10px] font-bold uppercase tracking-widest ${plan.popular ? 'text-zinc-500' : 'text-muted-foreground/60'}`}
                     >
                       USD / mes
                     </span>
                   </div>
                 </div>
 
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature) => (
+                <ul className="space-y-4 mb-10 relative z-10">
+                  {plan.features.map((feature, i) => (
                     <li
                       key={feature}
-                      className="flex items-start gap-2.5 group/item"
+                      className="flex items-start gap-3 group/item"
                     >
                       <div
-                        className={`mt-1 p-0.5 rounded-full ${plan.popular ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}
+                        className={`mt-0.5 p-1 rounded-md ${plan.popular ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}
                       >
                         <Check className="w-3 h-3" />
                       </div>
                       <span
-                        className={`text-sm ${plan.popular ? 'text-white/80' : 'text-muted-foreground'} font-light group-hover/item:translate-x-1 transition-transform`}
+                        className={`text-sm tracking-tight ${plan.popular ? 'text-zinc-300' : 'text-muted-foreground'} font-medium group-hover/item:translate-x-0.5 transition-transform duration-300`}
                       >
                         {feature}
                       </span>
@@ -180,28 +187,28 @@ export default function PricingSection() {
                   ))}
                 </ul>
 
-                <Button
-                  disabled={isDisabled}
-                  className={`w-full py-6 rounded-xl text-md font-bold shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] ${
-                    plan.popular
-                      ? 'bg-primary hover:bg-primary/90 text-white shadow-primary/20'
-                      : 'bg-muted hover:bg-muted/80 text-foreground shadow-none'
-                  }`}
-                >
-                  {isDisabled ? (
-                    <span>{plan.cta}</span>
-                  ) : (
-                    <Link
-                      href={href}
-                      className="w-full h-full flex items-center justify-center"
-                    >
-                      {ctaText}
-                    </Link>
-                  )}
-                </Button>
+                <div className="relative z-10">
+                  <Button
+                    disabled={isDisabled}
+                    asChild
+                    className={`w-full py-6 rounded-xl text-sm font-bold transition-all ${
+                      plan.popular
+                        ? 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20'
+                        : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 shadow-none dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-100'
+                    }`}
+                  >
+                    {isDisabled ? (
+                      <span>{plan.cta}</span>
+                    ) : (
+                      <Link href={href}>
+                        {ctaText}
+                      </Link>
+                    )}
+                  </Button>
+                </div>
 
                 {plan.popular && (
-                  <p className="text-center mt-4 text-white/30 text-[9px] font-medium uppercase tracking-widest">
+                  <p className="text-center mt-4 text-zinc-600 text-[9px] font-semibold uppercase tracking-widest relative z-10">
                     Cancela en cualquier momento
                   </p>
                 )}

@@ -185,19 +185,30 @@ export default function Header() {
     >
       <div className="flex items-center justify-between h-full">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link
+          href="/"
+          className="flex items-center gap-3 group relative shrink-0"
+        >
           <div className="relative">
-            <motion.div className="absolute -inset-1 bg-primary/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Image
-              src="/logo.webp"
-              alt="Memo.ai Logo"
-              width={32}
-              height={32}
-              className="rounded-lg relative z-10"
+            <motion.div
+              className="absolute -inset-2 bg-primary/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity"
+              whileHover={{ scale: 1.2 }}
             />
+            <motion.div
+              whileHover={{ rotate: [0, -10, 10, 0] }}
+              transition={{ duration: 0.5 }}
+            >
+              <Image
+                src="/logo.webp"
+                alt="Memo.ai Logo"
+                width={34}
+                height={34}
+                className="rounded-lg relative z-10 border border-white/10 shadow-sm"
+              />
+            </motion.div>
           </div>
-          <span className="text-xl font-extrabold tracking-tight">
-            memo<span className="text-primary">.ai</span>
+          <span className="text-xl font-black tracking-tight text-foreground/90 group-hover:text-foreground transition-colors">
+            memo<span className="text-primary italic">.ai</span>
           </span>
         </Link>
 
@@ -222,10 +233,31 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden p-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors"
+          className="lg:hidden relative z-50 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-all duration-300 active:scale-90 overflow-hidden"
           aria-label="Toggle menu"
         >
-          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <div className="w-6 h-5 flex flex-col justify-between items-end relative overflow-hidden">
+            <motion.span
+              animate={
+                isOpen
+                  ? { rotate: 45, y: 8.5, width: '100%' }
+                  : { rotate: 0, y: 0, width: '100%' }
+              }
+              className="h-0.5 bg-foreground rounded-full block origin-center transition-all duration-300"
+            />
+            <motion.span
+              animate={isOpen ? { x: 50, opacity: 0 } : { x: 0, opacity: 1 }}
+              className="h-0.5 w-[70%] bg-primary rounded-full block transition-all duration-300"
+            />
+            <motion.span
+              animate={
+                isOpen
+                  ? { rotate: -45, y: -8.5, width: '100%' }
+                  : { rotate: 0, y: 0, width: '100%' }
+              }
+              className="h-0.5 bg-foreground rounded-full block origin-center transition-all duration-300"
+            />
+          </div>
         </button>
       </div>
 
@@ -244,28 +276,32 @@ export default function Header() {
 
             {/* Menu Container */}
             <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              className="lg:hidden absolute top-[85px] left-4 right-4 p-4 bg-white/80 backdrop-blur-2xl border border-white/60 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] pointer-events-auto overflow-hidden"
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="lg:hidden absolute top-[70px] left-4 right-4 p-6 bg-white/70 dark:bg-slate-950/80 backdrop-blur-3xl border border-white/40 dark:border-white/10 rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] z-40 overflow-hidden"
             >
-              <nav className="flex flex-col gap-1">
+              <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
+              <nav className="flex flex-col gap-2 relative z-10">
                 {navLinks.map((link, i) => (
                   <motion.div
                     key={link.name}
-                    initial={{ opacity: 0, x: -5 }}
+                    initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    transition={{ delay: i * 0.05, type: 'spring' }}
                   >
                     <Link
                       href={link.href}
                       onClick={(e) => handleScroll(e, link.href)}
-                      className="flex items-center justify-between p-4 rounded-2xl hover:bg-black/5 group transition-colors"
+                      className="flex items-center justify-between p-4 px-6 rounded-2xl hover:bg-primary/5 group transition-all"
                     >
-                      <span className="text-base font-bold text-slate-800 tracking-tight">
+                      <span className="text-lg font-black text-foreground/80 group-hover:text-primary italic tracking-tight transition-colors">
                         {link.name}
                       </span>
-                      <ChevronRight className="size-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                      <div className="w-8 h-8 rounded-full bg-primary/0 group-hover:bg-primary/10 flex items-center justify-center transition-all">
+                        <ChevronRight className="size-4 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                      </div>
                     </Link>
                   </motion.div>
                 ))}
