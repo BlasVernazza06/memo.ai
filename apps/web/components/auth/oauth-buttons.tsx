@@ -21,7 +21,7 @@ export default function OAuthButtons({
 
   const handleSignIn = async (provider: 'google' | 'github') => {
     setIsLoading(provider);
-    const webUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+    const webUrl = process.env.NEXT_PUBLIC_APP_URL;
     const redirectTo = callbackUrl ? `${webUrl}${callbackUrl}` : webUrl;
     await signIn.social({ provider, callbackURL: redirectTo });
     setIsLoading(null);
@@ -37,7 +37,7 @@ export default function OAuthButtons({
         onClick={() => handleSignIn('google')}
       >
         {isLoading === 'google' ? (
-          <Loader2 className="size-5 animate-spin" />
+          <Loader2 className="size-5 animate-spin text-gray-500" />
         ) : (
           <Google className="size-5" />
         )}
@@ -51,7 +51,7 @@ export default function OAuthButtons({
         onClick={() => handleSignIn('github')}
       >
         {isLoading === 'github' ? (
-          <Loader2 className="size-5 animate-spin" />
+          <Loader2 className="size-5 animate-spin text-gray-500" />
         ) : (
           <GitHubLight className="size-5" />
         )}

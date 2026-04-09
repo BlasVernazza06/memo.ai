@@ -23,6 +23,7 @@ export default function SignInForm() {
   const { data: session } = authClient.useSession();
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
@@ -41,14 +42,24 @@ export default function SignInForm() {
 
   const onSubmit = async (formData: LoginFormValues) => {
     setIsLoadingForm(true);
+    setGeneralError(null);
     try {
-      await authClient.signIn.email({
+      const { error } = await authClient.signIn.email({
         email: formData.email,
         password: formData.password,
       });
+
+      if (error) {
+        setGeneralError(
+          error.message || 'Error al iniciar sesión. Revisa tus credenciales.',
+        );
+        return;
+      }
+
       router.push(callbackUrl);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setGeneralError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     } finally {
       setIsLoadingForm(false);
     }
@@ -62,6 +73,15 @@ export default function SignInForm() {
       className="space-y-4"
       onSubmit={handleSubmit(onSubmit)}
     >
+      {generalError && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-xl text-xs font-bold text-center"
+        >
+          {generalError}
+        </motion.div>
+      )}
       <div className="space-y-1">
         <Label
           htmlFor="email"

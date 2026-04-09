@@ -18,20 +18,10 @@ export default function Home() {
   const [isSandboxOpen, setIsSandboxOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
-      {/* Background gradient blobs */}
-      <div
-        className="absolute top-0 left-0 w-96 h-96 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        style={{ background: 'hsla(199, 89%, 48%, 0.25)' }}
-      />
-      <div
-        className="absolute top-0 right-0 w-96 h-96 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        style={{ background: 'hsla(217, 91%, 60%, 0.25)' }}
-      />
-      <div
-        className="absolute top-1/2 left-1/2 w-[800px] h-[800px] rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        style={{ background: 'hsla(199, 89%, 48%, 0.08)' }}
-      />
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden selection:bg-primary/10">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-[1000px] bg-[radial-gradient(ellipse_at_top,rgba(var(--primary-rgb),0.08),transparent)]" />
+      </div>
 
       <AnimatePresence>
         {!isSandboxOpen && (

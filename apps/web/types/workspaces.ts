@@ -14,6 +14,7 @@ export type Workspace = {
   // UI fields
   docs?: number;
   flashcards?: number;
+  quizzesCount?: number;
   color?: string;
   lastActive?: string;
 };

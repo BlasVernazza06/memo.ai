@@ -13,13 +13,12 @@ import {
   LogOut,
   Settings,
 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { Plus } from 'lucide-react';
 import { getInitials } from '@/hooks/use-Initials';
 import { authClient } from '@/lib/auth-client';
 import { useAuth } from '@/lib/auth-provider';
-
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
@@ -46,8 +45,6 @@ export default function DashAside() {
     router.push('/');
   };
 
-
-
   const renderAvatar = () => {
     if (isLoading) {
       return (
@@ -64,7 +61,7 @@ export default function DashAside() {
           alt={user?.name ?? 'Usuario'}
           width={40}
           height={40}
-          className="w-10 h-10 rounded-xl object-cover ring-2 ring-white shadow-sm"
+          className="w-10 h-10 rounded-xl object-cover ring-2  shadow-sm"
         />
       );
     }
@@ -95,7 +92,9 @@ export default function DashAside() {
 
             <span className="text-xl font-black text-foreground tracking-tight">
               memo
-              <span className="text-primary group-hover/logo:opacity-80 transition-opacity">.ai</span>
+              <span className="text-primary group-hover/logo:opacity-80 transition-opacity">
+                .ai
+              </span>
             </span>
           </Link>
         </div>
@@ -167,34 +166,36 @@ export default function DashAside() {
 
         {/* User Profile Footer */}
         <div className="p-6 pt-0 mt-auto">
-          <Link
-            href={'/dashboard/profile'}
-            className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-muted/20 backdrop-blur-sm border border-border/40 shadow-xs hover:bg-muted/40 hover:border-border/60 transition-all duration-300 group/profile"
-          >
-            <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center justify-between gap-1 rounded-2xl bg-muted/10 dark:bg-muted/5 backdrop-blur-sm border border-border/40 shadow-xs overflow-hidden">
+            <Link
+              href={'/dashboard/profile'}
+              className="flex items-center gap-3 p-3 flex-1 hover:bg-muted/40 transition-all duration-300 group/info min-w-0"
+            >
               <div className="relative">
                 {renderAvatar()}
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-card rounded-full" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-black text-foreground truncate group-hover/profile:text-primary transition-colors">
+                <p className="text-xs font-black text-foreground truncate group-hover/info:text-primary transition-colors">
                   {user?.name ?? 'JD'}
                 </p>
                 <p className="text-[10px] font-bold text-muted-foreground truncate uppercase tracking-tight opacity-70">
                   {user?.plan ? `${user.plan} Plan` : 'Loading...'}
                 </p>
               </div>
+            </Link>
+            <div className="pr-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSignOut();
+                }}
+                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/15 rounded-xl transition-all cursor-pointer group/logout"
+              >
+                <LogOut className="w-4 h-4 group-hover/logout:-translate-x-0.5 transition-transform" />
+              </button>
             </div>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                handleSignOut();
-              }}
-              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer group/logout"
-            >
-              <LogOut className="w-4 h-4 group-hover/logout:-translate-x-0.5 transition-transform" />
-            </button>
-          </Link>
+          </div>
 
           {/* Version Badge */}
           <div className="mt-4 flex justify-center">

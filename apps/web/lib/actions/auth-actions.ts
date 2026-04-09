@@ -31,3 +31,16 @@ export async function signIn(formData: LoginFormValues) {
     redirect('/dashboard');
   }
 }
+
+export async function signInSocial(
+  provider: 'google' | 'github',
+  callbackUrl?: string,
+) {
+  const webUrl =
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+  const redirectTo = callbackUrl ? `${webUrl}${callbackUrl}` : webUrl;
+
+  const url = `${API_URL}/auth/login/social/${provider}?callbackURL=${encodeURIComponent(redirectTo)}`;
+
+  redirect(url);
+}

@@ -3,6 +3,7 @@
 // React
 // External packages
 // Next
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -12,23 +13,21 @@ import {
   BarChart3,
   Brain,
   ChevronLeft,
-  Download,
   FileText,
   Heart,
   Layers,
-  MessageSquare,
-  MoreVertical,
   Plus,
   Settings,
   Sparkles,
+  Trophy,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
+import type { WorkspaceWithRelations } from '@repo/db';
 // Components
 import { Button } from '@repo/ui/components/ui/button';
 
-import type { WorkspaceWithRelations, DbDocument } from '@repo/db';
-import SearchInput from '@/components/shared/search-input';
+import { AiChatFloat } from '@/components/dashboard/workspace/ai-chat-float';
 import { apiFetchClient } from '@/lib/api-client';
 
 import WorkspaceSettingsModal from '../../../../../components/dashboard/workspace-settings-modal';
@@ -40,9 +39,11 @@ import WorkspaceSettingsModal from '../../../../../components/dashboard/workspac
 export default function WorkspaceDetailPage() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState<
-    'docs' | 'flashcards' | 'quizzes' | 'analysis'
-  >('docs');
-  const [workspace, setWorkspace] = useState<WorkspaceWithRelations | null>(null);
+    'flashcards' | 'quizzes' | 'analysis'
+  >('flashcards');
+  const [workspace, setWorkspace] = useState<WorkspaceWithRelations | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isFav, setIsFav] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -51,7 +52,9 @@ export default function WorkspaceDetailPage() {
     const fetchWorkspace = async () => {
       try {
         setIsLoading(true);
-        const data = await apiFetchClient<WorkspaceWithRelations>(`/workspaces/${id}`);
+        const data = await apiFetchClient<WorkspaceWithRelations>(
+          `/workspaces/${id}`,
+        );
         setWorkspace(data);
         setIsFav(data.isFavorite);
       } catch (error) {
@@ -67,12 +70,6 @@ export default function WorkspaceDetailPage() {
   }, [id]);
 
   const TABS = [
-    {
-      id: 'docs' as const,
-      label: 'Documentos',
-      count: workspace?.documents?.length || 0,
-      icon: FileText,
-    },
     {
       id: 'flashcards' as const,
       label: 'Flashcards',
@@ -93,14 +90,44 @@ export default function WorkspaceDetailPage() {
     },
   ];
 
+  const primaryDoc = workspace?.documents?.[0];
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <Brain className="w-12 h-12 text-primary animate-pulse" />
-          <p className="text-slate-500 font-black uppercase tracking-widest text-xs">
-            Cargando Workspace...
-          </p>
+      <div className="min-h-screen  flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-8 max-w-[240px] w-full">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{
+              opacity: [0.3, 0.6, 0.3],
+              scale: [1, 1.05, 1],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="w-12 h-12 text-primary/40"
+          >
+            <Brain className="w-full h-full" />
+          </motion.div>
+          <div className="space-y-4 w-full text-center">
+            <div className="h-px w-full bg-border/50 rounded-full overflow-hidden relative">
+              <motion.div
+                className="absolute top-0 left-0 h-full bg-primary/40"
+                initial={{ left: '-100%', width: '50%' }}
+                animate={{ left: '100%' }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+            </div>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em] pl-1">
+              Cargando
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -115,212 +142,294 @@ export default function WorkspaceDetailPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 pb-32 pt-6 px-4 md:px-8">
-      {/* Top Actions & Breadcrumb */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3 text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 hover:text-foreground transition-colors bg-card border border-border py-2.5 px-5 rounded-full shadow-sm"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Workspaces
-          </Link>
-          <span className="opacity-40">/</span>
-          <span className="text-foreground shrink-0">{workspace.category || 'General'}</span>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setIsFav(!isFav)}
-            variant="ghost"
-            className={`rounded-full w-12 h-12 p-0 shadow-sm transition-all active:scale-95 ${
-              isFav
-                ? 'bg-rose-500/10 border border-rose-500/20 text-rose-500'
-                : 'bg-card border border-border text-muted-foreground hover:text-rose-500'
-            }`}
-          >
-            <Heart className={`w-5 h-5 ${isFav ? 'fill-current' : ''}`} />
-          </Button>
-          <Button
-            onClick={() => setShowSettings(true)}
-            variant="ghost"
-            className="rounded-full w-12 h-12 p-0 bg-card border border-border text-muted-foreground hover:text-foreground shadow-sm transition-all active:scale-95"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Compact Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden">
-        {workspace.coverImage && (
-          <div
-            className="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none"
-            style={{
-              backgroundImage: `url(${workspace.coverImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              maskImage: 'linear-gradient(to left, black, transparent)',
-              WebkitMaskImage: 'linear-gradient(to left, black, transparent)'
-            }}
+    <div className="min-h-screen w-full">
+      {/* Notion-style Cover Area */}
+      <div className="relative h-72 md:h-96 w-full overflow-hidden group bg-muted">
+        {workspace.coverImage ? (
+          <Image
+            src={workspace.coverImage}
+            alt="Cover"
+            fill
+            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+            priority
           />
+        ) : (
+          <div className="w-full h-full bg-linear-to-tr from-primary/30 via-primary/10 to-background relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(var(--primary-rgb),0.15),transparent)]" />
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+          </div>
         )}
-        <div className="flex items-center gap-5 relative z-10">
-          <div className="w-16 h-16 md:w-20 md:h-20 bg-background border border-border rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-sm shrink-0">
-            {workspace.icon || '📚'}
-          </div>
-          <div className="space-y-1.5">
-            <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
-              {workspace.name}
-            </h1>
-            <p className="text-muted-foreground font-medium text-sm md:text-base">
-              {workspace.description || 'Transforma tus apuntes en conocimiento interactivo con IA.'}
-            </p>
-          </div>
-        </div>
-        <div className="shrink-0 relative z-10">
-          <Button className="w-full md:w-auto bg-primary text-primary-foreground font-black rounded-xl h-12 px-6 gap-2 shadow-sm transition-all active:scale-95">
-            <Sparkles className="w-4 h-4" />
-            Estudiar Ahora
-          </Button>
-        </div>
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-background via-background/60 to-transparent" />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-        {/* Left Column - Content & Stats */}
-        <div className="xl:col-span-8 space-y-8">
-          {/* Navigation Pills */}
-          <div className="flex flex-wrap items-center gap-2 bg-card border border-border p-2 rounded-2xl shadow-sm">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-xl transition-all duration-200 text-sm font-bold flex-1 md:flex-none justify-center ${
-                  activeTab === tab.id
-                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+      {/* Content Container */}
+      <div className="w-full px-8 md:px-16 lg:px-24 -mt-30 relative z-10 pb-32">
+        {/* Top Floating Actions Area */}
+        <div className="flex items-end justify-between mb-8 group/top">
+          {/* Main Icon Overlap */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="w-32 h-32 md:w-40 md:h-40 bg-background rounded-3xl border-4 border-background shadow-2xl flex items-center justify-center text-5xl md:text-6xl relative overflow-hidden group/icon"
+          >
+            {primaryDoc?.thumbnailUrl ? (
+              <Image
+                src={primaryDoc.thumbnailUrl}
+                alt="Workspace Icon"
+                fill
+                className="object-cover transition-transform group-hover/icon:scale-110"
+              />
+            ) : (
+              <span className="transition-transform group-hover/icon:scale-110 duration-500">
+                {workspace.icon || '📚'}
+              </span>
+            )}
+          </motion.div>
+
+          <div className="flex flex-col items-end gap-6 mb-2">
+            {/* Nav Actions */}
+            <div className="flex items-center gap-3">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-4 py-2 bg-background/50 backdrop-blur-md border border-border/50 rounded-xl text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all shadow-sm"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                Workspaces
+              </Link>
+              <div className="h-6 w-px bg-border/50 mx-1" />
+              <Button
+                onClick={() => setIsFav(!isFav)}
+                variant="ghost"
+                className={`rounded-xl w-10 h-10 p-0 shadow-sm transition-all active:scale-90 ${
+                  isFav
+                    ? 'bg-rose-500/10 border border-rose-500/20 text-rose-500'
+                    : 'bg-background/50 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-rose-500'
                 }`}
               >
-                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'opacity-100' : 'opacity-70'}`} />
-                <span>{tab.label}</span>
-                {tab.count !== null && (
-                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-black ${
-                    activeTab === tab.id 
-                    ? 'bg-white/20 text-white' 
-                    : 'bg-muted/80 text-foreground'
-                  }`}>
-                    {tab.count}
-                  </span>
+                <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
+              </Button>
+              <Button
+                onClick={() => setShowSettings(true)}
+                variant="ghost"
+                className="rounded-xl w-10 h-10 p-0 bg-background/50 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-foreground shadow-sm transition-all active:scale-90"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* 3-Column Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column (3) - File Escalón & Title */}
+          <div className="lg:col-span-3 space-y-8 sticky top-8">
+            <div className="space-y-6">
+              {/* Title Escalón */}
+              <div className="space-y-2">
+                <h1 className="text-3xl font-black text-foreground tracking-tight leading-tight">
+                  {workspace.name}
+                </h1>
+                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                  {workspace.description ||
+                    'Transforma tus apuntes en conocimiento interactivo con IA.'}
+                </p>
+              </div>
+
+              {/* Context Escalón */}
+              {workspace.customContext && (
+                <div className="p-4 bg-muted/30 rounded-2xl border border-border/50 italic text-[13px] text-muted-foreground leading-relaxed">
+                  &quot;{workspace.customContext}&quot;
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {/* File Escalón - Directly above tabs */}
+                {primaryDoc && (
+                  <div className="group/file relative bg-card/50 backdrop-blur-xl border border-border/40 rounded-3xl overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-primary/20">
+                    <div className="aspect-video relative bg-muted flex items-center justify-center overflow-hidden">
+                      {primaryDoc.thumbnailUrl ? (
+                        <Image
+                          src={primaryDoc.thumbnailUrl}
+                          alt="Preview"
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <FileText className="w-12 h-12 text-muted-foreground/30" />
+                      )}
+                      <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent flex items-end p-4">
+                        <div className="bg-background/90 backdrop-blur-sm rounded-lg px-2 py-1 text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                          Doc. Origen
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </button>
-            ))}
+
+                {/* Navigation Tabs (Vertical Stack) */}
+                <div className="flex flex-col gap-1.5 bg-card/30 p-1.5 rounded-2xl border border-border/40">
+                  {TABS.map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all font-bold text-sm relative group ${
+                          isActive
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        }`}
+                      >
+                        <tab.icon
+                          className={`w-4 h-4 ${isActive ? '' : 'opacity-60 group-hover:opacity-100'}`}
+                        />
+                        <span className="flex-1 text-left">{tab.label}</span>
+                        {tab.count !== null && (
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded-md ${isActive ? 'bg-white/20 text-white' : 'bg-muted/80 text-foreground'}`}
+                          >
+                            {tab.count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Tab Content Display */}
-          <div className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm min-h-[400px]">
+          {/* Middle Column (6) - Card List Content */}
+          <div className="lg:col-span-6 min-h-[600px] space-y-6">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-3">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={activeTab}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                  >
+                    {TABS.find((t) => t.id === activeTab)?.label}
+                  </motion.span>
+                </AnimatePresence>
+                <span className="h-px w-12 bg-border/50" />
+              </h2>
+              <Button
+                variant="ghost"
+                className="h-8 rounded-lg px-2 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Crear Nuevo
+              </Button>
+            </div>
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-                transition={{ duration: 0.25 }}
-                className="h-full"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
               >
-                {activeTab === 'docs' && (
-                  <DocsList docs={workspace.documents || []} />
+                {activeTab === 'flashcards' && (workspace.flashcardDecks?.length ?? 0) > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {workspace.flashcardDecks?.map((deck, idx) => (
+                      <DeckCard key={deck.id} deck={deck} index={idx} />
+                    ))}
+                  </div>
+                ) : activeTab === 'quizzes' && (workspace.quizzes?.length ?? 0) > 0 ? (
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {workspace.quizzes?.map((quiz, idx) => (
+                      <QuizCard key={quiz.id} quiz={quiz} index={idx} />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyTabListState
+                    tabName={TABS.find((t) => t.id === activeTab)?.label || ''}
+                    icon={TABS.find((t) => t.id === activeTab)?.icon || Layers}
+                  />
                 )}
-                {activeTab !== 'docs' && <EmptyTabState tabName={TABS.find(t => t.id === activeTab)?.label || ''} />}
               </motion.div>
             </AnimatePresence>
           </div>
-        </div>
 
-        {/* Right Column - Secondary Context */}
-        <div className="xl:col-span-4 space-y-8">
-          
-          {/* Progress Card */}
-          <div className="bg-card border border-border rounded-3xl p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden group">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
-            <h3 className="text-foreground text-xl font-black mb-6 relative z-10">
-              Dominio General
-            </h3>
-            <div className="relative w-36 h-36 flex items-center justify-center mb-6 z-10">
-              <svg className="w-full h-full -rotate-90 drop-shadow-sm">
-                <circle
-                  cx="72"
-                  cy="72"
-                  r="60"
-                  className="stroke-muted fill-none"
-                  strokeWidth="12"
-                />
-                <circle
-                  cx="72"
-                  cy="72"
-                  r="60"
-                  className="stroke-primary fill-none transition-all duration-1000"
-                  strokeWidth="12"
-                  strokeDasharray="377"
-                  strokeDashoffset="120"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-black text-foreground">68%</span>
-                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-wider">
-                  Precisión
+          {/* Right Column (3) - Metrics & Intelligence */}
+          <div className="lg:col-span-3 space-y-6 lg:sticky lg:top-8">
+            {/* Domain Metrics */}
+            <div className="bg-slate-900 border border-slate-800 text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full -mr-16 -mt-16" />
+
+              <div className="flex items-center gap-2 mb-8 opacity-40">
+                <Trophy className="w-3 h-3" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                  Dominio Global
                 </span>
               </div>
-            </div>
-            <p className="text-muted-foreground text-sm font-medium leading-relaxed relative z-10">
-              ¡Excelente ritmo! Sigue repasando tus flashcards para alcanzar el 100% de retención antes de tu examen.
-            </p>
-          </div>
 
-          {/* Context Note */}
-          {workspace.customContext && (
-            <div className="bg-card border border-border rounded-3xl p-8 shadow-sm relative overflow-hidden group transition-all hover:border-amber-500/30">
-              <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-                <MessageSquare className="w-24 h-24 text-foreground" />
-              </div>
-              <h3 className="text-foreground text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                <MessageSquare className="w-3.5 h-3.5 text-amber-500" />
-                Contexto Manual
-              </h3>
-              <p className="text-muted-foreground text-sm font-medium leading-relaxed italic relative z-10 border-l-2 border-amber-500/50 pl-4">
-                &quot;{workspace.customContext}&quot;
-              </p>
-            </div>
-          )}
-
-          {/* AI Banner */}
-          <div className="bg-foreground rounded-3xl p-8 text-background space-y-6 shadow-lg relative overflow-hidden group">
-            <div className="relative z-10">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 bg-primary/20 backdrop-blur-md rounded-2xl flex items-center justify-center ring-1 ring-primary/30 group-hover:scale-110 transition-transform">
-                  <Brain className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-black text-lg">Asistente Activo</h3>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    <p className="text-background/50 text-[10px] font-bold uppercase tracking-widest">
-                      En línea
-                    </p>
+              <div className="flex flex-col items-center gap-6 mb-8">
+                <div className="relative w-28 h-28">
+                  <svg className="w-full h-full -rotate-90">
+                    <circle
+                      cx="56"
+                      cy="56"
+                      r="50"
+                      className="stroke-white/5 fill-none"
+                      strokeWidth="8"
+                    />
+                    <circle
+                      cx="56"
+                      cy="56"
+                      r="50"
+                      className="stroke-primary fill-none transition-all duration-1000"
+                      strokeWidth="8"
+                      strokeDasharray="314"
+                      strokeDashoffset={314 * (1 - 0.68)}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center font-black text-2xl tracking-tighter">
+                    68 <span className="text-xs ml-0.5 opacity-40">%</span>
                   </div>
                 </div>
+                <div className="text-center">
+                  <p className="font-black text-lg leading-tight">
+                    Buen Progreso
+                  </p>
+                  <p className="text-[10px] font-medium opacity-50 mt-1 uppercase tracking-widest text-balance">
+                    Superando al 84% de usuarios
+                  </p>
+                </div>
               </div>
-              <p className="text-background/70 text-sm font-medium leading-relaxed bg-background/5 p-5 rounded-3xl border border-background/10 backdrop-blur-sm">
-                &quot;He procesado los últimos documentos. Te recomiendo empezar con el quiz de recién agregados.&quot;
+
+              <div className="grid grid-cols-2 gap-3 pt-6 border-t border-white/5">
+                <div className="space-y-1">
+                  <p className="text-[9px] font-bold opacity-30 uppercase">
+                    Material
+                  </p>
+                  <p className="font-black text-base">12/40</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[9px] font-bold opacity-30 uppercase">
+                    Sesiones
+                  </p>
+                  <p className="font-black text-base">8 Hoy</p>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Suggestion Tip */}
+            <div className="bg-card/40 backdrop-blur-xl border border-border/40 rounded-4xl p-6 relative group overflow-hidden shadow-sm hover:shadow-md transition-all">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
+              <Sparkles className="w-5 h-5 text-primary mb-4" />
+              <h3 className="font-black text-xs uppercase tracking-widest mb-2">
+                Memo IA Sugiere
+              </h3>
+              <p className="text-[13px] text-muted-foreground leading-relaxed font-medium">
+                Has mejorado en <strong>Teoría de Redes</strong>. Repasemos
+                estos conceptos antes de tu próximo quiz.
               </p>
-              <Button className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-2xl h-14 gap-2 border border-primary/50 shadow-lg shadow-primary/20 transition-all active:scale-95">
-                <MessageSquare className="w-4 h-4" />
-                Abrir Chat
-              </Button>
             </div>
           </div>
         </div>
@@ -332,95 +441,122 @@ export default function WorkspaceDetailPage() {
         onClose={() => setShowSettings(false)}
         workspace={workspace}
       />
+
+      {/* Floating Chat */}
+      <AiChatFloat />
     </div>
   );
 }
 
-function DocsList({ docs }: { docs: DbDocument[] }) {
-  const [filteredDocs, setFilteredDocs] = useState(docs);
-
+function DeckCard({ deck, index }: { deck: any, index: number }) {
   return (
-    <div className="space-y-8">
-      <SearchInput
-        data={docs}
-        onResultsChange={setFilteredDocs}
-        placeholder="Buscar documentos..."
-        showButton
-        buttonText="Subir"
-        suffix={<Plus className="w-5 h-5 mr-1" />}
-      />
-
-      {filteredDocs.length === 0 ? (
-        <div className="py-20 text-center">
-          <p className="text-muted-foreground font-medium">No hay documentos aún.</p>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="group relative bg-card border border-border/60 rounded-3xl p-6 hover:border-primary/30 transition-all hover:shadow-xl hover:shadow-primary/5"
+    >
+      <div className="flex items-start justify-between mb-6">
+        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500">
+          <Layers className="w-6 h-6" />
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredDocs.map((doc) => (
-            <div
-              key={doc.id}
-              className="bg-card border border-border p-5 rounded-3xl flex flex-col gap-4 hover:border-primary/40 hover:bg-muted/10 transition-all cursor-pointer group shadow-sm"
-            >
-              <div className="flex items-start justify-between">
-                <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shrink-0">
-                  <FileText className="w-6 h-6" />
-                </div>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="space-y-2 mt-auto">
-                <h4 className="font-black text-foreground text-lg group-hover:text-primary transition-colors line-clamp-1">
-                  {doc.name}
-                </h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest bg-muted/50 px-3 py-1 rounded-lg">
-                    {doc.type.toUpperCase()} • {doc.sizeBytes ? `${(doc.sizeBytes / 1024 / 1024).toFixed(1)} MB` : '0 MB'}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest">
-                      Procesado
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+          {deck.cards?.length || 0} Cartas
         </div>
-      )}
-    </div>
-  );
-}
-
-function EmptyTabState({ tabName }: { tabName: string }) {
-  return (
-    <div className="h-full flex flex-col items-center justify-center py-20 text-center space-y-6">
-      <div className="w-24 h-24 bg-card rounded-full shadow-lg flex items-center justify-center mx-auto text-muted-foreground border border-border relative">
-        <Sparkles className="w-10 h-10 absolute animate-pulse text-primary/50" />
-        <Layers className="w-8 h-8 opacity-50" />
       </div>
-      <div className="space-y-2">
-        <h3 className="text-2xl font-black text-foreground">
-          Generando {tabName}
-        </h3>
-        <p className="text-sm text-muted-foreground max-w-sm mx-auto font-medium">
-          Nuestra inteligencia artificial está destilando tus documentos para crear este material de estudio optimizado.
+      
+      <div className="space-y-1 mb-6">
+        <h4 className="font-black text-lg text-foreground group-hover:text-primary transition-colors">
+          {deck.name}
+        </h4>
+        <p className="text-xs text-muted-foreground/60 font-medium line-clamp-1">
+          {deck.description || 'Mazo de estudio optimizado'}
         </p>
       </div>
+
+      <div className="flex items-center gap-2">
+        <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl h-10 gap-2 shadow-lg shadow-primary/20">
+          <Brain className="w-4 h-4" />
+          Estudiar
+        </Button>
+        <Button variant="outline" className="w-10 h-10 p-0 rounded-xl border-border/60 hover:bg-muted">
+          <Settings className="w-4 h-4 text-muted-foreground" />
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
+function QuizCard({ quiz, index }: { quiz: any, index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="group relative bg-card border border-border/60 rounded-3xl p-6 hover:border-violet-500/30 transition-all hover:shadow-xl hover:shadow-violet-500/5"
+    >
+      <div className="flex items-start justify-between mb-6">
+        <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-500 group-hover:scale-110 transition-transform duration-500">
+          <Trophy className="w-6 h-6" />
+        </div>
+        <div className="px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-600 text-[10px] font-black uppercase tracking-widest">
+          {quiz.questions?.length || 0} Preguntas
+        </div>
+      </div>
+      
+      <div className="space-y-1 mb-6">
+        <h4 className="font-black text-lg text-foreground group-hover:text-violet-500 transition-colors">
+          {quiz.name}
+        </h4>
+        <p className="text-xs text-muted-foreground/60 font-medium line-clamp-1">
+          {quiz.description || 'Evaluación de conocimientos'}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button className="flex-1 bg-violet-500 hover:bg-violet-600 text-white font-black rounded-xl h-10 gap-2 shadow-lg shadow-violet-500/20">
+          <Trophy className="w-4 h-4" />
+          Comenzar
+        </Button>
+        <Button variant="outline" className="w-10 h-10 p-0 rounded-xl border-border/60 hover:bg-muted">
+          <Settings className="w-4 h-4 text-muted-foreground" />
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
+function EmptyTabListState({
+  tabName,
+  icon: Icon,
+}: {
+  tabName: string;
+  icon: React.ElementType;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 text-center space-y-8 bg-card/20 border border-border/40 rounded-[3rem] border-dashed">
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 blur-[60px] rounded-full animate-pulse" />
+        <div className="w-20 h-20 bg-background rounded-3xl shadow-xl flex items-center justify-center mx-auto border border-border/50 relative z-10">
+          <Icon className="w-8 h-8 text-primary/40" />
+        </div>
+      </div>
+      <div className="space-y-3 max-w-[280px] mx-auto">
+        <h3 className="text-xl font-black text-foreground">
+          Generando {tabName}
+        </h3>
+        <p className="text-xs text-muted-foreground/80 font-medium leading-relaxed">
+          Nuestra inteligencia artificial está destilando tus documentos para
+          crear este material de estudio optimizado.
+        </p>
+      </div>
+      <Button
+        variant="ghost"
+        className="text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5 rounded-full h-10 px-8 border border-primary/10"
+      >
+        Configurar Generación
+      </Button>
     </div>
   );
 }
+

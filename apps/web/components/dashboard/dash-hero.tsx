@@ -21,7 +21,11 @@ import { Button } from '@repo/ui/components/ui/button';
 
 import { useAuth } from '@/lib/auth-provider';
 
-export default function DashHero() {
+export default function DashHero({
+  summary,
+}: {
+  summary: { workspaces: number; docs: number; flashcards: number };
+}) {
   const { user } = useAuth();
   const [showTutorial, setShowTutorial] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -133,9 +137,17 @@ export default function DashHero() {
               <div className="flex items-center gap-3">
                 <div className="text-center">
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
-                    Docs
+                    Proyectos
                   </p>
-                  <p className="text-lg font-black">12</p>
+                  <p className="text-lg font-black">{summary.workspaces}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 border-l border-border/30 pl-8">
+                <div className="text-center">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                    Documentos
+                  </p>
+                  <p className="text-lg font-black">{summary.docs}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 border-l border-border/30 pl-8">
@@ -143,7 +155,7 @@ export default function DashHero() {
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
                     Cards
                   </p>
-                  <p className="text-lg font-black">850</p>
+                  <p className="text-lg font-black">{summary.flashcards}</p>
                 </div>
               </div>
                <div className="flex items-center gap-3 border-l border-border/30 pl-8">

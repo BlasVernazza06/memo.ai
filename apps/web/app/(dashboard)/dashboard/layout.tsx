@@ -24,11 +24,8 @@ export default async function DashboardLayout({
 
       {/* Main Content Area */}
       <main className="flex-1 relative overflow-y-auto h-screen custom-scrollbar">
-        {/* Subtle top bar for User Context if needed, or just padding */}
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 py-10 lg:py-16">
-          <div className="relative z-10 w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {children}
-          </div>
+        <div className="relative z-10 w-full animate-in fade-in duration-700">
+          {children}
         </div>
         
         {/* Subtle Decorative Element (just one, very controlled) */}

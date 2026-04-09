@@ -20,6 +20,7 @@ export default function SignUpForm() {
   const { data: session } = authClient.useSession();
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
@@ -39,16 +40,26 @@ export default function SignUpForm() {
 
   const onSubmit = async (formData: RegisterFormValues) => {
     setIsLoadingForm(true);
+    setGeneralError(null);
 
     try {
-      await authClient.signUp.email({
+      const { error } = await authClient.signUp.email({
         email: formData.email,
         password: formData.password,
         name: formData.name,
       });
+
+      if (error) {
+        setGeneralError(
+          error.message || 'Error al crear la cuenta. Inténtalo de nuevo.',
+        );
+        return;
+      }
+
       router.push(callbackUrl);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setGeneralError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     } finally {
       setIsLoadingForm(false);
     }
@@ -60,10 +71,17 @@ export default function SignUpForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
       className="space-y-3"
-      onSubmit={handleSubmit(onSubmit, (errors) =>
-        console.log('Errores de validación:', errors),
-      )}
+      onSubmit={handleSubmit(onSubmit)}
     >
+      {generalError && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-xl text-xs font-bold text-center mb-2"
+        >
+          {generalError}
+        </motion.div>
+      )}
       <div className="space-y-1">
         <Label
           htmlFor="name"

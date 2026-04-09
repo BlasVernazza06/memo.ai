@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import { Lock } from 'lucide-react';
+import { BrainCircuit, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import AuthRightPanel from '@/components/auth/auth-right-panel';
@@ -43,17 +43,18 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-               className="text-center mb-6"
+               className="text-center mb-10"
             >
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-primary rounded-2xl mb-4 shadow-lg shadow-primary/30 relative">
-                <div className="absolute inset-0 bg-white/10 rounded-2xl animate-pulse" />
-                <Lock className="w-6 h-6 text-white relative z-10" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-6 relative group/icon overflow-hidden">
+                <div className="absolute inset-0 bg-primary/20 scale-0 group-hover/icon:scale-110 transition-transform duration-500" />
+                <BrainCircuit className="w-8 h-8 text-primary relative z-10" />
               </div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-                ¡Accede a tu cuenta!
+              <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center justify-center gap-2">
+                Bienvenido <Zap className="w-6 h-6 text-primary fill-primary" />
               </h1>
-              <p className="text-muted-foreground mt-2 text-sm font-medium">
-                Entra con tu email y contraseña registrada para continuar.
+              <p className="text-muted-foreground mt-3 text-sm font-medium leading-relaxed">
+                Accede a tu cuenta para continuar con tu <br />
+                <span className="text-foreground italic">plan de estudio inteligente.</span>
               </p>
             </motion.div>
 

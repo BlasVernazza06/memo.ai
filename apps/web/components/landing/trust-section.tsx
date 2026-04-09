@@ -16,48 +16,44 @@ const universities = [
 
 export default function TrustSection() {
   return (
-    <section className="py-20 bg-muted/30 relative border-y border-border/50 overflow-hidden">
-      <div className="absolute inset-y-0 left-0 w-32 bg-linear-to-r from-background to-transparent z-10" />
-      <div className="absolute inset-y-0 right-0 w-32 bg-linear-to-l from-background to-transparent z-10" />
-
+    <section className="py-24 bg-background">
       <div className="memo-container px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-3 mb-10 text-muted-foreground/80"
-        >
-          <div className="h-px w-12 bg-border" />
-          <span className="text-xs font-bold uppercase tracking-[0.2em]">
-            Más de 50.000 horas estudiadas en
-          </span>
-          <div className="h-px w-12 bg-border" />
-        </motion.div>
+        <div className="grid lg:grid-cols-3 gap-12 items-center">
+          <div className="lg:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="bg-muted text-muted-foreground border border-border px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] w-fit mb-6"
+            >
+              Comunidad Global
+            </motion.div>
+            <h2 className="text-3xl font-bold tracking-tight mb-4">
+              Impulsando mentes en las instituciones más exigentes.
+            </h2>
+            <p className="text-sm text-muted-foreground/60 font-medium">
+              Memo.ai es la herramienta de elección para estudiantes que buscan
+              un rendimiento académico superior.
+            </p>
+          </div>
 
-        <div className="flex overflow-hidden group">
-          <motion.div
-            initial={{ x: 0 }}
-            animate={{ x: '-50%' }}
-            transition={{
-              duration: 30,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-            className="flex items-center gap-16 whitespace-nowrap min-w-full"
-          >
-            {[...universities, ...universities].map((uni, index) => (
-              <div
+          <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 grayscale opacity-40">
+            {universities.map((uni, index) => (
+              <motion.div
                 key={index}
-                className="flex items-center gap-3 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 group-hover:[animation-play-state:paused]"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: index * 0.05 }}
+                className="flex items-center gap-3 group"
               >
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center">
+                  <GraduationCap className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <span className="text-xl font-extrabold tracking-tight text-foreground">
+                <span className="text-sm font-bold tracking-tight text-foreground whitespace-nowrap group-hover:text-primary transition-colors">
                   {uni}
                 </span>
-              </div>
+              </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
