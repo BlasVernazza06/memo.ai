@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { chat, message } from '@repo/db';
@@ -16,6 +16,28 @@ export class ChatsService {
     type: 'creation' | 'study' = 'creation',
     workspaceId?: string,
   ) {
+    // Si es un chat de creación, limpiamos los anteriores que estén vacíos para evitar basura
+    if (type === 'creation') {
+      const unusedChats = await this.db.query.chat.findMany({
+        where: (c: any, { and, eq }: any) => and(
+          eq(c.userId, userId),
+          eq(c.type, 'creation')
+        ),
+        with: {
+          messages: true
+        }
+      });
+
+      const emptyChatIds = unusedChats
+        .filter((c: any) => !c.messages || c.messages.length === 0)
+        .map((c: any) => c.id);
+
+      if (emptyChatIds.length > 0) {
+        console.log(`[ChatsService] Eliminando ${emptyChatIds.length} chats de creación vacíos para user ${userId}`);
+        await this.db.delete(chat).where(inArray(chat.id, emptyChatIds));
+      }
+    }
+
     const chatId = uuidv4();
 
     await this.db.insert(chat).values({
