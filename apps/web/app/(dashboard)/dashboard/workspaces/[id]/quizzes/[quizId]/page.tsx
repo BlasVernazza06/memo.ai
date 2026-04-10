@@ -119,7 +119,7 @@ export default function QuizGamePage() {
     const incorrectAnswers = questions.length - score;
 
     return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center max-w-2xl mx-auto space-y-8 text-center p-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="min-h-screen flex flex-col items-center justify-center max-w-2xl mx-auto space-y-8 text-center p-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

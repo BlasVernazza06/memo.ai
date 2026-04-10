@@ -138,7 +138,7 @@ export default function NewWorkspaceChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] max-w-4xl mx-auto py-6">
+    <div className="flex flex-col min-h-screen max-w-4xl mx-auto py-6">
       {/* Header / Back */}
       <div className="flex items-center justify-between mb-8 shrink-0">
         <Link href="/dashboard">
@@ -151,7 +151,9 @@ export default function NewWorkspaceChatPage() {
           </Button>
         </Link>
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-black text-foreground">Nuevo Workspace</h1>
+          <h1 className="text-xl font-black text-foreground">
+            Nuevo Workspace
+          </h1>
         </div>
         <div className="w-20" /> {/* Spacer for balance */}
       </div>

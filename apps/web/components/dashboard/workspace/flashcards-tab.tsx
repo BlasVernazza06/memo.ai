@@ -1,13 +1,16 @@
 import Link from 'next/link';
+
 import { useState } from 'react';
-import { Layers, ChevronRight } from 'lucide-react';
-import type { DbFlashcardDeck } from '@repo/db';
+
+import { ChevronRight, Layers } from 'lucide-react';
+
+import type { FlashcardDeckWithCards } from '@repo/db';
 import SearchInput from '@/components/shared/search-input';
 
 export default function FlashcardsList({
   decks,
 }: {
-  decks: DbFlashcardDeck[];
+  decks: FlashcardDeckWithCards[];
 }) {
   const [filtered, setFiltered] = useState(decks);
 
@@ -22,7 +25,7 @@ export default function FlashcardsList({
       {filtered.length === 0 ? (
         <div className="py-24 flex flex-col items-center justify-center space-y-4">
           <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center text-muted-foreground mb-2">
-             <Layers className="w-8 h-8 opacity-50" />
+            <Layers className="w-8 h-8 opacity-50" />
           </div>
           <p className="text-muted-foreground font-medium text-lg">
             No hay mazos de estudio aún.
@@ -45,7 +48,7 @@ export default function FlashcardsList({
                     <Layers className="w-6 h-6" />
                   </div>
                   <div className="w-10 h-10 rounded-full bg-background/50 border border-border/50 flex items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                     <ChevronRight className="w-4 h-4 text-indigo-500" />
+                    <ChevronRight className="w-4 h-4 text-indigo-500" />
                   </div>
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">

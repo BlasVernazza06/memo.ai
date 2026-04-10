@@ -3,7 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@repo/db": ["../../packages/db/src/index"],
+      "@repo/auth": ["../../packages/auth/src/index"],
+      "@repo/validators": ["../../packages/validators/src/index"]
     },
     "plugins": [
       {
