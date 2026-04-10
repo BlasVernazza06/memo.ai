@@ -164,6 +164,7 @@ export const document = pgTable('document', {
   generateSummary: boolean('generate_summary').default(true).notNull(),
 
   aiSummary: text('ai_summary'),
+  thumbnailUrl: text('thumbnail_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -206,6 +207,9 @@ export const flashcard = pgTable('flashcard', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export type DbFlashcard = InferSelectModel<typeof flashcard>;
+export type NewFlashcard = InferInsertModel<typeof flashcard>;
+
 /**
  * quiz - Quizzes generados dentro de un workspace.
  */
@@ -242,6 +246,9 @@ export const quizQuestion = pgTable('quiz_question', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export type DbQuizQuestion = InferSelectModel<typeof quizQuestion>;
+export type NewQuizQuestion = InferInsertModel<typeof quizQuestion>;
+
 /**
  * quiz_attempt - Historial de intentos del usuario en un quiz.
  */
@@ -258,6 +265,9 @@ export const quizAttempt = pgTable('quiz_attempt', {
   answers: jsonb('answers'), // { questionId: selectedOption }
   completedAt: timestamp('completed_at').defaultNow().notNull(),
 });
+
+export type DbQuizAttempt = InferSelectModel<typeof quizAttempt>;
+export type NewQuizAttempt = InferInsertModel<typeof quizAttempt>;
 
 // RELATIONS - WORKSPACE
 export const workspaceRelations = relations(workspace, ({ one, many }) => ({
@@ -439,13 +449,26 @@ export const messageRelations = relations(message, ({ one }) => ({
   chat: one(chat, { fields: [message.chatId], references: [chat.id] }),
 }));
 
+// ============================================================
+// RELATION TYPES (DEEP)
+// ============================================================
+
+export type FlashcardDeckWithCards = DbFlashcardDeck & {
+  flashcards: DbFlashcard[];
+};
+
+export type QuizWithQuestions = DbQuiz & {
+  questions: DbQuizQuestion[];
+  attempts?: DbQuizAttempt[];
+};
+
 export type WorkspaceWithRelations = DbWorkspace & {
-  user: DbUser;
   documents: DbDocument[];
-  flashcardDecks: DbFlashcardDeck[];
-  quizzes: DbQuiz[];
-  chats: DbChat[];
-  activities: DbUserActivity[];
+  flashcardDecks: FlashcardDeckWithCards[];
+  quizzes: QuizWithQuestions[];
+  user?: DbUser;
+  chats?: DbChat[];
+  activities?: DbUserActivity[];
 };
 // ============================================================
 // EXPORTS
