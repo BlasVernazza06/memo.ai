@@ -14,16 +14,25 @@ Debes responder ÚNICAMENTE en formato JSON. No incluyas texto antes ni después
 El JSON debe seguir esta estructura:
 
 {{
-  "summary": "Un resumen ejecutivo de 3 párrafos del contenido.",
+  "name": "Título creativo y corto para el Workspace",
+  "description": "Una descripción breve del material (1 frase).",
+  "category": "Una categoría lógica (ej. Ciencias, Historia, Programación, etc.)",
+  "summary": "Un resumen ejecutivo de 6 párrafos del contenido.",
   "flashcards": [
     {{ "front": "Pregunta clara", "back": "Respuesta directa" }}
   ],
   "quizzes": [
     {{
-      "question": "Pregunta de opción múltiple",
-      "options": ["opcion A", "opcion B", "opcion C", "opcion D"],
-      "correctAnswer": 0,
-      "explanation": "Breve explicación de por qué es la correcta"
+      "name": "Nombre del Quiz (ej. Conceptos Básicos)",
+      "description": "Descripción del enfoque de este quiz",
+      "questions": [
+        {{
+          "question": "Pregunta de opción múltiple",
+          "options": ["opcion A", "opcion B", "opcion C", "opcion D"],
+          "correctAnswer": 0,
+          "explanation": "Breve explicación de por qué es la correcta"
+        }}
+      ]
     }}
   ]
 }}

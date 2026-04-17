@@ -1,4 +1,8 @@
 import os
+import json
+import base64
+from dotenv import load_dotenv
+
 import fitz  # PyMuPDF
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,6 +31,20 @@ def extract_text_from_pdf(file_bytes):
     for page in doc:
         text += page.get_text()
     return text
+
+def get_pdf_thumbnail(file_bytes):
+    try:
+        doc = fitz.open(stream=file_bytes, filetype="pdf")
+        if len(doc) == 0:
+            return None
+        page = doc.load_page(0)  # Primera página
+        pix = page.get_pixmap(matrix=fitz.Matrix(0.5, 0.5)) # Miniatura reducida
+        img_data = pix.tobytes("jpg")
+        base64_img = base64.b64encode(img_data).decode("utf-8")
+        return f"data:image/jpeg;base64,{base64_img}"
+    except Exception as e:
+        print(f"Error generating thumbnail: {e}")
+        return None
 
 @app.post("/ai/process-document")
 async def process_document(
@@ -68,9 +86,17 @@ async def process_document(
             response_format={ "type": "json_object" }
         )
 
+        thumbnail_base64 = None
+        if file and file.filename.endswith(".pdf"):
+            # Re-leer bytes para la miniatura ya que el puntero se movió al leer el texto
+            await file.seek(0)
+            content = await file.read()
+            thumbnail_base64 = get_pdf_thumbnail(content)
+
         return {
             "success": True,
-            "data": response.choices[0].message.content
+            "data": json.loads(response.choices[0].message.content),
+            "thumbnailBase64": thumbnail_base64
         }
 
     except Exception as e:
