@@ -1,6 +1,7 @@
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 
+import { AiModule } from '@/modules/ai/ai.module';
 import { DatabaseModule } from '@modules/database/database.module';
 import { StorageModule } from '@modules/storage/storage.module';
 import { UsersModule } from '@modules/users/users.module';
@@ -9,7 +10,13 @@ import { WorkspacesRepository } from '@modules/workspaces/repositories/workspace
 import { WorkspacesService } from '@modules/workspaces/services/workspaces.service';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, StorageModule, CacheModule.register()],
+  imports: [
+    DatabaseModule,
+    UsersModule,
+    StorageModule,
+    AiModule,
+    CacheModule.register(),
+  ],
   controllers: [WorkspacesController],
   providers: [WorkspacesService, WorkspacesRepository],
   exports: [WorkspacesService],

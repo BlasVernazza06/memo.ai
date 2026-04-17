@@ -1,5 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
@@ -33,10 +34,10 @@ export class WorkspacesRepository {
     data: CreateWorkspaceDto,
   ): Promise<{ id: string }> {
     console.log('REPO: Inicia creación atómica (Batch) para:', data.name);
-    
+
     const workspaceId = uuidv4();
     const batchRequests: any[] = [];
-    
+
     // 1. Preparar Workspace
     batchRequests.push(
       this.db.insert(workspace).values({
@@ -49,7 +50,7 @@ export class WorkspacesRepository {
         icon: data.icon,
         coverImage: data.coverImage,
         isFavorite: data.isFavorite || false,
-      })
+      }),
     );
 
     // 2. Preparar Documento (si existe)
@@ -66,7 +67,7 @@ export class WorkspacesRepository {
           sizeBytes: docData.sizeBytes ?? null,
           status: 'analyzed',
           aiSummary: docData.aiSummary ?? null,
-        })
+        }),
       );
     }
 
@@ -78,7 +79,7 @@ export class WorkspacesRepository {
           id: deckId,
           workspaceId,
           name: data.name || 'Mazo de estudio',
-        })
+        }),
       );
 
       const cardsToInsert = data.flashcards.map((f: any) => ({
@@ -105,7 +106,7 @@ export class WorkspacesRepository {
             description: q.description || '',
             totalQuestions: q.questions?.length || 0,
             isAiGenerated: true,
-          })
+          }),
         );
 
         if (q.questions && q.questions.length > 0) {
@@ -119,7 +120,9 @@ export class WorkspacesRepository {
             order: index,
           }));
 
-          batchRequests.push(this.db.insert(quizQuestion).values(questionsToInsert));
+          batchRequests.push(
+            this.db.insert(quizQuestion).values(questionsToInsert),
+          );
         }
       }
     }
@@ -153,11 +156,23 @@ export class WorkspacesRepository {
         quizzes: {
           with: {
             questions: true,
+            workspace: {
+              columns: { id: true, name: true },
+            },
           },
         },
         flashcardDecks: {
           with: {
             flashcards: true,
+            workspace: {
+              columns: { id: true, name: true },
+            },
+          },
+        },
+        chats: {
+          where: eq(chat.type, 'creation'),
+          with: {
+            messages: true,
           },
         },
       },
@@ -176,24 +191,31 @@ export class WorkspacesRepository {
     });
 
     // Si directDocs tiene algo y result.documents no, algo raro pasa con el join
-    if (result && directDocs.length > 0 && (!result.documents || result.documents.length === 0)) {
-       console.log('[WorkspacesRepository] ATENCIÓN: Join de Drizzle falló, inyectando directDocs manualmente');
-       result.documents = directDocs;
+    if (
+      result &&
+      directDocs.length > 0 &&
+      (!result.documents || result.documents.length === 0)
+    ) {
+      console.log(
+        '[WorkspacesRepository] ATENCIÓN: Join de Drizzle falló, inyectando directDocs manualmente',
+      );
+      result.documents = directDocs;
     }
 
     return result as WorkspaceWithRelations | undefined;
   }
 
   async like(userId: string, workspaceId: string): Promise<boolean> {
-    const result = await this.db
+    const rows = await this.db
       .update(workspace)
       .set({
-        isFavorite: true,
+        isFavorite: sql`NOT ${workspace.isFavorite}`,
         updatedAt: new Date(),
       })
-      .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)));
+      .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)))
+      .returning({ id: workspace.id });
 
-    return !!result;
+    return rows.length > 0;
   }
 
   async delete(userId: string, workspaceId: string): Promise<boolean> {
@@ -265,5 +287,73 @@ export class WorkspacesRepository {
       .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)));
 
     return !!result;
+  }
+
+  async addFlashcards(
+    workspaceId: string,
+    cards: any[],
+    workspaceName: string,
+  ): Promise<void> {
+    const deckId = uuidv4();
+    const batchRequests: any[] = [];
+
+    batchRequests.push(
+      this.db.insert(flashcardDeck).values({
+        id: deckId,
+        workspaceId,
+        name: `Mazo Extra - ${new Date().toLocaleDateString()}`,
+      }),
+    );
+
+    const cardsToInsert = cards.map((f: any) => ({
+      id: uuidv4(),
+      deckId,
+      front: f.front || f.question || '',
+      back: f.back || f.answer || '',
+      mastery: 0,
+      reviewCount: 0,
+    }));
+
+    batchRequests.push(this.db.insert(flashcard).values(cardsToInsert));
+
+    await (this.db as any).batch(batchRequests);
+  }
+
+  async addQuizzes(workspaceId: string, quizzes: any[]): Promise<void> {
+    const batchRequests: any[] = [];
+
+    for (const q of quizzes) {
+      const quizId = uuidv4();
+      batchRequests.push(
+        this.db.insert(quiz).values({
+          id: quizId,
+          workspaceId,
+          name: q.name || 'Cuestionario Extra',
+          description: q.description || '',
+          totalQuestions: q.questions?.length || 0,
+          isAiGenerated: true,
+        }),
+      );
+
+      if (q.questions && q.questions.length > 0) {
+        const questionsToInsert = q.questions.map(
+          (ques: any, index: number) => ({
+            id: uuidv4(),
+            quizId,
+            question: ques.question,
+            options: ques.options,
+            correctAnswer: ques.correctAnswer,
+            explanation: ques.explanation || null,
+            order: index,
+          }),
+        );
+
+        batchRequests.push(
+          this.db.insert(quizQuestion).values(questionsToInsert),
+        );
+      }
+    }
+
+    await (this.db as any).batch(batchRequests);
   }
 }

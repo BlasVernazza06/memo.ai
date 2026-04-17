@@ -38,6 +38,19 @@ import { DatabaseModule } from '@/modules/database/database.module';
               clientSecret: configService.get('GITHUB_CLIENT_SECRET') || '',
             },
           },
+          user: {
+            additionalFields: {
+              plan: {
+                type: 'string',
+                defaultValue: 'free',
+                input: false,
+              },
+              stripeCustomerId: { type: 'string', input: false },
+              stripeSubscriptionId: { type: 'string', input: false },
+              stripeSubscriptionStatus: { type: 'string', input: false },
+              stripePriceId: { type: 'string', input: false },
+            },
+          },
           trustedOrigins: [configService.getOrThrow('NEXT_PUBLIC_APP_URL')],
         }),
       }),

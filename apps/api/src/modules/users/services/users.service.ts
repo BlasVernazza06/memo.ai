@@ -1,0 +1,80 @@
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
+import { DbUser } from '@repo/db';
+
+import { UsersRepository } from '../repositories/users.repository';
+
+@Injectable()
+export class UsersService {
+  constructor(private readonly userRepo: UsersRepository) {}
+
+  async validateWorkspaceLimit(userId: string): Promise<void> {
+    const currentUser = await this.userRepo.findById(userId);
+
+    if (!currentUser) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    if (currentUser.plan === 'free') {
+      const workspacesCount = await this.userRepo.countWorkspaces(userId);
+
+      if (workspacesCount >= 3) {
+        throw new ForbiddenException(
+          'Límite de workspaces alcanzado. Pásate al plan Pro para crear workspaces ilimitados.',
+        );
+      }
+    }
+  }
+
+  async validateContentLimit(
+    userId: string,
+    workspaceId: string,
+    type: 'flashcards' | 'quizzes',
+  ): Promise<void> {
+    const currentUser = await this.userRepo.findById(userId);
+    if (!currentUser) throw new NotFoundException('Usuario no encontrado');
+
+    if (currentUser.plan === 'free') {
+      // Por simplicidad, limitamos por total de items en el workspace
+      // Puedes ajustar esto según lo que el usuario considere un "Mazo" o "Quiz"
+      const total = await this.userRepo.countContent(workspaceId, type);
+      const MAX_FREE = 5;
+
+      if (total >= MAX_FREE) {
+        throw new ForbiddenException(
+          `Has alcanzado el límite de ${type} para el plan gratuito en este workspace (máx ${MAX_FREE}).`,
+        );
+      }
+    }
+  }
+
+  async getUser(userId: string): Promise<DbUser> {
+    const currentUser = await this.userRepo.findById(userId);
+
+    if (!currentUser) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return currentUser;
+  }
+
+  async updateBillingInfo(
+    userId: string,
+    data: {
+      plan: 'free' | 'pro';
+      stripeCustomerId?: string;
+      stripeSubscriptionId?: string;
+      stripeSubscriptionStatus?: string;
+      stripePriceId?: string;
+    },
+  ) {
+    await this.userRepo.update(userId, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  }
+}

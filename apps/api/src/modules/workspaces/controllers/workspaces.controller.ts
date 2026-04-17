@@ -66,8 +66,11 @@ export class WorkspacesController {
       throw new Error('No se proporcionaron metadatos para crear el workspace');
     }
 
-    const parsedMetadata = metadata as any;
-    console.log('[WorkspacesController] Body raw recibido:', JSON.stringify(body, null, 2));
+    const parsedMetadata = metadata;
+    console.log(
+      '[WorkspacesController] Body raw recibido:',
+      JSON.stringify(body, null, 2),
+    );
 
     // Fallback de nombre si la IA no lo generó o el usuario no lo mandó
     if (!parsedMetadata.name) {
@@ -78,16 +81,23 @@ export class WorkspacesController {
 
     // 2. Si hay archivo binario, subirlo y agregarlo a la lista de documentos
     if (file) {
-      const storageResult = await this.storageService.uploadWorkspaceDocument(file);
-      
+      const storageResult =
+        await this.storageService.uploadWorkspaceDocument(file);
+
       const newDoc = {
         name: storageResult.name,
         type: 'pdf',
         url: storageResult.url,
         key: storageResult.key,
         sizeBytes: storageResult.sizeBytes,
-        aiSummary: (parsedMetadata.document?.aiSummary || parsedMetadata.documents?.[0]?.aiSummary) ?? undefined,
-        thumbnailBase64: (parsedMetadata.document?.thumbnailBase64 || parsedMetadata.documents?.[0]?.thumbnailBase64) ?? undefined,
+        aiSummary:
+          (parsedMetadata.document?.aiSummary ||
+            parsedMetadata.documents?.[0]?.aiSummary) ??
+          undefined,
+        thumbnailBase64:
+          (parsedMetadata.document?.thumbnailBase64 ||
+            parsedMetadata.documents?.[0]?.thumbnailBase64) ??
+          undefined,
       };
 
       // Inyectamos en documents (plural) como fuente única de verdad
@@ -99,7 +109,9 @@ export class WorkspacesController {
       const pluralDocs = parsedMetadata.documents;
 
       if (singularDoc && (!pluralDocs || pluralDocs.length === 0)) {
-        console.log('[WorkspacesController] Normalizando: moviendo singular document a plural documents');
+        console.log(
+          '[WorkspacesController] Normalizando: moviendo singular document a plural documents',
+        );
         parsedMetadata.documents = [singularDoc];
       }
     }
@@ -107,7 +119,9 @@ export class WorkspacesController {
     // SANITIZACIÓN: Asegurar que aiSummary sea un string (la IA a veces devuelve un array)
     const sanitizeDoc = (doc: any) => {
       if (doc && Array.isArray(doc.aiSummary)) {
-        console.log('[WorkspacesController] Sanitizando aiSummary de array a string');
+        console.log(
+          '[WorkspacesController] Sanitizando aiSummary de array a string',
+        );
         doc.aiSummary = doc.aiSummary.join('\n\n');
       }
     };
@@ -160,5 +174,14 @@ export class WorkspacesController {
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     return await this.workspacesService.like(userId, id);
+  }
+
+  @Post(':id/generate-more')
+  async generateMore(
+    @User('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('type') type: 'flashcards' | 'quizzes',
+  ) {
+    return await this.workspacesService.generateMoreContent(userId, id, type);
   }
 }

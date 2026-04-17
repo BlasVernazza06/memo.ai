@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { AiService } from './ai.service';
+import { AiService } from '../services/ai.service';
 
 @Controller('ai')
 export class AiController {
@@ -16,10 +16,10 @@ export class AiController {
   @Post('process')
   @UseInterceptors(FileInterceptor('file'))
   async processDocument(
-    @UploadedFile() file: any,
+    @UploadedFile() file: Express.Multer.File,
     @Body('userContext') userContext: string,
   ) {
-    console.log('--- BACKEND REQUEST RECEIVED ---');
+    console.log('--- BACKEND REQUEST RECEIVED (AI) ---');
     console.log('Context:', userContext);
     console.log('File:', file ? file.originalname : 'No file');
 

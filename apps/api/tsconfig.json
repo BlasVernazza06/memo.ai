@@ -16,6 +16,10 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
+      "@modules/*": ["src/modules/*"],
+      "@common/*": ["src/common/*"],
+      "@core/*": ["src/core/*"],
+      "@config/*": ["src/config/*"],
       "@repo/db": ["../../packages/db/src/index"],
       "@repo/auth": ["../../packages/auth/src/index"],
       "@repo/validators": ["../../packages/validators/src/index"]

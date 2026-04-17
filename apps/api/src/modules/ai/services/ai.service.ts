@@ -4,17 +4,17 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 export class AiService {
   private readonly pythonServiceUrl = 'http://127.0.0.1:8000';
 
-  async processDocument(file: any, userContext: string) {
+  async processDocument(file: Express.Multer.File | undefined, userContext: string) {
     try {
       const formData = new FormData();
 
       // Solo adjuntamos el archivo si existe
       if (file) {
-        const blob = new Blob([file.buffer], { type: file.mimetype });
+        const blob = new Blob([new Uint8Array(file.buffer)], { type: file.mimetype });
         formData.append('file', blob, file.originalname);
       }
 
-      formData.append('user_context', userContext);
+      formData.append('user_context', userContext || '');
       formData.append('flashcard_count', '5');
       formData.append('quiz_count', '3');
 
@@ -35,7 +35,13 @@ export class AiService {
       }
 
       const result = await response.json();
-      return JSON.parse(result.data);
+      
+      // En el pasado se hacia JSON.parse aquí, pero el Python backend ya devuelve un objeto
+      const finalData = result.data;
+      if (result.thumbnailBase64) {
+        finalData.thumbnailBase64 = result.thumbnailBase64;
+      }
+      return finalData;
     } catch (error) {
       console.error('DETAILED AI SERVICE ERROR:', {
         message: error.message,

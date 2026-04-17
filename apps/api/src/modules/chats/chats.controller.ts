@@ -16,9 +16,10 @@ import {
   type UserSession,
 } from '@thallesp/nestjs-better-auth';
 
-import { AiService } from '@/modules/ai/ai.service';
+import { AiService } from '@/modules/ai/services/ai.service';
 
 import { ChatsService } from './chats.service';
+import { StorageService } from '@/modules/storage/services/storage.service';
 
 @Controller('chats')
 @UseGuards(AuthGuard)
@@ -26,6 +27,7 @@ export class ChatsController {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly aiService: AiService,
+    private readonly storageService: StorageService,
   ) {}
 
   @Post()
@@ -42,7 +44,7 @@ export class ChatsController {
     @Param('id') chatId: string,
     @Session() session: UserSession,
     @Body('content') content: string,
-    @UploadedFile() file?: any,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     // 1. Guardar mensaje del usuario
     await this.chatsService.addMessage(
@@ -58,20 +60,45 @@ export class ChatsController {
         : null,
     );
 
-    // 2. Obtener respuesta de la IA
-    // Por ahora usamos el processDocument existente, pero lo adaptaremos
-    const aiResponse = await this.aiService.processDocument(file, content);
+    // 2. Subir archivo si existe para tener metadatos persistentes
+    let storageResult: any = null;
+    if (file) {
+      storageResult = await this.storageService.uploadWorkspaceDocument(file);
+    }
 
-    // 3. Guardar mensaje de la IA
-    // Formateamos la respuesta de la IA para el chat
-    const aiContent = `¡Procesado con éxito! 🧠\n\n**Resumen:** ${aiResponse.summary}\n\nHe generado ${aiResponse.flashcards.length} flashcards y ${aiResponse.quizzes.length} preguntas de quiz para ti.`;
+    // 3. Obtener respuesta de la IA
+    console.log('CHATS: Mandando a procesar documento. File presente:', !!file);
+    const aiResponse = await this.aiService.processDocument(file, content);
+    console.log('CHATS: Respuesta IA cruda (data):', JSON.stringify(aiResponse, null, 2));
+
+    // 4. Guardar respuesta de la IA
+    const aiContent = `¡Procesado con éxito! 🧠\n\n**Resumen:** ${aiResponse.summary || 'Listo.'}\n\nHe generado material de estudio para ti.`;
 
     await this.chatsService.addMessage(chatId, 'ai', aiContent);
+
+    // 5. Enriquecer la respuesta con el contexto y metadatos del documento
+    const enrichedData = {
+      ...aiResponse,
+      customContext: content || undefined,
+      document: storageResult
+        ? {
+            name: storageResult.name,
+            type: storageResult.type,
+            url: storageResult.url,
+            key: storageResult.key,
+            sizeBytes: storageResult.sizeBytes,
+            aiSummary: aiResponse.summary || undefined,
+            thumbnailBase64: aiResponse.thumbnailBase64 || undefined,
+          }
+        : undefined,
+    };
+
+    console.log('CHATS: Data enriquecida final:', JSON.stringify(enrichedData, null, 2));
 
     return {
       role: 'ai',
       content: aiContent,
-      data: aiResponse, // Enviamos la data cruda también por si el front la necesita
+      data: enrichedData,
     };
   }
 

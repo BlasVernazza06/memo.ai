@@ -11,6 +11,8 @@ import * as cacheManager from 'cache-manager';
 
 import { type WorkspaceWithRelations } from '@repo/db';
 
+import { AiService } from '@/modules/ai/services/ai.service';
+
 export type WorkspaceWithCounts = WorkspaceWithRelations & {
   flashcards?: number;
   quizzesCount?: number;
@@ -22,8 +24,62 @@ export class WorkspacesService {
   constructor(
     private readonly workspaceRepo: WorkspacesRepository,
     private readonly usersService: UsersService,
+    private readonly aiService: AiService,
     @Inject(CACHE_MANAGER) private cacheManager: cacheManager.Cache,
   ) {}
+
+  async generateMoreContent(
+    userId: string,
+    workspaceId: string,
+    type: 'flashcards' | 'quizzes',
+  ) {
+    // 1. Validar límites de plan
+    await this.usersService.validateContentLimit(userId, workspaceId, type);
+
+    // 2. Obtener workspace con su chat de creación
+    const workspaceDetail = await this.workspaceRepo.findById(
+      userId,
+      workspaceId,
+    );
+    if (!workspaceDetail)
+      throw new NotFoundException('Workspace no encontrado');
+
+    const creationChat = workspaceDetail.chats?.find(
+      (c) => c.type === 'creation',
+    );
+    const history =
+      creationChat?.messages
+        ?.map((m) => `${m.role}: ${m.content}`)
+        .join('\n') || '';
+
+    // 3. Llamar a la IA con el contexto histórico
+    const userPrompt = `Basándote en el material anterior, genera MÁS ${type}.
+    IMPORTANTE: No repitas lo que ya generaste. Enfócate en detalles o temas que no se hayan cubierto profundamente aún.`;
+
+    const aiData = await this.aiService.processDocument(
+      undefined,
+      `${history}\n\n${userPrompt}`,
+    );
+
+    // 4. Guardar el nuevo contenido
+    if (type === 'flashcards' && aiData.flashcards) {
+      // Reutilizamos la lógica del repo o creamos una pequeña aquí
+      // Por ahora el repo solo tiene create workspace entero.
+      // Debería agregar métodos parciales al repo.
+      await this.workspaceRepo.addFlashcards(
+        workspaceId,
+        aiData.flashcards,
+        workspaceDetail.name,
+      );
+    } else if (type === 'quizzes' && aiData.quizzes) {
+      await this.workspaceRepo.addQuizzes(workspaceId, aiData.quizzes);
+    }
+
+    // Invalidad caché
+    await this.cacheManager.del(`user:${userId}:workspace:v2:${workspaceId}`);
+
+    return { success: true };
+  }
 
   async create(
     userId: string,
@@ -106,7 +162,9 @@ export class WorkspacesService {
       return cached;
     }
 
-    console.log(`[WorkspacesService] Buscando workspace ${workspaceId} para usuario ${userId}`);
+    console.log(
+      `[WorkspacesService] Buscando workspace ${workspaceId} para usuario ${userId}`,
+    );
     const foundWorkspace = await this.workspaceRepo.findById(
       userId,
       workspaceId,
@@ -117,7 +175,10 @@ export class WorkspacesService {
       throw new NotFoundException('Workspace no encontrado');
     }
 
-    console.log(`[WorkspacesService] Workspace encontrado. Documentos:`, foundWorkspace.documents?.length || 0);
+    console.log(
+      `[WorkspacesService] Workspace encontrado. Documentos:`,
+      foundWorkspace.documents?.length || 0,
+    );
 
     const formattedWorkspace = {
       ...foundWorkspace,
@@ -141,15 +202,10 @@ export class WorkspacesService {
     userId: string,
     workspaceId: string,
   ): Promise<{ success: boolean }> {
-    const existing = await this.workspaceRepo.findById(userId, workspaceId);
-    if (!existing) {
-      throw new NotFoundException('Workspace no encontrado');
-    }
-
     const success = await this.workspaceRepo.like(userId, workspaceId);
 
     if (!success) {
-      throw new NotFoundException('Error al dar like al workspace');
+      throw new NotFoundException('Workspace no encontrado');
     }
 
     const listCacheKey = `workspaces:list:${userId}`;
@@ -195,8 +251,12 @@ export class WorkspacesService {
       throw new NotFoundException('Workspace no encontrado');
     }
 
-    const { name, icon, description, isFavorite, coverImage } = data;
-    const updatedData = { name, icon, description, isFavorite, coverImage };
+    if (!data) {
+      return { success: false };
+    }
+
+    const { name, icon, description } = data;
+    const updatedData = { name, icon, description };
 
     const success = await this.workspaceRepo.update(
       userId,
