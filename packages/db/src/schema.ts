@@ -151,7 +151,7 @@ export const document = pgTable('document', {
   id: text('id').primaryKey(),
   workspaceId: text('workspace_id')
     .notNull()
-    .references(() => workspace.id),
+    .references(() => workspace.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   type: text('type').notNull(), // "pdf" | "video" | "image" | "audio" | "text"
   url: text('url').notNull(), // URL de Uploadthing
@@ -179,7 +179,7 @@ export const flashcardDeck = pgTable('flashcard_deck', {
   id: text('id').primaryKey(),
   workspaceId: text('workspace_id')
     .notNull()
-    .references(() => workspace.id),
+    .references(() => workspace.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   description: text('description'),
   color: text('color'), // gradiente o color del mazo
@@ -197,7 +197,7 @@ export const flashcard = pgTable('flashcard', {
   id: text('id').primaryKey(),
   deckId: text('deck_id')
     .notNull()
-    .references(() => flashcardDeck.id),
+    .references(() => flashcardDeck.id, { onDelete: 'cascade' }),
   front: text('front').notNull(), // pregunta / frente de la carta
   back: text('back').notNull(), // respuesta / dorso de la carta
   mastery: integer('mastery').default(0).notNull(), // 0-100, dominio del usuario
@@ -217,7 +217,7 @@ export const quiz = pgTable('quiz', {
   id: text('id').primaryKey(),
   workspaceId: text('workspace_id')
     .notNull()
-    .references(() => workspace.id),
+    .references(() => workspace.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   description: text('description'),
   totalQuestions: integer('total_questions').default(0).notNull(),
@@ -237,7 +237,7 @@ export const quizQuestion = pgTable('quiz_question', {
   id: text('id').primaryKey(),
   quizId: text('quiz_id')
     .notNull()
-    .references(() => quiz.id),
+    .references(() => quiz.id, { onDelete: 'cascade' }),
   question: text('question').notNull(),
   options: jsonb('options').notNull(), // ["opción A", "opción B", "opción C", "opción D"]
   correctAnswer: integer('correct_answer').notNull(), // índice de la respuesta correcta
@@ -256,7 +256,7 @@ export const quizAttempt = pgTable('quiz_attempt', {
   id: text('id').primaryKey(),
   quizId: text('quiz_id')
     .notNull()
-    .references(() => quiz.id),
+    .references(() => quiz.id, { onDelete: 'cascade' }),
   userId: text('user_id')
     .notNull()
     .references(() => user.id),
@@ -343,7 +343,9 @@ export const userActivity = pgTable('user_activity', {
   userId: text('user_id')
     .notNull()
     .references(() => user.id),
-  workspaceId: text('workspace_id').references(() => workspace.id),
+  workspaceId: text('workspace_id').references(() => workspace.id, {
+    onDelete: 'cascade',
+  }),
   type: text('type').notNull(),
   metadata: jsonb('metadata'), // datos extra: { workspaceName, count, score, fileName... }
   date: text('date').notNull(), // "2026-02-18" — solo fecha, para cálculo de racha
@@ -408,7 +410,9 @@ export const chat = pgTable('chat', {
   userId: text('user_id')
     .notNull()
     .references(() => user.id),
-  workspaceId: text('workspace_id').references(() => workspace.id),
+  workspaceId: text('workspace_id').references(() => workspace.id, {
+    onDelete: 'cascade',
+  }),
   title: text('title'),
   type: text('type').default('creation').notNull(), // "creation" | "study"
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -425,7 +429,7 @@ export const message = pgTable('message', {
   id: text('id').primaryKey(),
   chatId: text('chat_id')
     .notNull()
-    .references(() => chat.id),
+    .references(() => chat.id, { onDelete: 'cascade' }),
   role: text('role').notNull(), // "user" | "assistant"
   content: text('content').notNull(),
   attachments: jsonb('attachments'), // [{ name, url, type }]
@@ -449,6 +453,10 @@ export const messageRelations = relations(message, ({ one }) => ({
   chat: one(chat, { fields: [message.chatId], references: [chat.id] }),
 }));
 
+export type ChatWithMessages = DbChat & {
+  messages: DbMessage[];
+};
+
 // ============================================================
 // RELATION TYPES (DEEP)
 // ============================================================
@@ -467,7 +475,7 @@ export type WorkspaceWithRelations = DbWorkspace & {
   flashcardDecks: FlashcardDeckWithCards[];
   quizzes: QuizWithQuestions[];
   user?: DbUser;
-  chats?: DbChat[];
+  chats?: ChatWithMessages[];
   activities?: DbUserActivity[];
 };
 // ============================================================

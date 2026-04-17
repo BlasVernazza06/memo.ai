@@ -7,6 +7,7 @@ export const DocumentSchema = z.object({
   key: z.string(),
   sizeBytes: z.number().optional(),
   aiSummary: z.string().optional(),
+  thumbnailBase64: z.string().optional(),
 });
 
 export const FlashcardSchema = z.object({
@@ -44,4 +45,8 @@ export const CreateWorkspaceSchema = z.object({
   quizzes: z.array(QuizSchema).optional(),
 });
 
-export const UpdateWorkspaceSchema = CreateWorkspaceSchema.partial();
+export const UpdateWorkspaceSchema = z.object({
+  name: z.string().min(1, 'El nombre no puede estar vacío').optional(),
+  description: z.string().nullable().optional(),
+  icon: z.string().nullable().optional(),
+});
