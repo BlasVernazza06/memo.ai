@@ -1,0 +1,6 @@
+{
+  "version": "0.2",
+  "language": "en,es",
+  "words": ["better-auth", "Memoai", "lucide", "pnpm", "dashborad"],
+  "ignorePaths": ["node_modules", "dist", "*.log", ".next", ".vscode"]
+}
