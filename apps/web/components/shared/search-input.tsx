@@ -102,7 +102,7 @@ export default function SearchInput<T>({
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="bg-transparent border-0 shadow-none h-14 text-lg focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/30 font-medium flex-1 px-4 text-foreground"
+            className="bg-transparent border-0 shadow-none h-14 text-lg focus-visible:ring-0 focus-visible:outline-none focus:ring-0 placeholder:text-muted-foreground/30 font-medium flex-1 px-4 text-foreground"
           />
           {query && (
             <button
@@ -125,7 +125,7 @@ export default function SearchInput<T>({
     return (
       <div
         className={cn(
-          'bg-card border border-border p-1.5 rounded-2xl shadow-sm flex items-center',
+          'bg-card border border-border p-1.5 rounded-2xl shadow-sm flex items-center transition-all duration-300 focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary/50',
           className,
         )}
       >
@@ -135,7 +135,7 @@ export default function SearchInput<T>({
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-9 bg-transparent border-0 shadow-none h-10 focus-visible:ring-0 focus:ring-0 text-foreground text-sm placeholder:text-muted-foreground/50 font-medium flex-1"
+            className="pl-9 bg-transparent border-0 shadow-none h-10 focus-visible:ring-0 focus-visible:outline-none focus:ring-0 text-foreground text-sm placeholder:text-muted-foreground/50 font-medium flex-1"
           />
           {query && (
             <button
@@ -154,7 +154,7 @@ export default function SearchInput<T>({
   return (
     <div
       className={cn(
-        'bg-card border border-border p-3 rounded-4xl shadow-sm flex flex-col md:flex-row gap-4 items-center',
+        'bg-card border border-border p-3 rounded-4xl shadow-sm flex flex-col md:flex-row gap-4 items-center transition-all duration-300 focus-within:ring-8 focus-within:ring-primary/5 focus-within:border-primary/30',
         className,
       )}
     >
@@ -164,7 +164,7 @@ export default function SearchInput<T>({
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-12 bg-transparent border-0 shadow-none h-12 focus-visible:ring-0 focus:ring-0 text-foreground placeholder:text-muted-foreground/50 font-medium flex-1"
+          className="pl-12 bg-transparent border-0 shadow-none h-12 focus-visible:ring-0 focus-visible:outline-none focus:ring-0 text-foreground placeholder:text-muted-foreground/50 font-medium flex-1"
         />
         {query && (
           <button
