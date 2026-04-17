@@ -45,16 +45,10 @@ export default function FlashcardGamePage() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const workspaceData = await apiFetchClient<WorkspaceWithRelations>(
-          `/workspaces/${workspaceId}`,
+        const deckData = await apiFetchClient<FlashcardDeckWithCards>(
+          `/flashcards/${deckId}`,
         );
-        const foundDeck = workspaceData.flashcardDecks?.find(
-          (d) => d.id === deckId,
-        );
-
-        if (foundDeck) {
-          setDeck(foundDeck);
-        }
+        setDeck(deckData);
       } catch (error) {
         console.error('Error loading deck:', error);
       } finally {
@@ -62,10 +56,10 @@ export default function FlashcardGamePage() {
       }
     }
 
-    if (workspaceId && deckId) {
+    if (deckId) {
       loadData();
     }
-  }, [workspaceId, deckId]);
+  }, [deckId]);
 
   const cards = deck?.flashcards || [];
 

@@ -1,7 +1,10 @@
 'use client';
 
-import { Sparkles, FileText } from 'lucide-react';
-import { motion } from 'motion/react';
+import { useState } from 'react';
+
+import { Check, ClipboardCheck, FileText, Sparkles } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+
 import { Button } from '@repo/ui/components/ui/button';
 
 interface AnalysisTabContentProps {
@@ -11,6 +14,14 @@ interface AnalysisTabContentProps {
 export function AnalysisTabContent({ summary }: AnalysisTabContentProps) {
   // Simple markdown-ish to HTML converter for basic formatting (paragraphs and bold)
   const paragraphs = summary.split('\n\n').filter((p) => p.trim() !== '');
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(summary);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <motion.div
@@ -24,12 +35,9 @@ export function AnalysisTabContent({ summary }: AnalysisTabContentProps) {
       <div className="p-8 md:p-14 relative z-10">
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground shadow-xl shadow-primary/20">
-              <Sparkles className="w-7 h-7" />
-            </div>
             <div>
-              <h3 className="font-black text-lg text-foreground tracking-tight">
-                Resumen Ejecutivo
+              <h3 className="font-black text-xl text-foreground tracking-tight">
+                Resumen
               </h3>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">
                 Memo AI Intelligence
@@ -76,13 +84,35 @@ export function AnalysisTabContent({ summary }: AnalysisTabContentProps) {
           </div>
           <div className="flex items-center gap-3">
             <Button
+              onClick={handleCopy}
               variant="outline"
-              className="rounded-xl font-black text-[10px] uppercase tracking-widest h-11 px-6 border-border/60"
+              className="rounded-xl font-black text-[10px] uppercase tracking-widest h-11 px-6 border-border/60 hover:bg-muted relative overflow-hidden"
             >
-              Copiar Texto
-            </Button>
-            <Button className="rounded-xl font-black text-[10px] uppercase tracking-widest h-11 px-6 bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-              Explorar
+              <AnimatePresence mode="wait">
+                {copied ? (
+                  <motion.div
+                    key="copied"
+                    initial={{ x: -15, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 15, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Check className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-foreground">Copiado</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="copy"
+                    initial={{ x: -15, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 15, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  >
+                    Copiar Texto
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Button>
           </div>
         </div>

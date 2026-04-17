@@ -2,13 +2,18 @@
 
 import Link from 'next/link';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { Carrd } from '@ridemountainpig/svgl-react';
 import {
   BookOpen,
   Brain,
+  CardSim,
+  FileCheck,
   FileText,
+  IdCardIcon,
+  Network,
   Plus,
   Sparkles,
   Target,
@@ -16,6 +21,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { Documenso } from 'svgl-react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
@@ -89,25 +95,28 @@ export default function DashHero({
                 className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground"
               >
                 <Sparkles className="w-3 h-3 text-primary animate-pulse" />
-                <span>Hola de nuevo, {user?.name?.split(' ')[0] || 'Blas'}</span>
+                <span>
+                  Hola de nuevo, {user?.name?.split(' ')[0] || 'Blas'}
+                </span>
               </motion.div>
 
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.95] italic max-w-xl">
                 ¿Qué vamos a{' '}
                 <span className="text-primary not-italic relative inline-block group/learn">
                   aprender
-                  <motion.span 
+                  <motion.span
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
                     transition={{ delay: 0.5, duration: 0.8 }}
-                    className="absolute -bottom-1 left-0 h-1.5 bg-primary/20 rounded-full blur-[2px]" 
+                    className="absolute -bottom-1 left-0 h-1.5 bg-primary/20 rounded-full blur-[2px]"
                   />
                 </span>{' '}
                 hoy?
               </h1>
 
               <p className="text-muted-foreground text-sm md:text-xl font-medium max-w-lg leading-relaxed opacity-80">
-                Transforma tus apuntes en conocimiento interactivo con el poder de la IA.
+                Transforma tus apuntes en conocimiento interactivo con el poder
+                de la IA.
               </p>
             </div>
 
@@ -133,41 +142,76 @@ export default function DashHero({
             </div>
 
             {/* Compact Status Row */}
-            <div className="flex flex-wrap gap-8 pt-6 border-t border-border/50">
-              <div className="flex items-center gap-3">
-                <div className="text-center">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+            <div className="flex flex-wrap items-center gap-x-12 gap-y-6 pt-8 border-t border-border/40">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="group/stat flex items-center gap-4 cursor-default"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-xl opacity-0 group-hover/stat:opacity-100 transition-opacity" />
+                  <div className="relative size-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center text-primary">
+                    <Network className="size-6" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] leading-none mb-1">
                     Proyectos
                   </p>
-                  <p className="text-lg font-black">{summary.workspaces}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 border-l border-border/30 pl-8">
-                <div className="text-center">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
-                    Documentos
-                  </p>
-                  <p className="text-lg font-black">{summary.docs}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 border-l border-border/30 pl-8">
-                <div className="text-center">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
-                    Cards
-                  </p>
-                  <p className="text-lg font-black">{summary.flashcards}</p>
-                </div>
-              </div>
-               <div className="flex items-center gap-3 border-l border-border/30 pl-8">
-                <div className="text-center text-emerald-600 dark:text-emerald-400 group/streak hover:scale-110 transition-transform">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
-                    Racha
-                  </p>
-                  <p className="text-lg font-black flex items-center gap-1">
-                    5 <span className="text-orange-500 text-xs">🔥</span>
+                  <p className="text-2xl font-black tracking-tight">
+                    {summary.workspaces}
                   </p>
                 </div>
-              </div>
+              </motion.div>
+
+              <div className="hidden sm:block w-px h-10 bg-border/30" />
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="group/stat flex items-center gap-4 cursor-default"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-blue-500/10 rounded-2xl blur-xl opacity-0 group-hover/stat:opacity-100 transition-opacity" />
+                  <div className="relative size-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center text-blue-500">
+                    <FileCheck className="size-6" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] leading-none mb-1">
+                    Docs
+                  </p>
+                  <p className="text-2xl font-black tracking-tight">
+                    {summary.docs}
+                  </p>
+                </div>
+              </motion.div>
+
+              <div className="hidden sm:block w-px h-10 bg-border/30" />
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="group/stat flex items-center gap-4 cursor-default"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl blur-xl opacity-0 group-hover/stat:opacity-100 transition-opacity" />
+                  <div className="relative size-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center text-emerald-500">
+                    <IdCardIcon className="size-6" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] leading-none mb-1">
+                    Flashcards
+                  </p>
+                  <p className="text-2xl font-black tracking-tight">
+                    {summary.flashcards}
+                  </p>
+                </div>
+              </motion.div>
             </div>
           </div>
 
@@ -213,7 +257,11 @@ export default function DashHero({
                 <div className="h-1.5 w-full bg-muted/40 rounded-full overflow-hidden">
                   <motion.div
                     animate={{ x: ['-100%', '100%'] }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
                     className="w-1/2 h-full bg-linear-to-r from-transparent via-primary to-transparent"
                   />
                 </div>
@@ -289,7 +337,7 @@ export default function DashHero({
               </div>
             )}
           </AnimatePresence>,
-          document.body
+          document.body,
         )}
     </section>
   );

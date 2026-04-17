@@ -9,7 +9,7 @@ import { motion } from 'motion/react';
 
 import EmptySearchWorkspaceSec from '@/components/dashboard/empty-search-workspace-sec';
 import EmptyWorkspacesSec from '@/components/dashboard/empty-workspaces-sec';
-import WorkspaceCard from '@/components/dashboard/workspace-card';
+import WorkspaceCard from '@/components/dashboard/workspace/workspace-card';
 import SearchInput from '@/components/shared/search-input';
 import type { Workspace } from '@/types/workspaces';
 
@@ -33,21 +33,23 @@ export default function DashWorkspacesSec({
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const filteredWorkspaces = workspaces.filter((ws) => {
-    if (!ws || !ws.name) return false;
-    return normalizeString(ws.name).includes(normalizeString(searchQuery));
-  });
+  const filteredWorkspaces = workspaces
+    .filter((ws) => {
+      if (!ws || !ws.name) return false;
+      return normalizeString(ws.name).includes(normalizeString(searchQuery));
+    })
+    .sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
 
   return (
     <section className="space-y-12">
       {/* Refined Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-border/40">
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
+          <div className="flex items-baseline gap-3">
             <h2 className="text-3xl font-bold text-foreground tracking-tight">
               Mis Espacios
             </h2>
-            <div className="px-2.5 py-0.5 rounded-full bg-muted border border-border/60 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            <div className="px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-widest relative -top-1">
               {filteredWorkspaces.length}
             </div>
           </div>
@@ -124,7 +126,7 @@ export default function DashWorkspacesSec({
               >
                 {/* Decorative background glow */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors" />
-                
+
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 group-hover:rotate-6 transition-all duration-500">
                   <Plus className="w-8 h-8 text-primary shadow-sm" />
                 </div>

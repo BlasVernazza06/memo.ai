@@ -30,12 +30,17 @@ export async function apiFetch<T = unknown>(
     }
   }
 
+  if (options?.body) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const { skipCookies: _, ...restOptions } = options || {};
 
   const res = await fetch(`${API_URL}/api${path}`, {
+    next: { revalidate: 60 },
     ...restOptions,
     headers,
-    next: { revalidate: 60 }, // Cachea por 60 segundos por defecto (ISR)
+    ...(restOptions?.next ? { next: { revalidate: 60, ...restOptions.next } } : {}),
   });
 
   if (!res.ok) {

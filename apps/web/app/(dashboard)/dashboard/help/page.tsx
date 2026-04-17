@@ -81,7 +81,7 @@ export default function HelpPage() {
             <div className="relative group">
               <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-primary/5 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-500" />
               <SearchInput
-                variant="hero"
+                variant="compact"
                 placeholder="Ej: ¿Cómo crear flashcards inteligentes?"
                 data={HELP_CATEGORIES}
                 onResultsChange={setFilteredCategories}

@@ -18,6 +18,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   icons: {
     icon: '/logo-app.webp',
+    apple: '/logo-app.webp',
   },
   title: 'memo.ai - Transforma tus PDFs en material de estudio interactivo',
   description:

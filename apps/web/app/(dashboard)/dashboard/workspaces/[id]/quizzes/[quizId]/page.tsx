@@ -6,11 +6,12 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   AlertCircle,
   ArrowRight,
+  Brain,
   Check,
   ChevronLeft,
   RotateCcw,
@@ -23,6 +24,8 @@ import { AnimatePresence, motion } from 'motion/react';
 // Components
 import { Button } from '@repo/ui/components/ui/button';
 
+import { apiFetchClient } from '@/lib/api-client';
+
 export default function QuizGamePage() {
   const params = useParams();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -32,47 +35,32 @@ export default function QuizGamePage() {
   const [gameState, setGameState] = useState<'playing' | 'completed'>(
     'playing',
   );
+  const [quiz, setQuiz] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const workspaceId = params.id as string;
+  const quizId = params.quizId as string;
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setIsLoading(true);
+        const data = await apiFetchClient<any>(`/quizzes/${quizId}`);
+        setQuiz(data);
+      } catch (error) {
+        console.error('Error loading quiz:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (quizId) {
+      loadData();
+    }
+  }, [quizId]);
 
   // Mock data for quiz
-  const questions = [
-    {
-      id: 1,
-      question: '¿Cuál de los siguientes huesos pertenece al esqueleto axial?',
-      options: ['Fémur', 'Esternón', 'Tibia', 'Húmero'],
-      correctIndex: 1,
-      explanation:
-        'El esqueleto axial incluye el cráneo, la columna vertebral y la caja torácica (donde está el esternón).',
-    },
-    {
-      id: 2,
-      question:
-        '¿Qué tipo de articulación permite el mayor rango de movimiento?',
-      options: [
-        'Sinartrosis',
-        'Anfiartrosis',
-        'Diartrosis (Sinovial)',
-        'Suturas',
-      ],
-      correctIndex: 2,
-      explanation:
-        'Las diartrosis o articulaciones sinoviales, como la del hombro, permiten movimientos amplios.',
-    },
-    {
-      id: 3,
-      question: 'La médula ósea roja es responsable de:',
-      options: [
-        'Almacenar grasa',
-        'Producir células sanguíneas',
-        'Proteger nervios',
-        'Absorber calcio',
-      ],
-      correctIndex: 1,
-      explanation:
-        'La hematopoyesis (producción de células sanguíneas) ocurre en la médula ósea roja.',
-    },
-  ];
+  const questions = quiz?.questions || [];
 
   const currentQuestion = questions[currentQuestionIndex];
   const [shake, setShake] = useState(false);
@@ -84,7 +72,7 @@ export default function QuizGamePage() {
 
   const handleSubmitAnswer = () => {
     setIsAnswered(true);
-    if (selectedOption === currentQuestion?.correctIndex) {
+    if (selectedOption === currentQuestion?.correctAnswer) {
       setScore((prev) => prev + 1);
       // Trigger success animation logic here if needed (e.g. confetti)
     } else {
@@ -112,6 +100,35 @@ export default function QuizGamePage() {
     setGameState('playing');
     setShake(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4 animate-pulse">
+        <div className="w-20 h-20 bg-muted rounded-full" />
+        <div className="h-6 w-48 bg-muted rounded-lg" />
+        <div className="h-4 w-32 bg-muted rounded-lg" />
+      </div>
+    );
+  }
+
+  if (!quiz || questions.length === 0) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6 text-center px-4">
+        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center text-muted-foreground">
+          <Brain className="w-10 h-10 opacity-20" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold">Sin preguntas disponibles</h2>
+          <p className="text-muted-foreground">
+            Este quiz no tiene preguntas o no se pudo cargar.
+          </p>
+        </div>
+        <Link href={`/dashboard/workspaces/${workspaceId}`}>
+          <Button variant="outline">Volver</Button>
+        </Link>
+      </div>
+    );
+  }
 
   if (gameState === 'completed') {
     const percentage = Math.round((score / questions.length) * 100);
@@ -236,7 +253,7 @@ export default function QuizGamePage() {
         <div className="grid gap-3">
           {currentQuestion.options.map((option, index) => {
             const isSelected = selectedOption === index;
-            const isCorrect = index === currentQuestion.correctIndex;
+            const isCorrect = index === currentQuestion.correctAnswer;
             const showResult = isAnswered;
 
             let cardClass =

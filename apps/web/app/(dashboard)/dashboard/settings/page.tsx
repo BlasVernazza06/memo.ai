@@ -45,7 +45,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-10 space-y-12">
+    <div className="max-w-5xl min-h-screen mx-auto flex flex-col justify-center py-12 px-6 space-y-12">
       {/* Header Section */}
       <header className="space-y-2">
         <motion.h1
@@ -106,7 +106,7 @@ export default function SettingsPage() {
         </motion.nav>
 
         {/* Content Area with Animations */}
-        <div className="flex-1 w-full min-h-[500px]">
+        <div className="flex-1 w-full min-h-[750px]">
           <AnimatePresence mode="wait">
             <div key={activeTab}>{renderTabContent()}</div>
           </AnimatePresence>

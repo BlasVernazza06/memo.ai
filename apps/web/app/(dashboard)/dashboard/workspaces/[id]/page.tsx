@@ -13,26 +13,21 @@ import {
   BarChart3,
   Brain,
   ChevronLeft,
-  FileText,
   Heart,
   Layers,
-  Plus,
   Settings,
-  Sparkles,
-  Trophy,
 } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 
 import type { WorkspaceWithRelations } from '@repo/db';
 // Components
 import { Button } from '@repo/ui/components/ui/button';
 
-import WorkspaceSettingsModal from '@/components/dashboard/workspace-settings-modal';
-import { AiChatFloat } from '@/components/dashboard/workspace/ai-chat-float';
 import { WorkspaceContentColumn } from '@/components/dashboard/workspace/workspace-content-column';
 import { WorkspaceInfoColumn } from '@/components/dashboard/workspace/workspace-info-column';
 import { WorkspaceInsightsColumn } from '@/components/dashboard/workspace/workspace-insights-column';
 import WorkspaceLoading from '@/components/dashboard/workspace/workspace-loading';
+import WorkspaceSettingsModal from '@/components/dashboard/workspace/workspace-settings-modal';
 import { apiFetchClient } from '@/lib/api-client';
 
 // ============================================================
@@ -50,28 +45,49 @@ export default function WorkspaceDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isFav, setIsFav] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const fetchWorkspace = async () => {
+    try {
+      setIsLoading(true);
+      const data = await apiFetchClient<WorkspaceWithRelations>(
+        `/workspaces/${id}`,
+      );
+      console.log('Workspace Detail Data:', data);
+      setWorkspace(data);
+      setIsFav(data.isFavorite);
+    } catch (error) {
+      console.error('Error fetching workspace:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchWorkspace = async () => {
-      try {
-        setIsLoading(true);
-        const data = await apiFetchClient<WorkspaceWithRelations>(
-          `/workspaces/${id}`,
-        );
-        console.log('Workspace Detail Data:', data);
-        setWorkspace(data);
-        setIsFav(data.isFavorite);
-      } catch (error) {
-        console.error('Error fetching workspace:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (id) {
       fetchWorkspace();
     }
   }, [id]);
+
+  const handleGenerateMore = async (type: 'flashcards' | 'quizzes') => {
+    try {
+      setIsGenerating(true);
+      await apiFetchClient(`/workspaces/${id}/generate-more`, {
+        method: 'POST',
+        body: JSON.stringify({ type }),
+      });
+
+      // Refrescar data
+      const data = await apiFetchClient<WorkspaceWithRelations>(
+        `/workspaces/${id}`,
+      );
+      setWorkspace(data);
+    } catch (error) {
+      console.error('Error generating more content:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const TABS = [
     {
@@ -96,7 +112,7 @@ export default function WorkspaceDetailPage() {
 
   const primaryDoc = workspace?.documents?.[0];
 
-  if (isLoading) {
+  if (isLoading && !workspace) {
     return <WorkspaceLoading />;
   }
 
@@ -137,22 +153,34 @@ export default function WorkspaceDetailPage() {
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="w-32 h-32 md:w-40 md:h-40 bg-background rounded-3xl border-4 border-background shadow-2xl flex items-center justify-center text-5xl md:text-6xl relative overflow-hidden group/icon"
+            className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 bg-white rounded-[2.5rem] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-20 group/icon border border-white/40"
           >
-            {primaryDoc?.thumbnailUrl ? (
-              <Image
-                src={primaryDoc.thumbnailUrl}
-                alt="Workspace Icon"
-                fill
-                className="object-cover transition-transform group-hover/icon:scale-110"
-              />
-            ) : (
-              <span className="transition-transform group-hover/icon:scale-110 duration-500">
-                {workspace.icon || '📚'}
-              </span>
-            )}
+            <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative flex items-center justify-center bg-slate-50">
+              {primaryDoc?.thumbnailUrl ? (
+                <Image
+                  src={
+                    primaryDoc.thumbnailUrl.startsWith('data:')
+                      ? primaryDoc.thumbnailUrl
+                      : primaryDoc.thumbnailUrl.length > 100
+                        ? `data:image/png;base64,${primaryDoc.thumbnailUrl}`
+                        : primaryDoc.thumbnailUrl
+                  }
+                  alt="Workspace Icon"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover/icon:scale-110"
+                />
+              ) : (
+                <>
+                  {/* Fondo holográfico para cuando no hay imagen */}
+                  <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-sky-400/10 to-emerald-400/10" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.8),transparent)]" />
+                  <span className="text-5xl md:text-6xl relative z-10 transition-transform duration-500 group-hover/icon:scale-110 group-hover/icon:rotate-3">
+                    {workspace.icon || '📚'}
+                  </span>
+                </>
+              )}
+            </div>
           </motion.div>
-
 
           <div className="flex flex-col items-end gap-6 mb-2">
             {/* Nav Actions */}
@@ -204,7 +232,10 @@ export default function WorkspaceDetailPage() {
             tabs={TABS}
           />
 
-          <WorkspaceInsightsColumn />
+          <WorkspaceInsightsColumn
+            onGenerateMore={handleGenerateMore}
+            isGenerating={isGenerating}
+          />
         </div>
       </div>
 
@@ -212,11 +243,9 @@ export default function WorkspaceDetailPage() {
       <WorkspaceSettingsModal
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
+        onSuccess={fetchWorkspace}
         workspace={workspace}
       />
-
-      {/* Floating Chat */}
-      <AiChatFloat />
     </div>
   );
 }

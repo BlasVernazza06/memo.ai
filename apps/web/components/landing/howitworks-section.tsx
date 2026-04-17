@@ -17,9 +17,9 @@ const steps = [
     title: 'Carga tu material',
     description: 'Sube PDFs, fotos de tus apuntes o grabaciones. Nuestra IA entiende cualquier formato de estudio.',
     mockup: (
-      <div className="w-full h-44 bg-indigo-50/30 rounded-2xl border border-indigo-100/50 p-6 mt-6 flex flex-col items-center justify-center relative overflow-hidden group/m">
+      <div className="w-full h-44 bg-indigo-500/5 rounded-2xl border border-indigo-500/10 p-6 mt-6 flex flex-col items-center justify-center relative overflow-hidden group/m">
         <div className="relative z-10 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-white shadow-xl shadow-indigo-200/50 border border-indigo-50 flex items-center justify-center mb-4 transition-transform duration-500 group-hover/m:-translate-y-2">
+          <div className="w-16 h-16 rounded-2xl bg-card shadow-xl border border-indigo-500/20 flex items-center justify-center mb-4 transition-transform duration-500 group-hover/m:-translate-y-2">
             <FileText className="w-8 h-8 text-indigo-500" />
             <motion.div 
               initial={{ opacity: 0, scale: 0.5 }}
@@ -30,8 +30,8 @@ const steps = [
             </motion.div>
           </div>
           <div className="space-y-2 text-center">
-            <div className="h-2 w-20 bg-indigo-200 rounded-full mx-auto" />
-            <div className="h-1.5 w-12 bg-indigo-100 rounded-full mx-auto" />
+            <div className="h-2 w-20 bg-indigo-500/20 rounded-full mx-auto" />
+            <div className="h-1.5 w-12 bg-indigo-500/10 rounded-full mx-auto" />
           </div>
         </div>
         {/* Floating elements */}
@@ -53,14 +53,14 @@ const steps = [
     title: 'Análisis Inteligente',
     description: 'La IA procesa el contenido, identifica los conceptos clave y crea una estructura de aprendizaje óptima.',
     mockup: (
-      <div className="w-full h-44 bg-sky-50/30 rounded-2xl border border-sky-100/50 p-5 mt-6 relative overflow-hidden group/m">
+      <div className="w-full h-44 bg-sky-500/5 rounded-2xl border border-sky-500/10 p-5 mt-6 relative overflow-hidden group/m">
         <div className="space-y-3 relative z-10">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-3 p-2.5 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-sky-50">
-              <div className={`w-2 h-2 rounded-full ${i === 1 ? 'bg-sky-500 animate-pulse' : 'bg-sky-200'}`} />
+            <div key={i} className="flex items-center gap-3 p-2.5 bg-card/80 backdrop-blur-md rounded-xl shadow-xs border border-sky-500/10">
+              <div className={`w-2 h-2 rounded-full ${i === 1 ? 'bg-sky-500 animate-pulse shadow-[0_0_8px_rgba(14,165,233,0.5)]' : 'bg-sky-500/20'}`} />
               <div className="space-y-1.5 flex-1">
-                <div className={`h-1.5 rounded-full bg-sky-900/10 ${i === 1 ? 'w-full' : 'w-3/4'}`} />
-                <div className="h-1 w-1/2 rounded-full bg-sky-900/5" />
+                <div className={`h-1.5 rounded-full bg-sky-500/20 ${i === 1 ? 'w-full' : 'w-3/4'}`} />
+                <div className="h-1 w-1/2 rounded-full bg-sky-500/10" />
               </div>
             </div>
           ))}
@@ -70,7 +70,7 @@ const steps = [
         <motion.div
           animate={{ top: ['-20%', '120%'] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-          className="absolute left-0 right-0 h-10 bg-linear-to-b from-transparent via-sky-400/20 to-transparent pointer-events-none z-20"
+          className="absolute left-0 right-0 h-10 bg-linear-to-b from-transparent via-sky-500/10 to-transparent pointer-events-none z-20"
         />
         
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
@@ -84,25 +84,25 @@ const steps = [
     title: 'Tu Plan de Éxito',
     description: 'Recibe flashcards automáticas, resúmenes enfocados y un roadmap para no olvidar nada jamás.',
     mockup: (
-      <div className="w-full h-44 bg-violet-50/30 rounded-2xl border border-violet-100/50 p-4 mt-6 flex gap-3 group/m">
+      <div className="w-full h-44 bg-violet-500/5 rounded-2xl border border-violet-500/10 p-4 mt-6 flex gap-3 group/m">
         {/* Flashcard preview */}
-        <div className="flex-1 bg-white rounded-xl shadow-lg shadow-violet-200/50 border border-violet-50 p-4 flex flex-col gap-3 transition-transform duration-500 group-hover/m:-rotate-2 group-hover/m:scale-105">
+        <div className="flex-1 bg-card rounded-xl shadow-xl border border-violet-500/20 p-4 flex flex-col gap-3 transition-transform duration-500 group-hover/m:-rotate-2 group-hover/m:scale-105">
           <div className="flex items-center gap-2 mb-1">
             <Zap className="w-3 h-3 text-violet-500" />
             <span className="text-[9px] font-black text-violet-400 uppercase tracking-tight">Flashcard #42</span>
           </div>
           <div className="space-y-2">
-            <div className="h-1.5 w-full bg-violet-900/10 rounded-full" />
-            <div className="h-1.5 w-2/3 bg-violet-900/5 rounded-full" />
+            <div className="h-1.5 w-full bg-violet-500/20 rounded-full" />
+            <div className="h-1.5 w-2/3 bg-violet-500/10 rounded-full" />
           </div>
-          <div className="mt-auto h-7 bg-violet-500 rounded-lg flex items-center justify-center shadow-lg shadow-violet-200">
+          <div className="mt-auto h-7 bg-violet-500 rounded-lg flex items-center justify-center shadow-lg shadow-violet-500/20">
             <span className="text-[9px] font-bold text-white">Recordar ahora</span>
           </div>
         </div>
         {/* Analytics preview */}
-        <div className="w-16 bg-white/50 rounded-xl border border-violet-50 p-2 flex flex-col gap-2">
+        <div className="w-16 bg-card/40 rounded-xl border border-violet-500/10 p-2 flex flex-col gap-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex-1 w-full bg-violet-200/50 rounded-sm relative overflow-hidden">
+            <div key={i} className="flex-1 w-full bg-violet-500/10 rounded-sm relative overflow-hidden">
                <motion.div 
                 initial={{ height: 0 }}
                 whileInView={{ height: `${i * 20}%` }}
@@ -212,7 +212,7 @@ export default function HowItWorkSection() {
                   </h3>
                 </div>
                 
-                <p className="text-base text-muted-foreground/80 font-medium leading-relaxed mb-8 flex-1">
+                <p className="text-base text-muted-foreground font-medium leading-relaxed mb-8 flex-1">
                   {step.description}
                 </p>
 

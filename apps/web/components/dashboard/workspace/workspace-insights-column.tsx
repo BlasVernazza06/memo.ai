@@ -1,8 +1,17 @@
 'use client';
 
-import { Trophy, Sparkles } from 'lucide-react';
+import { Trophy, Sparkles, Layers, Brain } from 'lucide-react';
+import { Button } from '@repo/ui/components/ui/button';
 
-export function WorkspaceInsightsColumn() {
+interface WorkspaceInsightsColumnProps {
+  onGenerateMore: (type: 'flashcards' | 'quizzes') => void;
+  isGenerating?: boolean;
+}
+
+export function WorkspaceInsightsColumn({
+  onGenerateMore,
+  isGenerating = false,
+}: WorkspaceInsightsColumnProps) {
   return (
     <div className="lg:col-span-3 space-y-6 lg:sticky lg:top-8">
       {/* Domain Metrics */}
@@ -78,6 +87,46 @@ export function WorkspaceInsightsColumn() {
           Has mejorado en <strong>Teoría de Redes</strong>. Repasemos
           estos conceptos antes de tu próximo quiz.
         </p>
+      </div>
+
+      {/* Generate More Section */}
+      <div className="bg-primary/5 border border-primary/10 rounded-4xl p-6 space-y-4">
+        <h3 className="font-black text-[10px] uppercase tracking-widest opacity-60 flex items-center gap-2">
+          <Sparkles className="w-3 h-3" />
+          Expandir Conocimiento
+        </h3>
+        
+        <div className="grid grid-cols-1 gap-2">
+          <Button
+            onClick={() => onGenerateMore('flashcards')}
+            disabled={isGenerating}
+            variant="outline"
+            className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Layers className="w-4 h-4 text-primary" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs">Más Flashcards</p>
+              <p className="text-[9px] opacity-50 font-medium">Nuevos conceptos</p>
+            </div>
+          </Button>
+
+          <Button
+            onClick={() => onGenerateMore('quizzes')}
+            disabled={isGenerating}
+            variant="outline"
+            className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Brain className="w-4 h-4 text-primary" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs">Más Quizzes</p>
+              <p className="text-[9px] opacity-50 font-medium">Ponte a prueba</p>
+            </div>
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,11 +1,14 @@
 'use client';
 
-import { Plus, Layers } from 'lucide-react';
+import { Layers, Plus } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Button } from '@repo/ui/components/ui/button';
+
 import type { DbDocument, WorkspaceWithRelations } from '@repo/db';
-import { DeckCard } from './deck-card';
-import { QuizCard } from './quiz-card';
+import { Button } from '@repo/ui/components/ui/button';
+
+import { DeckCard } from '@/components/dashboard/flashcards/deck-card';
+
+import { QuizCard } from '../quizzes/quiz-card';
 import { AnalysisTabContent } from './analysis-tab-content';
 import { EmptyTabListState } from './empty-tab-list-state';
 
@@ -36,7 +39,7 @@ export function WorkspaceContentColumn({
   return (
     <div className="lg:col-span-6 min-h-[600px] space-y-6">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-3">
+        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-3 flex-1 mr-6">
           <AnimatePresence mode="wait">
             <motion.span
               key={activeTab}
@@ -47,7 +50,7 @@ export function WorkspaceContentColumn({
               {title}
             </motion.span>
           </AnimatePresence>
-          <span className="h-px w-12 bg-border/50" />
+          <span className="h-px flex-1 bg-border/50" />
         </h2>
         <Button
           variant="ghost"
@@ -80,13 +83,13 @@ export function WorkspaceContentColumn({
                 <QuizCard key={quiz.id} quiz={quiz} index={idx} />
               ))}
             </div>
-          ) : activeTab === 'analysis' && (primaryDoc?.aiSummary || workspace.customContext) ? (
-            <AnalysisTabContent summary={primaryDoc?.aiSummary || workspace.customContext || ''} />
-          ) : (
-            <EmptyTabListState
-              tabName={title}
-              icon={icon}
+          ) : activeTab === 'analysis' &&
+            (primaryDoc?.aiSummary || workspace.customContext) ? (
+            <AnalysisTabContent
+              summary={primaryDoc?.aiSummary || workspace.customContext || ''}
             />
+          ) : (
+            <EmptyTabListState tabName={title} icon={icon} />
           )}
         </motion.div>
       </AnimatePresence>
