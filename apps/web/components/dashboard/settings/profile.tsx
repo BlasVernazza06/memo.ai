@@ -1,13 +1,39 @@
 'use client';
 
-import { Camera, Shield, Trash2 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
 
+import { Camera, Shield, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { authClient } from '@repo/auth/client';
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 
+import { deleteUser } from '@/lib/actions/auth-actions';
+
 export default function Profile() {
+  const router = useRouter();
+
+  const handleDeleteProfile = async () => {
+    try {
+      const result = await deleteUser();
+
+      if (result.success) {
+        await authClient.signOut({
+          fetchOptions: {
+            onSuccess: () => {
+              router.push('/');
+            },
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error al eliminar perfil:', error);
+      toast.error('No se pudo cerrar la sesión tras eliminar el perfil');
+    }
+  };
+
   return (
     <div className="space-y-10">
       {/* Primary Card */}
@@ -100,6 +126,7 @@ export default function Profile() {
             </p>
           </div>
           <Button
+            onClick={() => handleDeleteProfile()}
             variant="ghost"
             className="h-14 px-8 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 font-bold text-sm rounded-2xl transition-all active:scale-95"
           >

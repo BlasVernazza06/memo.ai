@@ -1,7 +1,10 @@
+'use server';
+
 import { redirect } from 'next/navigation';
 
 import { LoginFormValues, RegisterFormValues } from '@repo/validators';
 
+import { apiFetch } from '@/lib/api-fetch';
 import { API_URL } from '@/lib/constants/constants';
 
 export async function signUp(formData: RegisterFormValues) {
@@ -36,11 +39,26 @@ export async function signInSocial(
   provider: 'google' | 'github',
   callbackUrl?: string,
 ) {
-  const webUrl =
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+  const webUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
   const redirectTo = callbackUrl ? `${webUrl}${callbackUrl}` : webUrl;
 
   const url = `${API_URL}/auth/login/social/${provider}?callbackURL=${encodeURIComponent(redirectTo)}`;
 
   redirect(url);
+}
+
+export async function deleteUser() {
+  try {
+    await apiFetch(`/users`, {
+      method: 'DELETE',
+    });
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Error al eliminar el usuario',
+    };
+  }
 }

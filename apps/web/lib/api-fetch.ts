@@ -24,9 +24,7 @@ export async function apiFetch<T = unknown>(
     const cookieStore = await cookies();
     const allCookies = cookieStore.getAll();
     if (allCookies.length > 0) {
-      headers.cookie = allCookies
-        .map((c) => `${c.name}=${c.value}`)
-        .join('; ');
+      headers.cookie = allCookies.map((c) => `${c.name}=${c.value}`).join('; ');
     }
   }
 
@@ -40,7 +38,9 @@ export async function apiFetch<T = unknown>(
     next: { revalidate: 60 },
     ...restOptions,
     headers,
-    ...(restOptions?.next ? { next: { revalidate: 60, ...restOptions.next } } : {}),
+    ...(restOptions?.next
+      ? { next: { revalidate: 60, ...restOptions.next } }
+      : {}),
   });
 
   if (!res.ok) {
