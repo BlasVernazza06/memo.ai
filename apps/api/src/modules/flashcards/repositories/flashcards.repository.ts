@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { and, eq } from 'drizzle-orm';
-import {
-  type Database,
-  flashcardDeck,
-  workspace,
-} from '@repo/db';
+
+import { type Database, flashcardDeck, workspace } from '@repo/db';
+
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
 @Injectable()
@@ -21,18 +20,18 @@ export class FlashcardsRepository {
             .where(
               and(
                 eq(workspace.id, deck.workspaceId),
-                eq(workspace.userId, userId)
-              )
-            )
+                eq(workspace.userId, userId),
+              ),
+            ),
         ),
       with: {
         flashcards: true,
         workspace: {
-            columns: {
-                name: true,
-                id: true,
-            }
-        }
+          columns: {
+            name: true,
+            id: true,
+          },
+        },
       },
     });
   }

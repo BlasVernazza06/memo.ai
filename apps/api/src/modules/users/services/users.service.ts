@@ -1,8 +1,12 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
+import * as cacheManager from 'cache-manager';
 
 import { DbUser } from '@repo/db';
 
@@ -10,7 +14,10 @@ import { UsersRepository } from '../repositories/users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepo: UsersRepository) {}
+  constructor(
+    private readonly userRepo: UsersRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: cacheManager.Cache,
+  ) {}
 
   async validateWorkspaceLimit(userId: string): Promise<void> {
     const currentUser = await this.userRepo.findById(userId);
@@ -60,6 +67,16 @@ export class UsersService {
     }
 
     return currentUser;
+  }
+
+  async deleteUser(userId: string): Promise<{ success: boolean }> {
+    const success = await this.userRepo.deleteUserById(userId);
+
+    if (success) {
+      await this.cacheManager.del(`workspaces:list:${userId}`);
+    }
+
+    return { success: true };
   }
 
   async updateBillingInfo(

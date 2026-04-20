@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, UseGuards } from '@nestjs/common';
 
 import {
   AuthGuard,
@@ -21,5 +21,10 @@ export class UsersController {
   @Get('me')
   async getMe(@Session() session: UserSession) {
     return this.usersService.getUser(session.user.id);
+  }
+
+  @Delete('')
+  async delete(@Session() session: UserSession) {
+    return this.usersService.deleteUser(session.user.id);
   }
 }

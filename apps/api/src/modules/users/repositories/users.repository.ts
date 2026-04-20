@@ -60,6 +60,16 @@ export class UsersRepository {
     }
   }
 
+  async deleteUserById(userId: string): Promise<boolean> {
+    const result = await this.db.delete(user).where(eq(user.id, userId));
+
+    if (!result) {
+      throw new Error('Error al intentar eliminar el usuario');
+    }
+
+    return true;
+  }
+
   async countWorkspaces(userId: string): Promise<number> {
     const workspaces = await this.db.query.workspace.findMany({
       where: eq(workspace.userId, userId),
