@@ -3,6 +3,7 @@ import { Outfit } from 'next/font/google';
 import type { Metadata } from 'next';
 
 import { ThemeProvider } from '@repo/ui/components/theme-provider';
+import { Toaster } from '@repo/ui/components/ui/sonner';
 
 import { AuthProvider } from '@/lib/auth-provider';
 
@@ -50,6 +51,7 @@ export default function RootLayout({
         >
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
