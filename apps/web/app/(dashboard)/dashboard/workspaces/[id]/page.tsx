@@ -43,7 +43,7 @@ export default function WorkspaceDetailPage() {
     null,
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [isFav, setIsFav] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -55,7 +55,7 @@ export default function WorkspaceDetailPage() {
       );
       console.log('Workspace Detail Data:', data);
       setWorkspace(data);
-      setIsFav(data.isFavorite);
+      setIsFavorite(data.isFavorite);
     } catch (error) {
       console.error('Error fetching workspace:', error);
     } finally {
@@ -86,6 +86,28 @@ export default function WorkspaceDetailPage() {
       console.error('Error generating more content:', error);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!workspace) return;
+
+    // Optimistic update
+    const previous = isFavorite;
+    const nextValue = !previous;
+
+    setIsFavorite(nextValue);
+    setWorkspace((prev) => (prev ? { ...prev, isFavorite: nextValue } : null));
+
+    try {
+      await apiFetchClient(`/workspaces/${workspace.id}/like`, {
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Rollback on error
+      setIsFavorite(previous);
+      setWorkspace((prev) => (prev ? { ...prev, isFavorite: previous } : null));
     }
   };
 
@@ -194,15 +216,17 @@ export default function WorkspaceDetailPage() {
               </Link>
               <div className="h-6 w-px bg-border/50 mx-1" />
               <Button
-                onClick={() => setIsFav(!isFav)}
+                onClick={() => handleLike()}
                 variant="ghost"
                 className={`rounded-xl w-10 h-10 p-0 shadow-sm transition-all active:scale-90 ${
-                  isFav
+                  isFavorite
                     ? 'bg-rose-500/10 border border-rose-500/20 text-rose-500'
                     : 'bg-background/50 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-rose-500'
                 }`}
               >
-                <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
+                <Heart
+                  className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`}
+                />
               </Button>
               <Button
                 onClick={() => setShowSettings(true)}

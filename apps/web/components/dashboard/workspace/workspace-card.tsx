@@ -17,6 +17,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { toast } from 'sonner';
 
 import { formatDate } from '@/hooks/use-formate-date';
 import { apiFetchClient } from '@/lib/api-client';
@@ -50,9 +51,12 @@ export default function WorkspaceCard({
       await apiFetchClient(`/workspaces/${ws.id}/like`, {
         method: 'POST',
       });
+
+      toast.success('Haz agregado el workspace a tus me gusta');
     } catch (error) {
       console.error('Error toggling favorite:', error);
       setIsFavorite(previous);
+      toast.success('Haz quitado al workspace de tus me gusta con exito');
     }
   };
 
@@ -259,7 +263,7 @@ export default function WorkspaceCard({
                 {formatDate(ws.createdAt)}
               </span>
               <div
-                className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground transition-all duration-300 group-hover/ws:text-white"
+                className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground transition-all duration-300 hover:text-white"
                 style={
                   {
                     '--hover-bg': ws.color || '#3b82f6',

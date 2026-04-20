@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { Calendar, ChevronRight, Layers, Trash2, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { toast } from 'sonner';
 
 import { Button } from '@repo/ui/components/ui/button';
 
@@ -74,10 +75,12 @@ export default function WorkspaceSettingsModal({
 
       if (result.success) {
         router.push('/dashboard');
+        toast.success('Workspace eliminado con Exito');
         handleClose();
       } else {
         console.error(result.error);
         setIsDeleting(false);
+        toast.error('Eliminacion fallida');
       }
     } catch (error) {
       console.error('Error deleting workspace:', error);
