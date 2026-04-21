@@ -16,7 +16,7 @@ import {
 import { Plus } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { getInitials } from '@/hooks/use-Initials';
+import { SidebarUserAvatar } from '@/components/shared/dash-aside/user-avatar';
 import { authClient } from '@/lib/auth-client';
 import { useAuth } from '@/lib/auth-provider';
 
@@ -46,31 +46,7 @@ export default function DashAside() {
   };
 
   const renderAvatar = () => {
-    if (isLoading) {
-      return (
-        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-        </div>
-      );
-    }
-
-    if (user?.image) {
-      return (
-        <Image
-          src={user.image}
-          alt={user?.name ?? 'Usuario'}
-          width={40}
-          height={40}
-          className="w-10 h-10 rounded-xl object-cover ring-2  shadow-sm"
-        />
-      );
-    }
-
-    return (
-      <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-black text-xs border border-primary/20">
-        {getInitials(user?.name ?? 'JD')}
-      </div>
-    );
+    return <SidebarUserAvatar user={user} isLoading={isLoading} />;
   };
 
   return (

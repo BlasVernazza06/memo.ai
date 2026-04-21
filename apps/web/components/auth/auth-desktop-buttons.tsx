@@ -10,7 +10,7 @@ export default function AuthDesktopButtons() {
         Iniciar Sesión
       </Link>
       <Link
-        href="/auth?authForm=register"
+        href="/auth/register"
         className="bg-primary rounded-lg px-5 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors duration-200"
       >
         Registrarse

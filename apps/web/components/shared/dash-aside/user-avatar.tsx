@@ -7,14 +7,23 @@ import {
 } from '@repo/ui/components/ui/avatar';
 import { Skeleton } from '@repo/ui/components/ui/skeleton';
 
-interface SidebarUserAvatarProps {
-  user: any;
-  isLoading: boolean;
+import { cn } from '@repo/ui/utils';
+
+import { AuthUser } from '@/lib/auth-provider';
+
+interface UserAvatarProps {
+  user: AuthUser | null | undefined;
+  isLoading?: boolean;
+  className?: string;
 }
 
-export function SidebarUserAvatar({ user, isLoading }: SidebarUserAvatarProps) {
+export function UserAvatar({ user, isLoading, className }: UserAvatarProps) {
   if (isLoading) {
-    return <Skeleton className="w-9 h-9 rounded-xl animate-pulse" />;
+    return (
+      <Skeleton
+        className={cn('w-9 h-9 rounded-xl animate-pulse', className)}
+      />
+    );
   }
 
   const initials = user?.name
@@ -24,14 +33,26 @@ export function SidebarUserAvatar({ user, isLoading }: SidebarUserAvatarProps) {
         .join('')
         .toUpperCase()
         .slice(0, 2)
-    : 'JD';
+    : '??';
 
   return (
-    <Avatar className="w-9 h-9 rounded-xl border border-white/10 shadow-sm ring-2 ring-white/5 group-hover/profile:ring-primary/20 transition-all">
-      <AvatarImage src={user?.image} alt={user?.name} className="object-cover" />
-      <AvatarFallback className="bg-primary/10 text-primary font-black text-[10px] italic">
+    <Avatar
+      className={cn(
+        'w-9 h-9 rounded-xl border border-white/10 shadow-sm transition-all',
+        className
+      )}
+    >
+      <AvatarImage
+        src={user?.image || undefined}
+        alt={user?.name || 'Usuario'}
+        className="object-cover"
+      />
+      <AvatarFallback className={cn('bg-primary/10 text-primary font-black text-xs italic', className?.includes('w-') && 'text-2xl lg:text-4xl')}>
         {initials}
       </AvatarFallback>
     </Avatar>
   );
 }
+
+// Para compatibilidad con el resto del código
+export { UserAvatar as SidebarUserAvatar };

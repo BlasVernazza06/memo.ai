@@ -10,13 +10,8 @@ export default function Appearance() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="space-y-8"
-    >
-      <div className="bg-card border border-border/80 rounded-4xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
+    <div className="space-y-8">
+      <div className="bg-card border border-border/80 rounded-4xl p-8">
         <h3 className="text-xl font-bold mb-8 text-foreground">
           Personalización visual
         </h3>
@@ -37,7 +32,7 @@ export default function Appearance() {
                   onClick={() => setTheme(t.id)}
                   className={`cursor-pointer rounded-2xl border-2 p-4 flex flex-col items-center gap-3 transition-all ${
                     theme === t.id
-                      ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
+                      ? 'border-primary bg-primary/5'
                       : 'border-border hover:border-primary/40 bg-muted/20'
                   }`}
                 >
@@ -65,12 +60,12 @@ export default function Appearance() {
                 </p>
               </div>
               <div className="w-12 h-6 bg-muted rounded-full relative cursor-pointer p-1">
-                <div className="w-4 h-4 bg-background rounded-full shadow-sm" />
+                <div className="w-4 h-4 bg-background rounded-full" />
               </div>
             </div>
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

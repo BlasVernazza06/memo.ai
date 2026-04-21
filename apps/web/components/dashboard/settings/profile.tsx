@@ -10,9 +10,14 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 
+import { SidebarUserAvatar } from '@/components/shared/dash-aside/user-avatar';
+import AppearanceSection from '@/components/dashboard/settings/appearance';
+import SecuritySection from '@/components/dashboard/settings/security';
 import { deleteUser } from '@/lib/actions/auth-actions';
+import { useAuth } from '@/lib/auth-provider';
 
 export default function Profile() {
+  const { user } = useAuth();
   const router = useRouter();
 
   const handleDeleteProfile = async () => {
@@ -37,22 +42,18 @@ export default function Profile() {
   return (
     <div className="space-y-10">
       {/* Primary Card */}
-      <div className="bg-card/50 backdrop-blur-xl border border-border/60 rounded-[2.5rem] p-8 lg:p-12 shadow-2xl shadow-black/5 relative overflow-hidden">
+      <div className="bg-card/50 backdrop-blur-xl border border-border/60 rounded-[2.5rem] p-8 lg:p-12 relative overflow-hidden">
         {/* Decorative corner glow */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full translate-x-10 -translate-y-10" />
 
         <div className="relative space-y-12">
           <div className="flex flex-col md:flex-row gap-12 items-start md:items-center">
-            {/* Avatar Section */}
             <div className="relative group self-center md:self-auto">
-              <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-[2.5rem] bg-linear-to-br from-primary via-primary/80 to-blue-600 p-1.5 shadow-2xl shadow-primary/20 rotate-1 group-hover:rotate-0 transition-transform duration-500">
-                <div className="w-full h-full rounded-[2.2rem] bg-card flex items-center justify-center overflow-hidden">
-                  <span className="text-4xl lg:text-5xl font-black text-primary tracking-tighter">
-                    BV
-                  </span>
-                </div>
-              </div>
-              <button className="absolute -bottom-2 -right-2 w-12 h-12 bg-foreground text-background rounded-2xl shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all cursor-pointer border-4 border-card">
+              <SidebarUserAvatar
+                user={user}
+                className="w-32 h-32 lg:w-40 lg:h-40 rounded-[2.5rem] ring-offset-4 ring-2 ring-primary/20"
+              />
+              <button className="absolute -bottom-2 -right-2 w-12 h-12 bg-foreground text-background rounded-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all cursor-pointer border-4 border-card">
                 <Camera className="w-5 h-5" />
               </button>
             </div>
@@ -101,36 +102,47 @@ export default function Profile() {
           </div>
 
           <div className="flex justify-end pt-4">
-            <Button className="h-14 px-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0">
+            <Button className="h-14 px-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-widest rounded-2xl transition-all hover:-translate-y-0.5 active:translate-y-0">
               Guardar Cambios
             </Button>
           </div>
         </div>
       </div>
 
+      {/* Appearance Section */}
+      <AppearanceSection />
+
+      {/* Security Section (Password Change) */}
+      <SecuritySection />
+
       {/* Danger Zone */}
-      <div className="p-1 lg:p-1.5 rounded-[2.5rem] bg-linear-to-r from-rose-500/10 via-rose-500/5 to-transparent border border-rose-500/10">
-        <div className="bg-card/40 backdrop-blur-sm rounded-[2.2rem] p-8 lg:p-10 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="flex items-center gap-3 justify-center md:justify-start">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
-                <Trash2 className="w-5 h-5" />
-              </div>
-              <h4 className="text-xl font-black text-rose-500 tracking-tight">
-                Zona de Peligro
-              </h4>
+      <div className="rounded-[2rem] bg-card/30 border border-rose-500/20 overflow-hidden relative transition-all hover:bg-card/40">
+        <div className="relative p-6 lg:p-7 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-5 flex-1 w-full">
+            <div className="w-11 h-11 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0 border border-rose-500/5 shadow-sm">
+              <Trash2 className="w-5 h-5" />
             </div>
-            <p className="text-sm text-muted-foreground font-medium max-w-md">
-              Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor,
-              esté seguro de esta acción.
-            </p>
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <h4 className="text-base font-bold text-foreground">
+                  Zona de Peligro
+                </h4>
+                <span className="hidden sm:inline-block text-[9px] font-black uppercase tracking-[0.2em] text-rose-500/50 bg-rose-500/5 px-2 py-0.5 rounded-full border border-rose-500/10">
+                  Acción Irreversible
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground/70 font-medium max-w-md leading-relaxed">
+                Elimina tu cuenta y todos los datos permanentemente. Por favor,
+                asegúrate antes de proceder.
+              </p>
+            </div>
           </div>
           <Button
             onClick={() => handleDeleteProfile()}
-            variant="ghost"
-            className="h-14 px-8 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 font-bold text-sm rounded-2xl transition-all active:scale-95"
+            variant="outline"
+            className="w-full md:w-auto h-11 px-6 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all active:scale-95 shrink-0"
           >
-            Eliminar cuenta permanentemente
+            Eliminar cuenta
           </Button>
         </div>
       </div>

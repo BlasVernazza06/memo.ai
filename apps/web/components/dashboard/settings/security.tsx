@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, Lock, Smartphone } from 'lucide-react';
-import { motion } from 'motion/react';
 
+import { Eye, EyeOff, Lock, Smartphone } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { authClient } from '@repo/auth/client';
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
-import { authClient } from '@repo/auth/client';
 
 export default function Security() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -33,10 +34,12 @@ export default function Security() {
       });
 
       if (response.error) {
-        throw new Error(response.error.message || 'Error al cambiar la contraseña');
+        throw new Error(
+          response.error.message || 'Error al cambiar la contraseña',
+        );
       }
 
-      alert('¡Contraseña actualizada con éxito!');
+      toast.success('Su contraseña se ha actualizado con exito');
       setCurrentPassword('');
       setNewPassword('');
     } catch (err: any) {
@@ -47,13 +50,8 @@ export default function Security() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="space-y-6"
-    >
-      <div className="bg-card border border-border/80 rounded-4xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.2)] space-y-8">
+    <div className="space-y-6">
+      <div className="bg-card border border-border/80 rounded-4xl p-8 space-y-8">
         <div>
           <h3 className="text-xl font-bold mb-2 text-foreground">
             Cambiar Contraseña
@@ -103,11 +101,15 @@ export default function Security() {
                 onClick={() => setShowNewPassword(!showNewPassword)}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer focus:outline-hidden"
               >
-                {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showNewPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
-          <Button 
+          <Button
             onClick={handleUpdatePassword}
             disabled={isLoading}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-8 h-11 w-full md:w-auto cursor-pointer flex items-center justify-center gap-2"
@@ -117,26 +119,24 @@ export default function Security() {
         </div>
       </div>
 
-      <div className="bg-card border border-border/80 rounded-4xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
+      <div className="bg-card border border-border/80 rounded-4xl p-8">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center border border-emerald-500/20">
               <Smartphone className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-foreground">
-                Doble Factor (2FA)
-              </h4>
+              <h4 className="font-bold text-foreground">Doble Factor (2FA)</h4>
               <p className="text-xs text-muted-foreground font-medium">
                 Añade una capa extra de seguridad a tu cuenta.
               </p>
             </div>
           </div>
           <div className="w-12 h-6 bg-muted rounded-full relative cursor-pointer p-1">
-            <div className="w-4 h-4 bg-background rounded-full shadow-sm" />
+            <div className="w-4 h-4 bg-background rounded-full" />
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -71,14 +71,9 @@ export default function Billing() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="space-y-8"
-    >
+    <div className="space-y-8">
       <div
-        className={`relative overflow-hidden bg-card border rounded-4xl p-8 transition-all duration-300 ${isPro ? 'border-primary/25 shadow-[0_12px_40px_rgba(var(--primary),0.05)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.2)]' : 'border-border/80 shadow-md'}`}
+        className={`relative overflow-hidden bg-card border rounded-4xl p-8 transition-all duration-300 ${isPro ? 'border-primary/25' : 'border-border/80'}`}
       >
         {isPro && (
           <div className="absolute top-0 right-0 w-80 h-full bg-linear-to-l from-primary/10 via-primary/3 to-transparent pointer-events-none" />
@@ -103,7 +98,7 @@ export default function Billing() {
             </div>
           </div>
           <Button
-            className={`font-bold rounded-xl px-6 h-12 shadow-lg transition-all active:scale-95 cursor-pointer ${isPro ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20' : 'bg-foreground text-background hover:opacity-90'}`}
+            className={`font-bold rounded-xl px-6 h-12 transition-all active:scale-95 cursor-pointer ${isPro ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-foreground text-background hover:opacity-90'}`}
           >
             {isPro ? 'Gestionar Facturación' : 'Mejorar a PRO'}
           </Button>
@@ -120,7 +115,7 @@ export default function Billing() {
           {features.map((feature, i) => (
             <div
               key={i}
-              className={`p-6 bg-card border rounded-3xl transition-all duration-300 flex flex-col gap-3 group peer cursor-default ${isPro ? 'border-border/60 hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)]' : 'border-border/40 hover:border-border/80'}`}
+              className={`p-6 bg-card border rounded-3xl transition-all duration-300 flex flex-col gap-3 group peer cursor-default ${isPro ? 'border-border/60 hover:border-primary/30' : 'border-border/40 hover:border-border/80'}`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500 ${isPro ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}
@@ -152,11 +147,11 @@ export default function Billing() {
               acceso a resúmenes profundos sin límites.
             </p>
           </div>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-2xl h-12 px-8 shadow-lg shadow-primary/30 text-base">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-2xl h-12 px-8 text-base">
             Activar Pro ahora
           </Button>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

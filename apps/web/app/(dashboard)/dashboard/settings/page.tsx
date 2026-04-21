@@ -11,43 +11,32 @@ import NotificationsTab from '@/components/dashboard/settings/notifications';
 import ProfileTab from '@/components/dashboard/settings/profile';
 import SecurityTab from '@/components/dashboard/settings/security';
 
-type TabId =
-  | 'profile'
-  | 'billing'
-  | 'security'
-  | 'notifications'
-  | 'appearance';
+type TabId = 'profile' | 'subscription' | 'notifications';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('profile');
 
   const sections = [
     { id: 'profile' as TabId, icon: User, label: 'Perfil' },
-    { id: 'billing' as TabId, icon: CreditCard, label: 'Suscripción' },
-    { id: 'security' as TabId, icon: Shield, label: 'Seguridad' },
+    { id: 'subscription' as TabId, icon: CreditCard, label: 'Suscripción' },
     { id: 'notifications' as TabId, icon: Bell, label: 'Notificaciones' },
-    { id: 'appearance' as TabId, icon: Palette, label: 'Apariencia' },
   ];
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
         return <ProfileTab />;
-      case 'billing':
+      case 'subscription':
         return <BillingTab />;
-      case 'security':
-        return <SecurityTab />;
       case 'notifications':
         return <NotificationsTab />;
-      case 'appearance':
-        return <AppearanceTab />;
     }
   };
 
   return (
-    <div className="max-w-5xl min-h-screen mx-auto flex flex-col justify-center py-12 px-6 space-y-12">
+    <div className="max-w-6xl h-[calc(100vh-4rem)] mx-auto flex flex-col py-8 px-6 overflow-hidden">
       {/* Header Section */}
-      <header className="space-y-2">
+      <header className="space-y-2 mb-10 shrink-0">
         <motion.h1
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -65,7 +54,7 @@ export default function SettingsPage() {
         </motion.p>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-10 items-start">
+      <div className="flex flex-col lg:flex-row gap-10 items-start overflow-hidden h-full">
         {/* Navigation Menu */}
         <motion.nav
           initial={{ opacity: 0, y: 20 }}
@@ -79,7 +68,7 @@ export default function SettingsPage() {
               onClick={() => setActiveTab(item.id)}
               className={`flex items-center gap-3 px-5 py-4 rounded-[1.25rem] font-bold text-sm transition-all duration-300 relative shrink-0 ${
                 activeTab === item.id
-                  ? 'bg-card text-primary shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border'
+                  ? 'bg-card text-primary border border-border'
                   : 'border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
               }`}
             >
@@ -105,11 +94,22 @@ export default function SettingsPage() {
           </div>
         </motion.nav>
 
-        {/* Content Area with Animations */}
-        <div className="flex-1 w-full min-h-[750px]">
-          <AnimatePresence mode="wait">
-            <div key={activeTab}>{renderTabContent()}</div>
-          </AnimatePresence>
+        {/* Content Area with Animations and Internal Scroll */}
+        <div className="flex-1 w-full h-full overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-y-auto pr-4 scrollbar-hide pb-10">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="w-full"
+              >
+                {renderTabContent()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>

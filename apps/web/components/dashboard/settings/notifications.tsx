@@ -5,13 +5,8 @@ import { motion } from 'motion/react';
 
 export default function Notifications() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="space-y-6"
-    >
-      <div className="bg-card border border-border/80 rounded-4xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
+    <div className="space-y-6">
+      <div className="bg-card border border-border/80 rounded-4xl p-8">
         <h3 className="text-xl font-bold mb-6 text-foreground">
           Canales de Notificación
         </h3>
@@ -57,13 +52,13 @@ export default function Notifications() {
                 className={`w-12 h-6 rounded-full relative cursor-pointer p-1 transition-colors ${notif.active ? 'bg-primary' : 'bg-muted'}`}
               >
                 <div
-                  className={`w-4 h-4 bg-background rounded-full shadow-sm transition-transform ${notif.active ? 'translate-x-6' : 'translate-x-0'}`}
+                  className={`w-4 h-4 bg-background rounded-full transition-transform ${notif.active ? 'translate-x-6' : 'translate-x-0'}`}
                 />
               </div>
             </div>
           ))}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
