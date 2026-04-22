@@ -16,6 +16,9 @@ export const envSchema = z.object({
   STRIPE_PRO_PRICE_ID: z.string().optional(),
   STRIPE_SUCCESS_URL: z.string().url().optional(),
   STRIPE_CANCEL_URL: z.string().url().optional(),
+  BREVO_SECRET_KEY: z.string(),
+  BREVO_SENDER_EMAIL: z.string().email(),
+  BREVO_SENDER_NAME: z.string().default('Memo.ai'),
 });
 
 export type Env = z.infer<typeof envSchema>;

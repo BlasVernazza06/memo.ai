@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,8 +35,13 @@ export default function SignInForm() {
     resolver: zodResolver(loginSchema),
   });
 
+  useEffect(() => {
+    if (session) {
+      router.replace(callbackUrl);
+    }
+  }, [session, router, callbackUrl]);
+
   if (session) {
-    router.replace(callbackUrl);
     return null;
   }
 
@@ -149,7 +154,7 @@ export default function SignInForm() {
 
       <div className="flex items-center justify-between px-1">
         <Link
-          href="#"
+          href="/auth/forgetPassword"
           className="text-[13px] font-bold text-primary hover:text-primary/80 transition-colors"
         >
           ¿Olvidaste tu contraseña?

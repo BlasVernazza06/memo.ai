@@ -11,10 +11,11 @@ import { PlansModule } from '@/modules/billing/plans/plans.module';
 import { WebhooksModule } from '@/modules/billing/webhooks/webhooks.module';
 import { ChatsModule } from '@/modules/chats/chats.module';
 import { DatabaseModule } from '@/modules/database/database.module';
-import { UsersModule } from '@/modules/users/users.module';
-import { WorkspacesModule } from '@/modules/workspaces/workspaces.module';
+import { EmailModule } from '@/modules/email/email.module';
 import { FlashcardsModule } from '@/modules/flashcards/flashcards.module';
 import { QuizzesModule } from '@/modules/quizzes/quizzes.module';
+import { UsersModule } from '@/modules/users/users.module';
+import { WorkspacesModule } from '@/modules/workspaces/workspaces.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { QuizzesModule } from '@/modules/quizzes/quizzes.module';
       isGlobal: true,
     }),
     DatabaseModule,
+    EmailModule,
     BetterAuthModule,
     UsersModule,
     AiModule,

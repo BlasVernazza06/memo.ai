@@ -29,6 +29,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@getbrevo/brevo':
+        specifier: ^5.0.4
+        version: 5.0.4
       '@mguay/nestjs-better-auth':
         specifier: ^1.0.4
         version: 1.0.4(@nestjs/common@11.1.13(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.13(@nestjs/common@11.1.13(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.13)(@nestjs/websockets@11.1.15)(reflect-metadata@0.2.2)(rxjs@7.8.2))(better-auth@1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(express@5.2.1)(typescript@5.9.2)
@@ -73,7 +76,7 @@ importers:
         version: 11.0.0
       better-auth:
         specifier: ^1.4.18
-        version: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       cache-manager:
         specifier: ^7.2.8
         version: 7.2.8
@@ -206,7 +209,7 @@ importers:
         version: 1.0.15(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       better-auth:
         specifier: ^1.4.18
-        version: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       lucide-react:
         specifier: ^0.563.0
         version: 0.563.0(react@19.2.0)
@@ -279,7 +282,7 @@ importers:
         version: link:../validators
       better-auth:
         specifier: ^1.4.18
-        version: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       next:
         specifier: 16.1.0
         version: 16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -1020,6 +1023,10 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@getbrevo/brevo@5.0.4':
+    resolution: {integrity: sha512-wN4mHE6O0Pb/d/Dh3E4MAm2zCHbLLUcFF8/wgwTeMPy9KzHBYLu7S/nsJbzd0AWL09MHn8vwue8ULL9YOzluOQ==}
+    engines: {node: '>=18.0.0'}
 
   '@hookform/resolvers@5.2.2':
     resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
@@ -5846,6 +5853,8 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
+  '@getbrevo/brevo@5.0.4': {}
+
   '@hookform/resolvers@5.2.2(react-hook-form@7.71.1(react@19.2.0))':
     dependencies:
       '@standard-schema/utils': 0.3.0
@@ -6340,7 +6349,7 @@ snapshots:
     dependencies:
       '@nestjs/common': 11.1.13(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.13(@nestjs/common@11.1.13(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.13)(@nestjs/websockets@11.1.15)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      better-auth: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      better-auth: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       express: 5.2.1
       typescript: 5.9.2
 
@@ -6763,7 +6772,7 @@ snapshots:
     dependencies:
       '@nestjs/common': 11.1.13(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.13(@nestjs/common@11.1.13(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.13)(@nestjs/websockets@11.1.15)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      better-auth: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      better-auth: 1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       express: 5.2.1
       typescript: 5.9.2
     optionalDependencies:
@@ -7423,7 +7432,7 @@ snapshots:
 
   baseline-browser-mapping@2.9.11: {}
 
-  better-auth@1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  better-auth@1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.41.0(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(kysely@0.28.11))(next@16.1.0(@playwright/test@1.58.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@better-auth/core': 1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)
       '@better-auth/telemetry': 1.4.18(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0))

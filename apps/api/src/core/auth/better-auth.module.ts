@@ -11,14 +11,17 @@ import { authSchema } from '@repo/db';
 
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 import { DatabaseModule } from '@/modules/database/database.module';
+import { EmailModule } from '@/modules/email/email.module';
+import { EmailService } from '@/modules/email/service/email.service';
 
 @Module({
   imports: [
     AuthModule.forRootAsync({
-      imports: [DatabaseModule, ConfigModule],
+      imports: [DatabaseModule, ConfigModule, EmailModule],
       useFactory: (
         database: NeonHttpDatabase,
         configService: ConfigService,
+        emailService: EmailService,
       ) => ({
         auth: betterAuth({
           database: drizzleAdapter(database, {
@@ -27,6 +30,12 @@ import { DatabaseModule } from '@/modules/database/database.module';
           }),
           emailAndPassword: {
             enabled: true,
+            sendResetPassword: async ({ user, url }) => {
+              await emailService.sendResetPasswordEmail(user.email, url);
+            },
+            sendVerificationEmail: async ({ user, url }) => {
+              await emailService.sendVerificationEmail(user.email, url);
+            },
           },
           socialProviders: {
             google: {
@@ -54,7 +63,7 @@ import { DatabaseModule } from '@/modules/database/database.module';
           trustedOrigins: [configService.getOrThrow('NEXT_PUBLIC_APP_URL')],
         }),
       }),
-      inject: [DATABASE_CONNECTION, ConfigService],
+      inject: [DATABASE_CONNECTION, ConfigService, EmailService],
     }),
   ],
   providers: [

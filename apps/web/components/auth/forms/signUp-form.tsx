@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,8 +33,13 @@ export default function SignUpForm() {
     resolver: zodResolver(registerSchema),
   });
 
+  useEffect(() => {
+    if (session) {
+      router.replace(callbackUrl);
+    }
+  }, [session, router, callbackUrl]);
+
   if (session) {
-    router.replace(callbackUrl);
     return null;
   }
 
