@@ -31,6 +31,7 @@ function CheckoutInner() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const planParam = searchParams.get('plan');
+  const billingCycle = (searchParams.get('billingCycle') as 'monthly' | 'yearly') || 'monthly';
 
   const [plan, setPlan] = useState<PlanData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,30 +163,22 @@ function CheckoutInner() {
     );
   }
 
-  const formattedPrice = (plan.price / 100).toFixed(0);
+  const basePrice = plan.price / 100;
+  const finalPrice =
+    billingCycle === 'yearly' ? basePrice * 0.8 : basePrice;
+  const formattedPrice = finalPrice.toFixed(0);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden selection:bg-primary/30">
-      {/* Background aesthetic blobs */}
+      {/* Ultra-subtle background resplendence */}
       <div
-        className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-20 pointer-events-none"
+        className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] opacity-[0.08] pointer-events-none"
         style={{
-          background:
-            'conic-gradient(from 180deg at 50% 50%, #0EA5E9 0deg, #3B82F6 120deg, #6366F1 240deg, #0EA5E9 360deg)',
-        }}
-      />
-      <div
-        className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[150px] opacity-15 pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle at center, #6366F1, transparent)',
+          background: 'radial-gradient(circle at center, #3B82F6, transparent)',
         }}
       />
 
-      {/* Grid pattern background */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none mix-blend-overlay" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[14px_24px] pointer-events-none" />
-
-      <div className="relative z-10 memo-container py-8 md:py-12 lg:py-16">
+      <div className="relative z-10 memo-container py-4 md:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Top navigation/logo */}
           <motion.div
@@ -207,7 +200,7 @@ function CheckoutInner() {
             </div>
           </motion.div>
 
-          <header className="text-center mb-8 space-y-3">
+          <header className="text-center mb-4 space-y-1">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -225,7 +218,7 @@ function CheckoutInner() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-3xl md:text-4xl font-black tracking-tight"
+              className="text-2xl md:text-3xl font-black tracking-tight"
             >
               Mejora tu{' '}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-blue-600">
@@ -237,10 +230,9 @@ function CheckoutInner() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto"
+              className="text-muted-foreground text-xs md:text-sm max-w-lg mx-auto"
             >
-              Únete a cientos de estudiantes que ya están dominando nuevos temas
-              un 2x más rápido con {plan.name}.
+              Domina nuevos temas un 2x más rápido con {plan.name}.
             </motion.p>
           </header>
 
@@ -265,6 +257,7 @@ function CheckoutInner() {
                 <LeftPanelCheckout
                   plan={plan}
                   formattedPrice={formattedPrice}
+                  billingCycle={billingCycle}
                 />
 
                 {/* RIGHT: Payment section */}
@@ -272,6 +265,7 @@ function CheckoutInner() {
                   user={user}
                   planName={plan.name}
                   formattedPrice={formattedPrice}
+                  billingCycle={billingCycle}
                   checkoutLoading={checkoutLoading}
                   error={error}
                   handleCheckout={handleCheckout}

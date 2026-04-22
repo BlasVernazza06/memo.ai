@@ -42,7 +42,10 @@ export default function PricingSection() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        interface RawPlan extends Omit<Plan, 'icon' | 'cta' | 'price' | 'popular'> {
+        interface RawPlan extends Omit<
+          Plan,
+          'icon' | 'cta' | 'price' | 'popular'
+        > {
           price: number;
           popular: boolean;
         }
@@ -155,7 +158,7 @@ export default function PricingSection() {
               isProUser && isProCard
                 ? '/dashboard'
                 : plan.popular
-                  ? `/checkout?plan=${plan.stripePriceId}`
+                  ? `/checkout?plan=${plan.stripePriceId}&billingCycle=${billingCycle}`
                   : '/dashboard';
 
             return (
@@ -172,8 +175,10 @@ export default function PricingSection() {
                 className={`relative p-10 rounded-[2.5rem] border transition-all duration-700 overflow-hidden group ${
                   plan.popular
                     ? 'bg-foreground text-background border-primary/50 shadow-2xl md:scale-[1.02] z-20'
-                    : 'bg-card border-border/60 hover:border-border z-10'
-                } ${isDisabled ? 'opacity-60 pointer-events-none' : ''}`}
+                    : isDisabled
+                      ? 'bg-muted/40 border-border/40 text-muted-foreground grayscale z-10'
+                      : 'bg-card border-border/60 hover:border-border z-10'
+                } ${isDisabled ? 'pointer-events-none' : ''}`}
               >
                 {/* Subtle Background effects for Popular Card */}
                 {plan.popular && (
