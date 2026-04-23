@@ -181,7 +181,13 @@ export class WorkspacesController {
     @User('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Body('type') type: 'flashcards' | 'quizzes',
+    @Body('prompt') prompt?: string,
   ) {
-    return await this.workspacesService.generateMoreContent(userId, id, type);
+    return await this.workspacesService.generateMoreContent(
+      userId,
+      id,
+      type,
+      prompt,
+    );
   }
 }

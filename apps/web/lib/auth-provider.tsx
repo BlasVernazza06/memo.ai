@@ -1,6 +1,12 @@
 'use client';
 
-import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 import { apiFetchClient } from './api-client';
 import { authClient } from './auth-client';
@@ -43,7 +49,9 @@ export function AuthProvider({
       if (currentSession?.user?.id) {
         setIsFetchingDb(true);
         try {
-          const userFromDb = await apiFetchClient<AuthUser>('/users/me');
+          const userFromDb = await apiFetchClient<AuthUser>('/users/me', {
+            cache: 'force-cache',
+          });
           if (isMounted) {
             setDbUser(userFromDb);
           }
@@ -63,10 +71,9 @@ export function AuthProvider({
     return () => {
       isMounted = false;
     };
-  }, [session, session?.user?.id, initialSession]);
+  }, [session, session?.user?.id, initialSession, dbUser?.id]);
 
   const isLoading = (isPending && !initialSession) || isFetchingDb;
-
 
   return (
     <AuthContext.Provider value={{ user: dbUser, isLoading }}>
@@ -82,6 +89,3 @@ export function useAuth() {
   }
   return context;
 }
-
-
-

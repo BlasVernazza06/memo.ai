@@ -1,11 +1,12 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
+import { PlansRepository } from '@modules/billing/plans/respository/plans.repository';
 import * as cacheManager from 'cache-manager';
 
 import { type DbPlan } from '@repo/db';
 
-import { PlansRepository } from '../respository/plans.repository';
+import { CACHE_KEYS } from '@/common/constants/cache-keys';
 
 @Injectable()
 export class PlansService {
@@ -15,7 +16,7 @@ export class PlansService {
   ) {}
 
   async findAll(): Promise<DbPlan[]> {
-    const cacheKey = `plans:list`;
+    const cacheKey = CACHE_KEYS.PLANS_LIST;
 
     const cachedPlans = await this.cacheManager.get<DbPlan[]>(cacheKey);
     if (cachedPlans) {
@@ -30,7 +31,7 @@ export class PlansService {
   }
 
   async findById(idOrPriceId: string): Promise<DbPlan> {
-    const cacheKey = `plan:smart:${idOrPriceId}`;
+    const cacheKey = CACHE_KEYS.PLAN_SMART(idOrPriceId);
 
     const cached = await this.cacheManager.get<DbPlan>(cacheKey);
     if (cached) {
@@ -55,14 +56,15 @@ export class PlansService {
   }
 
   async findByStripePriceId(stripePriceId: string): Promise<DbPlan> {
-    const cacheKey = `plan:stripe:${stripePriceId}`;
+    const cacheKey = CACHE_KEYS.PLAN_STRIPE(stripePriceId);
 
     const cached = await this.cacheManager.get<DbPlan>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    const planByStripe = await this.plansRepo.findByStripePriceId(stripePriceId);
+    const planByStripe =
+      await this.plansRepo.findByStripePriceId(stripePriceId);
 
     if (!planByStripe) {
       throw new NotFoundException('Plan de Stripe no encontrado');

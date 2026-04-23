@@ -10,6 +10,8 @@ import * as cacheManager from 'cache-manager';
 
 import { DbUser } from '@repo/db';
 
+import { CACHE_KEYS } from '@/common/constants/cache-keys';
+
 import { UsersRepository } from '../repositories/users.repository';
 
 @Injectable()
@@ -60,11 +62,20 @@ export class UsersService {
   }
 
   async getUser(userId: string): Promise<DbUser> {
+    const cacheKey = CACHE_KEYS.USER_PROFILE(userId);
+
+    const cached = await this.cacheManager.get<DbUser>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const currentUser = await this.userRepo.findById(userId);
 
     if (!currentUser) {
       throw new NotFoundException('Usuario no encontrado');
     }
+
+    await this.cacheManager.set(cacheKey, currentUser, 600000);
 
     return currentUser;
   }
@@ -73,7 +84,8 @@ export class UsersService {
     const success = await this.userRepo.deleteUserById(userId);
 
     if (success) {
-      await this.cacheManager.del(`workspaces:list:${userId}`);
+      await this.cacheManager.del(CACHE_KEYS.WORKSPACES_LIST(userId));
+      await this.cacheManager.del(CACHE_KEYS.USER_PROFILE(userId));
     }
 
     return { success: true };

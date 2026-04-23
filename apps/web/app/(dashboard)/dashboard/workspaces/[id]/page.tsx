@@ -69,12 +69,15 @@ export default function WorkspaceDetailPage() {
     }
   }, [id]);
 
-  const handleGenerateMore = async (type: 'flashcards' | 'quizzes') => {
+  const handleGenerateMore = async (
+    type: 'flashcards' | 'quizzes',
+    prompt?: string,
+  ) => {
     try {
       setIsGenerating(true);
       await apiFetchClient(`/workspaces/${id}/generate-more`, {
         method: 'POST',
-        body: JSON.stringify({ type }),
+        body: JSON.stringify({ type, prompt }),
       });
 
       // Refrescar data

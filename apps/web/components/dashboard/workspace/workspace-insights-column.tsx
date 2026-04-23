@@ -1,10 +1,13 @@
 'use client';
 
 import { Trophy, Sparkles, Layers, Brain } from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@repo/ui/components/ui/button';
+import { Textarea } from '@repo/ui/components/ui/textarea';
 
 interface WorkspaceInsightsColumnProps {
-  onGenerateMore: (type: 'flashcards' | 'quizzes') => void;
+  onGenerateMore: (type: 'flashcards' | 'quizzes', prompt?: string) => void;
   isGenerating?: boolean;
 }
 
@@ -12,6 +15,7 @@ export function WorkspaceInsightsColumn({
   onGenerateMore,
   isGenerating = false,
 }: WorkspaceInsightsColumnProps) {
+  const [prompt, setPrompt] = useState('');
   return (
     <div className="lg:col-span-3 space-y-6 lg:sticky lg:top-8">
       {/* Domain Metrics */}
@@ -95,37 +99,52 @@ export function WorkspaceInsightsColumn({
           <Sparkles className="w-3 h-3" />
           Expandir Conocimiento
         </h3>
-        
-        <div className="grid grid-cols-1 gap-2">
-          <Button
-            onClick={() => onGenerateMore('flashcards')}
-            disabled={isGenerating}
-            variant="outline"
-            className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
-          >
-            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Layers className="w-4 h-4 text-primary" />
-            </div>
-            <div className="text-left">
-              <p className="text-xs">Más Flashcards</p>
-              <p className="text-[9px] opacity-50 font-medium">Nuevos conceptos</p>
-            </div>
-          </Button>
 
-          <Button
-            onClick={() => onGenerateMore('quizzes')}
-            disabled={isGenerating}
-            variant="outline"
-            className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
-          >
-            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Brain className="w-4 h-4 text-primary" />
-            </div>
-            <div className="text-left">
-              <p className="text-xs">Más Quizzes</p>
-              <p className="text-[9px] opacity-50 font-medium">Ponte a prueba</p>
-            </div>
-          </Button>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-[9px] font-bold opacity-40 uppercase ml-1">
+              ¿En qué quieres enfocarte? (Opcional)
+            </label>
+            <Textarea
+              placeholder="Ej: Enfócate en los capítulos 3 y 4, o haz preguntas más difíciles..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              className="resize-none bg-background/50 border-primary/10 rounded-2xl text-xs min-h-[80px] focus-visible:ring-primary/20"
+              disabled={isGenerating}
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 gap-2">
+            <Button
+              onClick={() => onGenerateMore('flashcards', prompt)}
+              disabled={isGenerating}
+              variant="outline"
+              className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Layers className="w-4 h-4 text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs">Más Flashcards</p>
+                <p className="text-[9px] opacity-50 font-medium">Nuevos conceptos</p>
+              </div>
+            </Button>
+
+            <Button
+              onClick={() => onGenerateMore('quizzes', prompt)}
+              disabled={isGenerating}
+              variant="outline"
+              className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Brain className="w-4 h-4 text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs">Más Quizzes</p>
+                <p className="text-[9px] opacity-50 font-medium">Ponte a prueba</p>
+              </div>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
