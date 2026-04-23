@@ -12,8 +12,7 @@ export function useFileUpload() {
   const [files, setFiles] = useState<LocalFile[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files;
+  const addFiles = (selectedFiles: FileList | File[]) => {
     if (!selectedFiles || selectedFiles.length === 0) return;
 
     if (files.length >= 1) {
@@ -21,7 +20,6 @@ export function useFileUpload() {
         'Solo podés adjuntar un archivo a la vez. Eliminá el actual para subir otro.',
       );
       setTimeout(() => setError(null), 3000);
-      event.target.value = '';
       return;
     }
 
@@ -36,6 +34,10 @@ export function useFileUpload() {
     };
 
     setFiles([newFile]);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    addFiles(event.target.files!);
     event.target.value = '';
   };
 
@@ -49,6 +51,7 @@ export function useFileUpload() {
     files,
     error,
     handleFileSelect,
+    addFiles,
     removeFile,
     clearFiles,
   };

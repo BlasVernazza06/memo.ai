@@ -5,38 +5,54 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Bot, ChevronLeft, User } from 'lucide-react';
+import {
+  ArrowDown,
+  BookOpen,
+  Bot,
+  Brain,
+  ChevronLeft,
+  FileText,
+  Sparkles,
+  User,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { z } from 'zod';
 
 import { Button } from '@repo/ui/components/ui/button';
 import { CreateWorkspaceSchema } from '@repo/validators';
 
-import AttachmentCard from '@/components/workspace/new/attachment-card';
-import InputChat from '@/components/workspace/new/input-chat';
+import AttachmentCard from '@/components/chat/attachment-card';
+import InputChat from '@/components/chat/input-chat';
+import SuggestionCard from '@/components/chat/suggestion-card';
+import SuggestionList from '@/components/chat/suggestion-list';
+import WorkspaceCreationActions from '@/components/chat/workspace-creation-actions';
 import { LocalFile } from '@/hooks/use-file-upload';
 import { apiFetchClient } from '@/lib/api-client';
+import { useAuth } from '@/lib/auth-provider';
 import { ChatMessage } from '@/types/workspace-chat-types';
 
 export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceSchema>;
 
 export default function NewWorkspaceChatPage() {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const queryChatId = searchParams.get('chatId');
 
   const [chatId, setChatId] = useState<string | null>(queryChatId);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputValue, setInputValue] = useState('');
   const [pendingWorkspaceData, setPendingWorkspaceData] =
     useState<CreateWorkspaceInput | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  const isInitialState = messages.length <= 1;
+
   // 1. Inicializar la sesión de chat o cargar historia
   useEffect(() => {
     const initOrLoadChat = async () => {
       try {
-        // Si ya tenemos un chatId en la URL, cargamos el historial
         if (queryChatId) {
           const history = await apiFetchClient<ChatMessage[]>(
             `/chats/${queryChatId}`,
@@ -47,20 +63,18 @@ export default function NewWorkspaceChatPage() {
           }
         }
 
-        // Si no hay chatId o el historial está vacío, creamos uno nuevo o mostramos bienvenida
         const newChat = await apiFetchClient<{ id: string }>(`/chats`, {
           method: 'POST',
           body: JSON.stringify({ type: 'creation' }),
         });
         if (newChat) {
           setChatId(newChat.id);
-
           setMessages([
             {
               id: '1',
               role: 'ai',
               content:
-                '¡Hola! Soy Memo. Estoy listo para ayudarte a crear un nuevo workspace de estudio inteligente. 🧠\n\n¿De qué trata este nuevo proyecto? Cuéntame un poco o sube directamente el material (PDFs, vídeos o imágenes) que quieras que analicemos juntos.',
+                '¡Hola! Soy Memo. Estoy listo para ayudarte a crear un nuevo workspace de estudio inteligente. 🧠\n\n¿De qué trata este nuevo proyecto?',
             },
           ]);
         }
@@ -71,6 +85,15 @@ export default function NewWorkspaceChatPage() {
 
     initOrLoadChat();
   }, [queryChatId]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages, isAiLoading]);
 
   const handleSend = async (content: string, files: LocalFile[]) => {
     if (!chatId) return;
@@ -87,10 +110,7 @@ export default function NewWorkspaceChatPage() {
     try {
       const formData = new FormData();
       formData.append('content', content);
-
-      if (files[0]) {
-        formData.append('file', files[0].file);
-      }
+      if (files[0]) formData.append('file', files[0].file);
 
       const aiData = await apiFetchClient<any>(`/chats/${chatId}/messages`, {
         method: 'POST',
@@ -104,7 +124,6 @@ export default function NewWorkspaceChatPage() {
       };
       setMessages((prev) => [...prev, aiResponse]);
 
-      // Si la IA devolvió data de workspace, la guardamos para que el usuario pueda confirmar
       if (aiData.data) {
         setPendingWorkspaceData(aiData.data);
       }
@@ -113,8 +132,7 @@ export default function NewWorkspaceChatPage() {
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content:
-          'Lo siento, hubo un error al conectar con mis motores de IA. ¿Podrías intentarlo de nuevo?',
+        content: 'Lo siento, hubo un error al conectar con mis motores de IA.',
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
@@ -124,13 +142,11 @@ export default function NewWorkspaceChatPage() {
 
   const handleCreateWorkspace = async () => {
     if (!pendingWorkspaceData) return;
-
     try {
       const data = await apiFetchClient<{ id: string }>(`/workspaces`, {
         method: 'POST',
         body: JSON.stringify(pendingWorkspaceData),
       });
-
       router.push(`/dashboard/workspaces/${data.id}`);
     } catch (error) {
       console.error('ERROR CREATING WORKSPACE:', error);
@@ -138,127 +154,145 @@ export default function NewWorkspaceChatPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen max-w-4xl mx-auto py-6">
+    <div className="flex flex-col h-screen max-w-5xl mx-auto py-6 overflow-hidden bg-background">
       {/* Header / Back */}
-      <div className="flex items-center justify-between mb-8 shrink-0">
+      <div className="flex items-center justify-between px-4 mb-2 shrink-0">
         <Link href="/dashboard">
           <Button
             variant="ghost"
-            className="rounded-2xl gap-2 font-bold text-muted-foreground hover:text-foreground transition-colors"
+            className="rounded-2xl gap-2 font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-all active:scale-95"
           >
             <ChevronLeft className="w-5 h-5" />
-            Volver
+            Salir
           </Button>
         </Link>
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-black text-foreground">
-            Nuevo Workspace
+        <div className="flex flex-col items-center">
+          <h1 className="text-xl font-black text-foreground leading-none">
+            Memo.ai
           </h1>
+          <span className="text-[10px] uppercase font-bold tracking-widest text-primary mt-1">
+            Creador de Workspace
+          </span>
         </div>
-        <div className="w-20" /> {/* Spacer for balance */}
+        <div className="w-20" />
       </div>
 
       {/* Chat Area */}
       <div
-        className="flex-1 overflow-y-auto px-4 space-y-8 pb-10 scrollbar-hide"
+        className="flex-1 overflow-y-auto px-4 scrollbar-hide flex flex-col pt-10"
         ref={scrollRef}
       >
-        <AnimatePresence initial={false}>
-          {messages.map((message) => (
+        <AnimatePresence mode="wait">
+          {isInitialState ? (
             <motion.div
-              key={message.id}
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              key="welcome"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex-1 flex flex-col justify-center items-center text-center pb-20 mt-auto"
             >
-              <div
-                className={`flex gap-4 max-w-[85%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-              >
-                <div
-                  className={`w-10 h-10 shrink-0 rounded-2xl flex items-center justify-center shadow-sm ${
-                    message.role === 'ai'
-                      ? 'bg-primary text-white'
-                      : 'bg-card border border-border text-foreground'
-                  }`}
+              <div className="space-y-4 mb-20">
+                <h2 className="text-4xl md:text-5xl font-bl tracking-tighter text-foreground">
+                  Hola,{' '}
+                  <span className="text-primary">
+                    {user?.name.split(' ')[0] || 'estudiante'}
+                  </span>
+                </h2>
+                <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-gray-700 leading-none">
+                  ¿Qué te gustaría aprender hoy?
+                </h3>
+              </div>
+
+              <SuggestionList setInputValue={setInputValue} />
+
+              <button className="flex items-center gap-2 mt-12 text-[10px] font-black text-muted-foreground/30 hover:text-primary transition-colors uppercase tracking-[0.3em]">
+                <ArrowDown className="w-3 h-3" />
+                Define tus propias reglas
+              </button>
+            </motion.div>
+          ) : (
+            <div className="space-y-8 pb-10">
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.role === 'ai' ? (
-                    <Bot className="w-5 h-5" />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="space-y-4">
-                  {message.attachments && (
-                    <div className="flex flex-wrap gap-2">
-                      {message.attachments.map((file) => (
-                        <AttachmentCard key={file.id} file={file} />
-                      ))}
-                    </div>
-                  )}
-                  {message.content && (
+                  <div
+                    className={`flex gap-4 max-w-[85%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                  >
                     <div
-                      className={`p-5 rounded-3xl text-sm font-medium leading-relaxed shadow-sm ${
+                      className={`w-10 h-10 shrink-0 rounded-2xl flex items-center justify-center shadow-sm ${
                         message.role === 'ai'
-                          ? 'bg-muted border border-transparent text-foreground rounded-tl-none'
-                          : 'bg-primary text-white rounded-tr-none'
+                          ? 'bg-primary text-white'
+                          : 'bg-card border border-border text-foreground'
                       }`}
                     >
-                      {message.content.split('\n').map((line, i) => (
-                        <p key={i} className={i > 0 ? 'mt-2' : ''}>
-                          {line}
-                        </p>
-                      ))}
+                      {message.role === 'ai' ? (
+                        <Bot className="w-5 h-5" />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-          {isAiLoading && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex justify-start"
-            >
-              <div className="flex gap-4">
-                <div className="w-10 h-10 shrink-0 rounded-2xl bg-primary text-white flex items-center justify-center shadow-sm">
-                  <Bot className="w-5 h-5 animate-pulse" />
-                </div>
-                <div className="bg-muted border border-transparent p-4 rounded-3xl rounded-tl-none shadow-sm flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
-                </div>
-              </div>
-            </motion.div>
+                    <div className="space-y-4">
+                      {message.attachments && (
+                        <div className="flex flex-wrap gap-2">
+                          {message.attachments.map((file) => (
+                            <AttachmentCard key={file.id} file={file} />
+                          ))}
+                        </div>
+                      )}
+                      {message.content && (
+                        <div
+                          className={`p-5 rounded-3xl text-sm font-medium leading-relaxed shadow-sm ${
+                            message.role === 'ai'
+                              ? 'bg-muted border border-transparent text-foreground rounded-tl-none'
+                              : 'bg-primary text-white rounded-tr-none'
+                          }`}
+                        >
+                          {message.content.split('\n').map((line, i) => (
+                            <p key={i} className={i > 0 ? 'mt-2' : ''}>
+                              {line}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+              {isAiLoading && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex justify-start"
+                >
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 shrink-0 rounded-2xl bg-primary text-white flex items-center justify-center shadow-sm">
+                      <Bot className="w-5 h-5 animate-pulse" />
+                    </div>
+                    <div className="bg-muted border border-transparent p-4 rounded-3xl rounded-tl-none shadow-sm flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
           )}
         </AnimatePresence>
       </div>
 
       {/* Input Area */}
-      <div className="relative">
-        <AnimatePresence>
-          {pendingWorkspaceData && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="absolute -top-20 left-0 right-0 flex justify-center px-4"
-            >
-              <Button
-                onClick={handleCreateWorkspace}
-                className="bg-primary hover:bg-primary/90 text-white rounded-2xl px-8 py-6 shadow-2xl shadow-primary/30 flex items-center gap-3 font-bold group border-white/20 border cursor-pointer active:scale-95 transition-all"
-              >
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
-                  <span className="text-lg">✨</span>
-                </div>
-                Confirmar y Crear Workspace
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <InputChat onSend={handleSend} />
-      </div>
+      <WorkspaceCreationActions
+        pendingWorkspaceData={pendingWorkspaceData}
+        handleCreateWorkspace={handleCreateWorkspace}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        handleSend={handleSend}
+      />
     </div>
   );
 }
