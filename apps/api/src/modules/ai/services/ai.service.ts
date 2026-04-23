@@ -15,8 +15,8 @@ export class AiService {
       }
 
       formData.append('user_context', userContext || '');
-      formData.append('flashcard_count', '5');
-      formData.append('quiz_count', '3');
+      formData.append('flashcard_count', '10');
+      formData.append('quiz_count', '15');
 
       const response = await fetch(
         `${this.pythonServiceUrl}/ai/process-document`,

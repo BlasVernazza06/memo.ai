@@ -11,6 +11,7 @@ import * as cacheManager from 'cache-manager';
 
 import { type WorkspaceWithRelations } from '@repo/db';
 
+import { CACHE_KEYS } from '@/common/constants/cache-keys';
 import { AiService } from '@/modules/ai/services/ai.service';
 
 export type WorkspaceWithCounts = WorkspaceWithRelations & {
@@ -32,6 +33,7 @@ export class WorkspacesService {
     userId: string,
     workspaceId: string,
     type: 'flashcards' | 'quizzes',
+    customPrompt?: string,
   ) {
     // 1. Validar límites de plan
     await this.usersService.validateContentLimit(userId, workspaceId, type);
@@ -49,34 +51,51 @@ export class WorkspacesService {
     );
     const history =
       creationChat?.messages
+        ?.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        )
         ?.map((m) => `${m.role}: ${m.content}`)
         .join('\n') || '';
 
-    // 3. Llamar a la IA con el contexto histórico
-    const userPrompt = `Basándote en el material anterior, genera MÁS ${type}.
+    // 3. Llamar a la IA con el contexto histórico y el prompt personalizado
+    const basePrompt = `Basándote en el material anterior, genera MÁS ${type === 'flashcards' ? 'Flashcards' : 'Quizzes'}.
     IMPORTANTE: No repitas lo que ya generaste. Enfócate en detalles o temas que no se hayan cubierto profundamente aún.`;
+
+    const finalPrompt = customPrompt
+      ? `${basePrompt}\n\nINSTRUCCIONES ADICIONALES DEL USUARIO: ${customPrompt}`
+      : basePrompt;
 
     const aiData = await this.aiService.processDocument(
       undefined,
-      `${history}\n\n${userPrompt}`,
+      `${history}\n\n${finalPrompt}`,
     );
 
     // 4. Guardar el nuevo contenido
-    if (type === 'flashcards' && aiData.flashcards) {
-      // Reutilizamos la lógica del repo o creamos una pequeña aquí
-      // Por ahora el repo solo tiene create workspace entero.
-      // Debería agregar métodos parciales al repo.
-      await this.workspaceRepo.addFlashcards(
-        workspaceId,
-        aiData.flashcards,
-        workspaceDetail.name,
-      );
+    if (type === 'flashcards') {
+      if (aiData.flashcardDecks && aiData.flashcardDecks.length > 0) {
+        // Si la IA devolvió mazos estructurados, los agregamos todos
+        for (const deck of aiData.flashcardDecks) {
+          await this.workspaceRepo.addFlashcards(
+            workspaceId,
+            deck.flashcards,
+            deck.name || workspaceDetail.name,
+          );
+        }
+      } else if (aiData.flashcards) {
+        // Formato antiguo o simplificado
+        await this.workspaceRepo.addFlashcards(
+          workspaceId,
+          aiData.flashcards,
+          workspaceDetail.name,
+        );
+      }
     } else if (type === 'quizzes' && aiData.quizzes) {
       await this.workspaceRepo.addQuizzes(workspaceId, aiData.quizzes);
     }
 
     // Invalidad caché
-    await this.cacheManager.del(`user:${userId}:workspace:v2:${workspaceId}`);
+    await this.cacheManager.del(CACHE_KEYS.WORKSPACE(userId, workspaceId));
 
     return { success: true };
   }
@@ -91,7 +110,7 @@ export class WorkspacesService {
     // Persistencia delegada al repositorio
     const result = await this.workspaceRepo.create(userId, data);
 
-    const cacheKey = `workspaces:list:${userId}`;
+    const cacheKey = CACHE_KEYS.WORKSPACES_LIST(userId);
 
     await this.cacheManager.del(cacheKey);
 
@@ -155,7 +174,7 @@ export class WorkspacesService {
     userId: string,
     workspaceId: string,
   ): Promise<WorkspaceWithCounts> {
-    const cacheKey = `user:${userId}:workspace:v2:${workspaceId}`;
+    const cacheKey = CACHE_KEYS.WORKSPACE(userId, workspaceId);
 
     const cached = await this.cacheManager.get<WorkspaceWithCounts>(cacheKey);
     if (cached) {
@@ -208,8 +227,8 @@ export class WorkspacesService {
       throw new NotFoundException('Workspace no encontrado');
     }
 
-    const listCacheKey = `workspaces:list:${userId}`;
-    const itemCacheKey = `user:${userId}:workspace:v2:${workspaceId}`;
+    const listCacheKey = CACHE_KEYS.WORKSPACES_LIST(userId);
+    const itemCacheKey = CACHE_KEYS.WORKSPACE(userId, workspaceId);
 
     await Promise.all([
       this.cacheManager.del(listCacheKey),
@@ -229,8 +248,8 @@ export class WorkspacesService {
       throw new NotFoundException('Workspace no encontrado');
     }
 
-    const listCacheKey = `workspaces:list:${userId}`;
-    const itemCacheKey = `user:${userId}:workspace:v2:${workspaceId}`;
+    const listCacheKey = CACHE_KEYS.WORKSPACES_LIST(userId);
+    const itemCacheKey = CACHE_KEYS.WORKSPACE(userId, workspaceId);
 
     await Promise.all([
       this.cacheManager.del(listCacheKey),
@@ -269,8 +288,8 @@ export class WorkspacesService {
     }
 
     // Invalidación de caché
-    const listCacheKey = `workspaces:list:${userId}`;
-    const itemCacheKey = `user:${userId}:workspace:v2:${workspaceId}`;
+    const listCacheKey = CACHE_KEYS.WORKSPACES_LIST(userId);
+    const itemCacheKey = CACHE_KEYS.WORKSPACE(userId, workspaceId);
 
     await Promise.all([
       this.cacheManager.del(listCacheKey),

@@ -47,7 +47,7 @@ export class WorkspacesRepository {
         description: data.description,
         category: data.category,
         customContext: data.customContext || null,
-        icon: data.icon,
+        icon: data.emoji || data.icon, // Usar emoji de la IA si existe
         coverImage: data.coverImage,
         isFavorite: data.isFavorite || false,
       }),
@@ -72,7 +72,34 @@ export class WorkspacesRepository {
     }
 
     // 3. Preparar Mazos y Flashcards (si existen)
-    if (data.flashcards && data.flashcards.length > 0) {
+    // Soportar tanto el formato antiguo (flashcards plano) como el nuevo (flashcardDecks)
+    if (data.flashcardDecks && data.flashcardDecks.length > 0) {
+      for (const deck of data.flashcardDecks) {
+        const deckId = uuidv4();
+        batchRequests.push(
+          this.db.insert(flashcardDeck).values({
+            id: deckId,
+            workspaceId,
+            name: deck.name || 'Mazo de estudio',
+            description: deck.description || null,
+            color: deck.color || null,
+          }),
+        );
+
+        const cardsToInsert = deck.flashcards.map((f: any) => ({
+          id: uuidv4(),
+          deckId,
+          front: f.front || f.question || '',
+          back: f.back || f.answer || '',
+          mastery: 0,
+          reviewCount: 0,
+        }));
+
+        if (cardsToInsert.length > 0) {
+          batchRequests.push(this.db.insert(flashcard).values(cardsToInsert));
+        }
+      }
+    } else if (data.flashcards && data.flashcards.length > 0) {
       const deckId = uuidv4();
       batchRequests.push(
         this.db.insert(flashcardDeck).values({

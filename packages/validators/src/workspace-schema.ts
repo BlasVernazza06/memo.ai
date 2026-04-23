@@ -17,6 +17,13 @@ export const FlashcardSchema = z.object({
   back: z.string().optional(),
 });
 
+export const FlashcardDeckSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  color: z.string().optional(),
+  flashcards: z.array(FlashcardSchema),
+});
+
 export const QuizQuestionSchema = z.object({
   question: z.string(),
   options: z.array(z.string()),
@@ -37,11 +44,13 @@ export const CreateWorkspaceSchema = z.object({
   category: z.string().optional(),
   customContext: z.string().optional(),
   icon: z.string().optional(),
+  emoji: z.string().optional(),
   coverImage: z.string().url().nullable().optional(),
   isFavorite: z.boolean().optional(),
   document: DocumentSchema.optional(),
   documents: z.array(DocumentSchema).optional(),
   flashcards: z.array(FlashcardSchema).optional(),
+  flashcardDecks: z.array(FlashcardDeckSchema).optional(),
   quizzes: z.array(QuizSchema).optional(),
 });
 

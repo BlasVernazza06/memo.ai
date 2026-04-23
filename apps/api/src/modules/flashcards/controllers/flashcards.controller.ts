@@ -1,6 +1,16 @@
-import { Controller, Get, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+
 import { AuthGuard } from '@thallesp/nestjs-better-auth';
+
 import { User } from '@/common/decorators/user.decorator';
+
 import { FlashcardsService } from '../services/flashcards.service';
 
 @Controller('flashcards')
@@ -23,6 +33,14 @@ export class FlashcardsController {
 
   @Get(':id')
   async findById(
+    @User('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return await this.flashcardsService.findById(userId, id);
+  }
+
+  @Post(':id')
+  async createFlashcard(
     @User('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
