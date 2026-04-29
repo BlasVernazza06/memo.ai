@@ -13,6 +13,7 @@ import { type WorkspaceWithRelations } from '@repo/db';
 
 import { CACHE_KEYS } from '@/common/constants/cache-keys';
 import { AiService } from '@/modules/ai/services/ai.service';
+import { StorageService } from '@/modules/storage/services/storage.service';
 
 export type WorkspaceWithCounts = WorkspaceWithRelations & {
   flashcards?: number;
@@ -26,6 +27,7 @@ export class WorkspacesService {
     private readonly workspaceRepo: WorkspacesRepository,
     private readonly usersService: UsersService,
     private readonly aiService: AiService,
+    private readonly storageService: StorageService,
     @Inject(CACHE_MANAGER) private cacheManager: cacheManager.Cache,
   ) {}
 
@@ -242,10 +244,40 @@ export class WorkspacesService {
     userId: string,
     workspaceId: string,
   ): Promise<{ success: boolean }> {
+    // 1. Buscar el workspace para obtener las llaves de los archivos
+    const workspaceDetail = await this.workspaceRepo.findById(
+      userId,
+      workspaceId,
+    );
+    if (!workspaceDetail) {
+      throw new NotFoundException('Workspace no encontrado');
+    }
+
+    // 2. Borrar archivos de S3 si existen
+    if (workspaceDetail.documents && workspaceDetail.documents.length > 0) {
+      console.log(
+        `[WorkspacesService] Borrando ${workspaceDetail.documents.length} archivos de S3...`,
+      );
+      for (const doc of workspaceDetail.documents) {
+        if (doc.key) {
+          try {
+            await this.storageService.deleteFile(doc.key);
+          } catch (error) {
+            console.error(
+              `[WorkspacesService] Error al borrar archivo ${doc.key} de S3:`,
+              error,
+            );
+            // No bloqueamos el proceso si falla el borrado en S3 (puedes decidir si quieres que falle)
+          }
+        }
+      }
+    }
+
+    // 3. Borrar de la base de datos (repositorio)
     const success = await this.workspaceRepo.delete(userId, workspaceId);
 
     if (!success) {
-      throw new NotFoundException('Workspace no encontrado');
+      throw new NotFoundException('Error al eliminar el workspace de la BD');
     }
 
     const listCacheKey = CACHE_KEYS.WORKSPACES_LIST(userId);

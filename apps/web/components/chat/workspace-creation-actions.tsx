@@ -1,5 +1,6 @@
 'use client';
 
+import { Loader2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
@@ -13,6 +14,7 @@ interface WorkspaceCreationActionsProps {
   inputValue: string;
   setInputValue: (val: string) => void;
   handleSend: (content: string, files: LocalFile[]) => void;
+  isLoading?: boolean;
 }
 
 export default function WorkspaceCreationActions({
@@ -21,6 +23,7 @@ export default function WorkspaceCreationActions({
   inputValue,
   setInputValue,
   handleSend,
+  isLoading = false,
 }: WorkspaceCreationActionsProps) {
   return (
     <div className="relative shrink-0">
@@ -34,17 +37,24 @@ export default function WorkspaceCreationActions({
           >
             <Button
               onClick={handleCreateWorkspace}
+              disabled={isLoading}
               className="relative h-16 px-8 rounded-[2rem] bg-slate-950 text-white font-bold group overflow-hidden border border-white/10 hover:border-primary/50 transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-primary/20"
             >
               <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative flex items-center gap-4">
                 <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center border border-primary/20 group-hover:rotate-12 transition-transform shadow-inner">
-                  <span className="text-xl text-primary">✨</span>
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  ) : (
+                    <span className="text-xl text-primary">✨</span>
+                  )}
                 </div>
                 <div className="flex flex-col items-start leading-tight text-left">
-                  <span className="text-sm">Confirmar y Crear</span>
+                  <span className="text-sm">
+                    {isLoading ? 'Subiendo archivo...' : 'Confirmar y Crear'}
+                  </span>
                   <span className="text-[10px] opacity-50 uppercase tracking-widest">
-                    Workspace Inteligente
+                    {isLoading ? 'Aguarde un momento' : 'Workspace Inteligente'}
                   </span>
                 </div>
               </div>

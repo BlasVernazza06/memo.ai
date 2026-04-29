@@ -43,7 +43,9 @@ export default function NewWorkspaceChatPage() {
   const [inputValue, setInputValue] = useState('');
   const [pendingWorkspaceData, setPendingWorkspaceData] =
     useState<CreateWorkspaceInput | null>(null);
+  const [lastFile, setLastFile] = useState<File | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -110,7 +112,10 @@ export default function NewWorkspaceChatPage() {
     try {
       const formData = new FormData();
       formData.append('content', content);
-      if (files[0]) formData.append('file', files[0].file);
+      if (files[0]) {
+        formData.append('file', files[0].file);
+        setLastFile(files[0].file);
+      }
 
       const aiData = await apiFetchClient<any>(`/chats/${chatId}/messages`, {
         method: 'POST',
@@ -142,14 +147,63 @@ export default function NewWorkspaceChatPage() {
 
   const handleCreateWorkspace = async () => {
     if (!pendingWorkspaceData) return;
+
+    setIsCreating(true);
     try {
+      const finalWorkspaceData = { ...pendingWorkspaceData };
+
+      // 1. Si hay un archivo pendiente, subirlo a S3 ahora
+      if (lastFile) {
+        console.log('[NewWorkspace] Obteniendo Presigned URL...');
+        const presignedData = await apiFetchClient<{
+          uploadUrl: string;
+          key: string;
+          url: string;
+        }>(
+          `/storage/presigned-url?fileName=${encodeURIComponent(lastFile.name)}&contentType=${encodeURIComponent(lastFile.type)}`,
+        );
+
+        console.log('[NewWorkspace] Subiendo archivo directamente a S3...');
+        await fetch(presignedData.uploadUrl, {
+          method: 'PUT',
+          body: lastFile,
+          headers: {
+            'Content-Type': lastFile.type,
+          },
+        });
+
+        // Actualizar los datos del documento con la info real de S3
+        if (
+          finalWorkspaceData.documents &&
+          finalWorkspaceData.documents.length > 0
+        ) {
+          finalWorkspaceData.documents = finalWorkspaceData.documents.map(
+            (doc) => ({
+              ...doc,
+              key: presignedData.key,
+              url: presignedData.url,
+            }),
+          );
+        } else if (finalWorkspaceData.document) {
+          finalWorkspaceData.document = {
+            ...finalWorkspaceData.document,
+            key: presignedData.key,
+            url: presignedData.url,
+          };
+        }
+      }
+
+      console.log('[NewWorkspace] Creando registro en la base de datos...');
       const data = await apiFetchClient<{ id: string }>(`/workspaces`, {
         method: 'POST',
-        body: JSON.stringify(pendingWorkspaceData),
+        body: JSON.stringify(finalWorkspaceData),
       });
+
       router.push(`/dashboard/workspaces/${data.id}`);
     } catch (error) {
       console.error('ERROR CREATING WORKSPACE:', error);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -292,6 +346,7 @@ export default function NewWorkspaceChatPage() {
         inputValue={inputValue}
         setInputValue={setInputValue}
         handleSend={handleSend}
+        isLoading={isCreating}
       />
     </div>
   );

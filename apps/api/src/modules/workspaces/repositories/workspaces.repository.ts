@@ -63,6 +63,7 @@ export class WorkspacesRepository {
           name: docData.name,
           type: docData.type || 'pdf',
           url: docData.url,
+          key: docData.key,
           thumbnailUrl: docData.thumbnailBase64 ?? null,
           sizeBytes: docData.sizeBytes ?? null,
           status: 'analyzed',
@@ -246,58 +247,26 @@ export class WorkspacesRepository {
   }
 
   async delete(userId: string, workspaceId: string): Promise<boolean> {
-    console.log('[REPO] Borrando Workspace:', workspaceId);
+    console.log(`[WorkspacesRepository] Iniciando eliminación de Workspace: ${workspaceId} para usuario: ${userId}`);
 
-    const quizzes = await this.db.query.quiz.findMany({
-      where: eq(quiz.workspaceId, workspaceId),
-      columns: { id: true },
-    });
-    const quizIds = quizzes.map((q) => q.id);
-
-    const decks = await this.db.query.flashcardDeck.findMany({
-      where: eq(flashcardDeck.workspaceId, workspaceId),
-      columns: { id: true },
-    });
-    const deckIds = decks.map((d) => d.id);
-
-    const chats = await this.db.query.chat.findMany({
-      where: eq(chat.workspaceId, workspaceId),
-      columns: { id: true },
-    });
-    const chatIds = chats.map((c) => c.id);
-
-    if (quizIds.length > 0) {
-      await this.db
-        .delete(quizQuestion)
-        .where(inArray(quizQuestion.quizId, quizIds));
-      await this.db
-        .delete(quizAttempt)
-        .where(inArray(quizAttempt.quizId, quizIds));
-      await this.db.delete(quiz).where(inArray(quiz.id, quizIds));
-    }
-
-    if (deckIds.length > 0) {
-      await this.db.delete(flashcard).where(inArray(flashcard.deckId, deckIds));
-      await this.db
-        .delete(flashcardDeck)
-        .where(inArray(flashcardDeck.id, deckIds));
-    }
-
-    if (chatIds.length > 0) {
-      await this.db.delete(message).where(inArray(message.chatId, chatIds));
-      await this.db.delete(chat).where(inArray(chat.id, chatIds));
-    }
-
-    await this.db
-      .delete(userActivity)
-      .where(eq(userActivity.workspaceId, workspaceId));
-    await this.db.delete(document).where(eq(document.workspaceId, workspaceId));
-
+    // Gracias al 'onDelete: cascade' en el esquema de la base de datos,
+    // solo necesitamos borrar el workspace principal. 
+    // Los documentos, quizzes, flashcards, chats, etc., se borrarán automáticamente en la BD.
+    
     const result = await this.db
       .delete(workspace)
-      .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)));
+      .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)))
+      .returning({ id: workspace.id });
 
-    return !!result;
+    const deleted = result.length > 0;
+    
+    if (deleted) {
+      console.log(`[WorkspacesRepository] Workspace ${workspaceId} eliminado con éxito de la base de datos.`);
+    } else {
+      console.warn(`[WorkspacesRepository] No se encontró el workspace ${workspaceId} para eliminar o no pertenece al usuario.`);
+    }
+
+    return deleted;
   }
 
   async update(

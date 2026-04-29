@@ -59,22 +59,8 @@ export class ChatsController {
         : null,
     );
 
-    // 2. Obtener respuesta de la IA
+    // 3. Obtener respuesta de la IA
     const aiResponse = await this.aiService.processDocument(file, content);
-
-    // 3. Subir archivo a S3 si existe
-    if (file && aiResponse) {
-      const uploadResult =
-        await this.storageService.uploadWorkspaceDocument(file);
-      aiResponse.document = {
-        name: file.originalname,
-        type: file.mimetype.includes('pdf') ? 'pdf' : 'text',
-        url: uploadResult.url,
-        key: uploadResult.key,
-        sizeBytes: file.size,
-        thumbnailBase64: aiResponse.thumbnailBase64,
-      };
-    }
 
     // 4. Guardar respuesta de la IA
     const aiContent = `¡Procesado con éxito! 🧠\n\n**Resumen:** ${aiResponse.summary || 'Listo.'}\n\nHe generado material de estudio para ti.`;
