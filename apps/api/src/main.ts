@@ -19,6 +19,7 @@ async function bootstrap() {
     origin: ['http://localhost:3001', 'http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    exposedHeaders: ['Location', 'location', 'set-cookie'],
   });
 
   const port = process.env.PORT ?? 3000;

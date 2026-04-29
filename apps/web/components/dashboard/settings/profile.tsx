@@ -2,7 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 
-import { Camera, Shield, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { Camera, Loader2, Shield, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { authClient } from '@repo/auth/client';
@@ -10,15 +12,78 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 
-import { SidebarUserAvatar } from '@/components/shared/dash-aside/user-avatar';
 import AppearanceSection from '@/components/dashboard/settings/appearance';
 import SecuritySection from '@/components/dashboard/settings/security';
+import { SidebarUserAvatar } from '@/components/shared/dash-aside/user-avatar';
+import { useFileUpload } from '@/hooks/use-file-upload';
+import { useStorage } from '@/hooks/use-storage';
 import { deleteUser } from '@/lib/actions/auth-actions';
 import { useAuth } from '@/lib/auth-provider';
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
+
+  const { handleFileSelect, files, clearFiles } = useFileUpload();
+  const { uploadFile, isUploading } = useStorage();
+
+  const [name, setName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Sincronizar el nombre cuando el usuario cargue
+  useEffect(() => {
+    if (user?.name) {
+      setName(user.name);
+    }
+  }, [user]);
+
+  // Limpiar el preview de la imagen si se desmonta o cambia
+  useEffect(() => {
+    if (files.length > 0) {
+      const objectUrl = URL.createObjectURL(files[0]?.file);
+      setPreviewUrl(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [files]);
+
+  const handleSaveChanges = async () => {
+    try {
+      setIsSaving(true);
+      let avatarUrl = user?.image;
+
+      // 1. Subir imagen si hay una nueva seleccionada
+      if (files.length > 0) {
+        const uploaded = await uploadFile(files[0]?.file);
+        avatarUrl = uploaded.url;
+      }
+
+      // 2. Actualizar el usuario a través del cliente de Better Auth
+      await authClient.updateUser({
+        name: name,
+        image: avatarUrl || undefined,
+      });
+
+      // 3. Refrescar el usuario en el contexto global de Auth
+      await refreshUser();
+
+      toast.success('Perfil actualizado correctamente');
+
+      // Esperamos un momento para que el estado de React se propague
+      setTimeout(() => {
+        clearFiles();
+      }, 500);
+
+      router.refresh();
+    } catch (error) {
+      console.error('Error al guardar perfil:', error);
+      toast.error('Hubo un error al guardar los cambios');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleDeleteProfile = async () => {
     try {
@@ -49,13 +114,22 @@ export default function Profile() {
         <div className="relative space-y-12">
           <div className="flex flex-col md:flex-row gap-12 items-start md:items-center">
             <div className="relative group self-center md:self-auto">
+              {/* Le pasamos un usuario fake con la imagen de preview si existe */}
               <SidebarUserAvatar
-                user={user}
+                user={
+                  user ? { ...user, image: previewUrl || user.image } : null
+                }
                 className="w-32 h-32 lg:w-40 lg:h-40 rounded-[2.5rem] ring-offset-4 ring-2 ring-primary/20"
               />
-              <button className="absolute -bottom-2 -right-2 w-12 h-12 bg-foreground text-background rounded-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all cursor-pointer border-4 border-card">
+              <label className="absolute -bottom-2 -right-2 w-12 h-12 bg-foreground text-background rounded-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all cursor-pointer border-4 border-card group-hover:bg-primary group-hover:text-primary-foreground shadow-lg">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
                 <Camera className="w-5 h-5" />
-              </button>
+              </label>
             </div>
 
             {/* Basic Info */}
@@ -77,7 +151,9 @@ export default function Profile() {
                 Nombre Completo
               </Label>
               <Input
-                defaultValue="Blas Vernazza"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ingresa tu nombre"
                 className="rounded-2xl border-border/60 bg-muted/20 h-14 px-6 text-sm font-bold focus:ring-primary/20 focus:border-primary/40 transition-all"
               />
             </div>
@@ -87,7 +163,7 @@ export default function Profile() {
               </Label>
               <div className="relative group">
                 <Input
-                  defaultValue="blas@memo.ai"
+                  value={user?.email || ''}
                   disabled
                   className="rounded-2xl border-border/40 bg-muted h-14 px-6 text-sm font-bold text-muted-foreground/60 cursor-not-allowed opacity-80"
                 />
@@ -102,8 +178,19 @@ export default function Profile() {
           </div>
 
           <div className="flex justify-end pt-4">
-            <Button className="h-14 px-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-widest rounded-2xl transition-all hover:-translate-y-0.5 active:translate-y-0">
-              Guardar Cambios
+            <Button
+              onClick={handleSaveChanges}
+              disabled={isSaving || isUploading}
+              className="h-14 px-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-widest rounded-2xl transition-all hover:-translate-y-0.5 active:translate-y-0"
+            >
+              {isSaving || isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                'Guardar Cambios'
+              )}
             </Button>
           </div>
         </div>

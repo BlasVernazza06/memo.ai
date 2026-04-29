@@ -20,11 +20,43 @@ export default function OAuthButtons({
   const [isLoading, setIsLoading] = useState<'google' | 'github' | null>(null);
 
   const handleSignIn = async (provider: 'google' | 'github') => {
-    setIsLoading(provider);
-    const webUrl = process.env.NEXT_PUBLIC_APP_URL;
-    const redirectTo = callbackUrl ? `${webUrl}${callbackUrl}` : webUrl;
-    await signIn.social({ provider, callbackURL: redirectTo });
-    setIsLoading(null);
+    try {
+      setIsLoading(provider);
+      const webUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const redirectTo = callbackUrl ? `${webUrl}${callbackUrl}` : webUrl;
+      
+      // We use a custom fetch to the social endpoint because the NestJS adapter currently
+      // has a bug where it truncates the JSON response body, but the 'Location' header
+      // contains the correct and complete Google/GitHub OAuth URL.
+      const response = await fetch(`${apiUrl}/api/auth/sign-in/social`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ provider, callbackURL: redirectTo }),
+      });
+
+      const locationHeader = response.headers.get('Location') || response.headers.get('location');
+      
+      if (locationHeader) {
+        window.location.href = locationHeader;
+        return;
+      }
+      
+      // Fallback if Location header is missing
+      const res = await signIn.social({ provider, callbackURL: redirectTo });
+      if (res?.error) {
+        console.error('OAuth error:', res.error);
+        alert(`Error: ${res.error.message || 'Unknown OAuth error'}`);
+      }
+    } catch (error) {
+      console.error('OAuth throw error:', error);
+      alert(
+        `Exception: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    } finally {
+      setIsLoading(null);
+    }
   };
 
   return (

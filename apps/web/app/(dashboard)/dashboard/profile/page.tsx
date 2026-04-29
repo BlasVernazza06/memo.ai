@@ -55,7 +55,9 @@ export default async function ProfilePage() {
             <h1 className="text-2xl font-black text-foreground tracking-tight">
               {user.name}
             </h1>
-            <p className="text-xs text-muted-foreground font-medium">{user.email}</p>
+            <p className="text-xs text-muted-foreground font-medium">
+              {user.email}
+            </p>
             <p className="text-sm font-bold text-primary/80 uppercase tracking-widest px-4 py-1.5 bg-primary/5 rounded-full inline-block mt-2">
               Pro Member
             </p>

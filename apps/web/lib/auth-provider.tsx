@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
 } from 'react';
 
 import { apiFetchClient } from './api-client';
@@ -26,6 +27,7 @@ export interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,42 +43,32 @@ export function AuthProvider({
   const [dbUser, setDbUser] = useState<AuthUser | null>(null);
   const [isFetchingDb, setIsFetchingDb] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    async function fetchDbUser() {
-      const currentSession = session || initialSession;
-      if (currentSession?.user?.id) {
-        setIsFetchingDb(true);
-        try {
-          const userFromDb = await apiFetchClient<AuthUser>('/users/me', {
-            cache: 'force-cache',
-          });
-          if (isMounted) {
-            setDbUser(userFromDb);
-          }
-        } catch (error) {
-          console.error('Error fetching user data from DB:', error);
-          if (isMounted) setDbUser(null);
-        } finally {
-          if (isMounted) setIsFetchingDb(false);
-        }
-      } else {
+  const fetchDbUser = useCallback(async () => {
+    const currentSession = session || initialSession;
+    if (currentSession?.user?.id) {
+      setIsFetchingDb(true);
+      try {
+        const userFromDb = await apiFetchClient<AuthUser>('/users/me');
+        setDbUser(userFromDb);
+      } catch (error) {
+        console.error('Error fetching user data from DB:', error);
         setDbUser(null);
+      } finally {
+        setIsFetchingDb(false);
       }
+    } else {
+      setDbUser(null);
     }
+  }, [session, initialSession]);
 
+  useEffect(() => {
     fetchDbUser();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [session, session?.user?.id, initialSession, dbUser?.id]);
+  }, [fetchDbUser]);
 
   const isLoading = (isPending && !initialSession) || isFetchingDb;
 
   return (
-    <AuthContext.Provider value={{ user: dbUser, isLoading }}>
+    <AuthContext.Provider value={{ user: dbUser, isLoading, refreshUser: fetchDbUser }}>
       {children}
     </AuthContext.Provider>
   );

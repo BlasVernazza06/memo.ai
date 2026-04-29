@@ -6,7 +6,6 @@ import {
   AvatarImage,
 } from '@repo/ui/components/ui/avatar';
 import { Skeleton } from '@repo/ui/components/ui/skeleton';
-
 import { cn } from '@repo/ui/utils';
 
 import { AuthUser } from '@/lib/auth-provider';
@@ -20,9 +19,7 @@ interface UserAvatarProps {
 export function UserAvatar({ user, isLoading, className }: UserAvatarProps) {
   if (isLoading) {
     return (
-      <Skeleton
-        className={cn('w-9 h-9 rounded-xl animate-pulse', className)}
-      />
+      <Skeleton className={cn('w-9 h-9 rounded-xl animate-pulse', className)} />
     );
   }
 
@@ -39,15 +36,21 @@ export function UserAvatar({ user, isLoading, className }: UserAvatarProps) {
     <Avatar
       className={cn(
         'w-9 h-9 rounded-xl border border-white/10 shadow-sm transition-all',
-        className
+        className,
       )}
     >
       <AvatarImage
         src={user?.image || undefined}
         alt={user?.name || 'Usuario'}
         className="object-cover"
+        referrerPolicy="no-referrer"
       />
-      <AvatarFallback className={cn('bg-primary/10 text-primary font-black text-xs italic', className?.includes('w-') && 'text-2xl lg:text-4xl')}>
+      <AvatarFallback
+        className={cn(
+          'bg-primary/10 text-primary font-black text-xs italic',
+          className?.includes('w-') && 'text-2xl lg:text-4xl',
+        )}
+      >
         {initials}
       </AvatarFallback>
     </Avatar>
