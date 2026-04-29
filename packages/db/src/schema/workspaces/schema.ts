@@ -39,6 +39,7 @@ export const document = pgTable('document', {
   name: text('name').notNull(),
   type: text('type').notNull(),
   url: text('url').notNull(),
+  key: text('key'),
   sizeBytes: integer('size_bytes'),
   status: text('status').default('pending').notNull(),
   generateFlashcards: boolean('generate_flashcards').default(true).notNull(),

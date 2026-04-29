@@ -12,6 +12,10 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'amzn-s3-memo-ai.s3.sa-east-1.amazonaws.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'images.unsplash.com',
       }
     ],

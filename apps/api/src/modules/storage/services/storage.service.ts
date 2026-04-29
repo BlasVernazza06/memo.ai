@@ -18,6 +18,10 @@ export class StorageService {
     return this.storageProvider.uploadFile(file);
   }
 
+  async getPresignedUrl(fileName: string, contentType: string) {
+    return this.storageProvider.getPresignedUrl(fileName, contentType);
+  }
+
   async deleteFile(key: string) {
     return this.storageProvider.deleteFile(key);
   }

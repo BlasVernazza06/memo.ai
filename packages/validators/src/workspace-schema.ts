@@ -4,7 +4,7 @@ export const DocumentSchema = z.object({
   name: z.string(),
   type: z.string(),
   url: z.string().url(),
-  key: z.string(),
+  key: z.string().optional().nullable(),
   sizeBytes: z.number().optional(),
   aiSummary: z.string().optional(),
   thumbnailBase64: z.string().optional(),

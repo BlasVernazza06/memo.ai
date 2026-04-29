@@ -1,24 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
 import { IStorageProvider } from './interfaces/storage-provider.interface';
-import { UploadthingProvider } from './providers/uploadthing.provider';
+import { S3Provider } from './providers/s3.provider';
 import { StorageService } from './services/storage.service';
+import { StorageController } from './controllers/storage.controller';
 
 @Module({
   imports: [ConfigModule],
+  controllers: [StorageController],
   providers: [
     StorageService,
     {
-      provide: 'UPLOADTHING_TOKEN',
-      useFactory: (configService: ConfigService) => {
-        return configService.get<string>('UPLOADTHING_SECRET');
-      },
-      inject: [ConfigService],
-    },
-    {
       provide: IStorageProvider,
-      useClass: UploadthingProvider,
+      useClass: S3Provider,
     },
   ],
   exports: [StorageService],
