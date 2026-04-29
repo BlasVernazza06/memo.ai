@@ -14,5 +14,11 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "workbench.colorTheme": "One Dark Pro Darker",
+  "editor.fontFamily": "'Cascadia Code PL', Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/components/**": "${filename}.${extname} - ${dirname} - Components 🧱"
   }
 }
