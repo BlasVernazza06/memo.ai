@@ -30,6 +30,26 @@ interface Plan {
   cta: string;
 }
 
+const PLAN_FEATURES: Record<string, string[]> = {
+  free: [
+    '3 workspaces',
+    'Carga de archivos hasta 5 MB',
+    '20 resúmenes con IA / mes',
+    '10 quizzes generados / mes',
+    '50 flashcards automáticas / mes',
+    'Soporte por email',
+  ],
+  pro: [
+    'Workspaces ilimitados',
+    'Carga de archivos hasta 100 MB',
+    'Resúmenes con IA ilimitados',
+    'Quizzes ilimitados',
+    'Flashcards ilimitadas',
+    'Soporte prioritario',
+    'Acceso anticipado a nuevas features',
+  ],
+};
+
 export default function PricingSection() {
   const { user } = useAuth();
 
@@ -58,6 +78,7 @@ export default function PricingSection() {
             icon: p.id === 'pro' ? Sparkles : Zap,
             cta: p.id === 'pro' ? 'Obtener Pro ahora' : 'Comenzar gratis',
             stripePriceId: p.stripePriceId,
+            features: PLAN_FEATURES[p.id] ?? p.features,
           }));
           setPlans(mappedPlans);
         }
@@ -284,6 +305,32 @@ export default function PricingSection() {
             );
           })}
         </div>
+
+        {/* Link to detailed pricing page */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+          className="flex justify-center mt-10"
+        >
+          <Link
+            href="/pricing"
+            className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            Ver comparación completa de planes
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-200"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

@@ -20,7 +20,7 @@ const navLinks = [
   },
   {
     name: 'Precios',
-    href: '/#pricing',
+    href: '/pricing',
   },
   {
     name: 'Testimonios',
