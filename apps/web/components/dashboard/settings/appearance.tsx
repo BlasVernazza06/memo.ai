@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Laptop, Moon, Sun } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -8,6 +9,16 @@ import { Label } from '@repo/ui/components/ui/label';
 
 export default function Appearance() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Evitar errores de hidratación: el tema solo está disponible en el cliente
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null; // O un esqueleto de carga
+  }
 
   return (
     <div className="space-y-8">
