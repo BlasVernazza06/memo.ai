@@ -18,8 +18,8 @@ interface QuizWithContext {
   description: string | null;
   totalQuestions: number;
   workspaceId: string;
-  createdAt: string;
-  workspace: {
+  createdAt: string | Date;
+  workspace?: {
     id: string;
     name: string;
   };
