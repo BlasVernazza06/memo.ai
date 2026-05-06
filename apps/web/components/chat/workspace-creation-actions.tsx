@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@repo/ui/components/ui/button';
 
 import InputChat from '@/components/chat/input-chat';
-import { LocalFile } from '@/hooks/use-file-upload';
+import { LocalFile } from '@/hooks/functionalities/use-file-upload';
 
 interface WorkspaceCreationActionsProps {
   pendingWorkspaceData: any;

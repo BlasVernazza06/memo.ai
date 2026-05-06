@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { useClickOutside } from '@/hooks/use-click-outside';
+import { useClickOutside } from '@/hooks/design/use-click-outside';
 import { authClient } from '@/lib/auth-client';
 
 interface UserModalLandingProps {

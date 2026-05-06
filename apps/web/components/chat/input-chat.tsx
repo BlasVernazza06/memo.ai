@@ -6,8 +6,11 @@ import { FileText, Upload, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import AttachmentCard from '@/components/chat/attachment-card';
-import { useAutoResize } from '@/hooks/use-auto-resize';
-import { LocalFile, useFileUpload } from '@/hooks/use-file-upload';
+import { useAutoResize } from '@/hooks/design/use-auto-resize';
+import {
+  LocalFile,
+  useFileUpload,
+} from '@/hooks/functionalities/use-file-upload';
 
 interface InputChatProps {
   onSend: (message: string, files: LocalFile[]) => void;

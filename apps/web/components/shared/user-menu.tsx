@@ -18,8 +18,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { type DbUser } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
-import { getInitials } from '@/hooks/use-Initials';
-import { useClickOutside } from '@/hooks/use-click-outside';
+import { useClickOutside } from '@/hooks/design/use-click-outside';
+import { getInitials } from '@/hooks/formats/use-Initials';
 
 const MOCK_NOTIFICATIONS = [
   {

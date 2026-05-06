@@ -3,9 +3,9 @@
 import { X } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { formatFileSize } from '@/hooks/use-file-size';
-import { LocalFile } from '@/hooks/use-file-upload';
-import { getFileIcon } from '@/hooks/use-get-icon';
+import { formatFileSize } from '@/hooks/formats/use-file-size';
+import { LocalFile } from '@/hooks/functionalities/use-file-upload';
+import { getFileIcon } from '@/hooks/functionalities/use-get-icon';
 
 interface AttachmentCardProps {
   file: LocalFile;
@@ -27,15 +27,13 @@ export default function AttachmentCard({
       {/* Icon Container with subtle background tint */}
       <div className="w-9 h-9 rounded-xl bg-background border border-border flex items-center justify-center relative overflow-hidden shrink-0">
         <div className="absolute inset-0 bg-primary/[0.03] group-hover/file:bg-primary/[0.08] transition-colors" />
-        <div className="relative z-10 scale-90">
-          {getFileIcon(file.type)}
-        </div>
+        <div className="relative z-10 scale-90">{getFileIcon(file.type)}</div>
       </div>
-      
+
       {/* File Info */}
       <div className="flex flex-col min-w-0 py-0.5">
         <div className="flex items-center gap-1.5">
-           <span className="text-[9px] font-black text-primary/60 dark:text-primary/50 uppercase tracking-wider leading-none">
+          <span className="text-[9px] font-black text-primary/60 dark:text-primary/50 uppercase tracking-wider leading-none">
             {file.type}
           </span>
           <span className="w-1 h-1 rounded-full bg-border/60" />
