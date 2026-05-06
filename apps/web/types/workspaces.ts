@@ -6,7 +6,7 @@ export type Workspace = {
   customContext?: string | null;
   category?: string | null;
   icon?: string | null;
-  coverImage?: string | null;
+  bgColor?: string | null;
   isFavorite?: boolean;
   isArchived?: boolean;
   createdAt?: Date | string;

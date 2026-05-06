@@ -14,9 +14,9 @@ interface FlashcardDeckWithContext {
   description: string | null;
   color: string | null;
   workspaceId: string;
-  createdAt: string;
+  createdAt: string | Date;
   flashcards: DbFlashcard[];
-  workspace: {
+  workspace?: {
     id: string;
     name: string;
   };

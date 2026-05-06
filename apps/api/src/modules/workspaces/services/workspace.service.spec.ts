@@ -155,7 +155,7 @@ describe('WorkspacesService', () => {
         icon: '🚀',
         description: 'Nueva descripción',
         isFavorite: true,
-        coverImage: 'https://example.com/new-cover.jpg',
+        bgColor: '#7C3AED',
       };
 
       mockWorkspacesRepo.findById.mockResolvedValue({
@@ -164,7 +164,7 @@ describe('WorkspacesService', () => {
         icon: '🚀',
         description: 'Antigua descripción',
         isFavorite: false,
-        coverImage: 'https://example.com/old-cover.jpg',
+        bgColor: '#2563EB',
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -200,7 +200,7 @@ describe('WorkspacesService', () => {
         icon: '🚀',
         description: 'Nueva descripción',
         isFavorite: true,
-        coverImage: 'https://example.com/new-cover.jpg',
+        bgColor: '#7C3AED',
       };
 
       mockWorkspacesRepo.findById.mockResolvedValue(false);
@@ -226,7 +226,7 @@ describe('WorkspacesService', () => {
         icon: '🚀',
         description: 'Nueva descripción',
         isFavorite: true,
-        coverImage: 'https://example.com/new-cover.jpg',
+        bgColor: '#7C3AED',
       };
 
       mockWorkspacesRepo.findById.mockResolvedValue({
@@ -235,7 +235,7 @@ describe('WorkspacesService', () => {
         icon: '🚀',
         description: 'Antigua descripción',
         isFavorite: false,
-        coverImage: 'https://example.com/old-cover.jpg',
+        bgColor: '#2563EB',
         createdAt: new Date(),
         updatedAt: new Date(),
       });

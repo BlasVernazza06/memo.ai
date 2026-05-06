@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -15,15 +16,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ThrottlerGuard } from '@nestjs/throttler';
 
 import { AuthGuard } from '@thallesp/nestjs-better-auth';
-import { z } from 'zod';
 
 import { type DbWorkspace } from '@repo/db';
 import { CreateWorkspaceSchema } from '@repo/validators';
 
 import { User } from '@/common/decorators/user.decorator';
 import { StorageService } from '@/modules/storage/services/storage.service';
-import { UpdateWorkspaceDto } from '@/modules/workspaces/dto/workspace-update.dto';
 import { WorkspacesService } from '@/modules/workspaces/services/workspaces.service';
+
+import { UpdateWorkspaceDto } from '../dto/workspace.dto';
 
 @Controller('workspaces')
 @UseGuards(AuthGuard, ThrottlerGuard)
@@ -47,23 +48,25 @@ export class WorkspacesController {
   @UseInterceptors(FileInterceptor('file'))
   async create(
     @User('id') userId: string,
-    @Body() body: any,
+    @Body() body: Record<string, any>,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     // 1. Deserializar metadatos de forma segura
-    let metadata = body;
+    let metadata: any = body;
 
     // Si viene como multipart/form-data, el campo 'metadata' suele ser un string JSON
     if (typeof body.metadata === 'string') {
       try {
-        metadata = JSON.parse(body.metadata);
+        metadata = JSON.parse(body.metadata) as Record<string, any>;
       } catch (error) {
-        throw new Error('El campo metadata no es un JSON válido');
+        throw new BadRequestException('El campo metadata no es un JSON válido');
       }
     }
 
-    if (!metadata || Object.keys(metadata).length === 0) {
-      throw new Error('No se proporcionaron metadatos para crear el workspace');
+    if (!metadata || Object.keys(metadata as object).length === 0) {
+      throw new BadRequestException(
+        'No se proporcionaron metadatos para crear el workspace',
+      );
     }
 
     const parsedMetadata = metadata;

@@ -21,7 +21,7 @@ export const workspace = pgTable('workspace', {
   customContext: text('custom_context'),
   category: text('category'),
   icon: text('icon'),
-  coverImage: text('cover_image'),
+  bgColor: text('bg_color'),
   isFavorite: boolean('is_favorite').default(false).notNull(),
   isArchived: boolean('is_archived').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

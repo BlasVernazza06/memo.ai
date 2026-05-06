@@ -1,29 +1,29 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
+import type {
+  CreateWorkspaceDto,
+  UpdateWorkspaceDto,
+} from '@modules/workspaces/dto/workspace.dto';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
   type Database,
+  DbQuiz,
+  NewFlashcard,
   type WorkspaceWithRelations,
   chat,
   document,
   flashcard,
   flashcardDeck,
-  message,
   quiz,
-  quizAttempt,
   quizQuestion,
-  userActivity,
   workspace,
 } from '@repo/db';
 
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
-import type {
-  CreateWorkspaceDto,
-  UpdateWorkspaceDto,
-} from '../dto/workspace-update.dto';
+import { FlashcardsUpdateDto } from '../dto/workspace.dto';
 
 @Injectable()
 export class WorkspacesRepository {
@@ -33,8 +33,6 @@ export class WorkspacesRepository {
     userId: string,
     data: CreateWorkspaceDto,
   ): Promise<{ id: string }> {
-    console.log('REPO: Inicia creación atómica (Batch) para:', data.name);
-
     const workspaceId = uuidv4();
     const batchRequests: any[] = [];
 
@@ -47,8 +45,8 @@ export class WorkspacesRepository {
         description: data.description,
         category: data.category,
         customContext: data.customContext || null,
-        icon: data.emoji || data.icon, // Usar emoji de la IA si existe
-        coverImage: data.coverImage,
+        icon: data.emoji || data.icon || '📚', // Usar emoji de la IA si existe, sino fallback a libro
+        bgColor: data.bgColor || '#7C3AED', // Color violeta por defecto
         isFavorite: data.isFavorite || false,
       }),
     );
@@ -157,7 +155,9 @@ export class WorkspacesRepository {
 
     // Ejecutar todo de forma atómica (si el driver lo soporta) o en ráfaga
     // En neon-http, batch() envía todas las sentencias en una sola petición HTTP
-    await (this.db as any).batch(batchRequests);
+    if (batchRequests.length > 0) {
+      await this.db.batch(batchRequests as [any, ...any[]]);
+    }
 
     return { id: workspaceId };
   }
@@ -211,22 +211,12 @@ export class WorkspacesRepository {
       where: eq(document.workspaceId, workspaceId),
     });
 
-    console.log(`[WorkspacesRepository] findById result for ${workspaceId}:`, {
-      id: result?.id,
-      name: result?.name,
-      documentsCountInResult: (result as any)?.documents?.length || 0,
-      directDocsCount: directDocs.length,
-    });
-
     // Si directDocs tiene algo y result.documents no, algo raro pasa con el join
     if (
       result &&
       directDocs.length > 0 &&
       (!result.documents || result.documents.length === 0)
     ) {
-      console.log(
-        '[WorkspacesRepository] ATENCIÓN: Join de Drizzle falló, inyectando directDocs manualmente',
-      );
       result.documents = directDocs;
     }
 
@@ -247,23 +237,25 @@ export class WorkspacesRepository {
   }
 
   async delete(userId: string, workspaceId: string): Promise<boolean> {
-    console.log(`[WorkspacesRepository] Iniciando eliminación de Workspace: ${workspaceId} para usuario: ${userId}`);
-
     // Gracias al 'onDelete: cascade' en el esquema de la base de datos,
-    // solo necesitamos borrar el workspace principal. 
+    // solo necesitamos borrar el workspace principal.
     // Los documentos, quizzes, flashcards, chats, etc., se borrarán automáticamente en la BD.
-    
+
     const result = await this.db
       .delete(workspace)
       .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)))
       .returning({ id: workspace.id });
 
     const deleted = result.length > 0;
-    
+
     if (deleted) {
-      console.log(`[WorkspacesRepository] Workspace ${workspaceId} eliminado con éxito de la base de datos.`);
+      console.log(
+        `[WorkspacesRepository] Workspace ${workspaceId} eliminado con éxito de la base de datos.`,
+      );
     } else {
-      console.warn(`[WorkspacesRepository] No se encontró el workspace ${workspaceId} para eliminar o no pertenece al usuario.`);
+      console.warn(
+        `[WorkspacesRepository] No se encontró el workspace ${workspaceId} para eliminar o no pertenece al usuario.`,
+      );
     }
 
     return deleted;
@@ -287,8 +279,8 @@ export class WorkspacesRepository {
 
   async addFlashcards(
     workspaceId: string,
-    cards: any[],
-    workspaceName: string,
+    cards: FlashcardsUpdateDto[],
+    deckName?: string,
   ): Promise<void> {
     const deckId = uuidv4();
     const batchRequests: any[] = [];
@@ -297,25 +289,31 @@ export class WorkspacesRepository {
       this.db.insert(flashcardDeck).values({
         id: deckId,
         workspaceId,
-        name: `Mazo Extra - ${new Date().toLocaleDateString()}`,
+        name: deckName || `Mazo Extra - ${new Date().toLocaleDateString()}`,
       }),
     );
 
-    const cardsToInsert = cards.map((f: any) => ({
-      id: uuidv4(),
-      deckId,
-      front: f.front || f.question || '',
-      back: f.back || f.answer || '',
-      mastery: 0,
-      reviewCount: 0,
-    }));
+    const cardsToInsert: NewFlashcard[] = cards.map(
+      (f: FlashcardsUpdateDto) => ({
+        id: uuidv4(),
+        deckId,
+        front: f.front || f.question || '',
+        back: f.back || f.answer || '',
+        mastery: 0,
+        reviewCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    );
 
     batchRequests.push(this.db.insert(flashcard).values(cardsToInsert));
 
-    await (this.db as any).batch(batchRequests);
+    if (batchRequests.length > 0) {
+      await this.db.batch(batchRequests as [any, ...any[]]);
+    }
   }
 
-  async addQuizzes(workspaceId: string, quizzes: any[]): Promise<void> {
+  async addQuizzes(workspaceId: string, quizzes: DbQuiz[]): Promise<void> {
     const batchRequests: any[] = [];
 
     for (const q of quizzes) {

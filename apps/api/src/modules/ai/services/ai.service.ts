@@ -1,16 +1,27 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AiService {
-  private readonly pythonServiceUrl = 'http://127.0.0.1:8000';
+  private readonly pythonServiceUrl: string;
 
-  async processDocument(file: Express.Multer.File | undefined, userContext: string) {
+  constructor(private readonly configService: ConfigService) {
+    this.pythonServiceUrl =
+      this.configService.getOrThrow<string>('PYTHON_SERVICE_URL');
+  }
+
+  async processDocument(
+    file: Express.Multer.File | undefined,
+    userContext: string,
+  ) {
     try {
       const formData = new FormData();
 
       // Solo adjuntamos el archivo si existe
       if (file) {
-        const blob = new Blob([new Uint8Array(file.buffer)], { type: file.mimetype });
+        const blob = new Blob([new Uint8Array(file.buffer)], {
+          type: file.mimetype,
+        });
         formData.append('file', blob, file.originalname);
       }
 
@@ -35,7 +46,7 @@ export class AiService {
       }
 
       const result = await response.json();
-      
+
       // En el pasado se hacia JSON.parse aquí, pero el Python backend ya devuelve un objeto
       const finalData = result.data;
       if (result.thumbnailBase64) {
@@ -50,6 +61,44 @@ export class AiService {
       });
       throw new InternalServerErrorException(
         'Error al procesar el documento con IA: ' + error.message,
+      );
+    }
+  }
+
+  async generateContentFromPrompt(
+    systemPrompt: string,
+    userPrompt: string,
+    type: 'flashcards' | 'quizzes',
+  ) {
+    try {
+      const response = await fetch(
+        `${this.pythonServiceUrl}/ai/generate-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            system_prompt: systemPrompt,
+            user_prompt: userPrompt,
+            type,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Python Service Error: ${response.status} - ${errorText}`,
+        );
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('GENERATE FROM PROMPT ERROR:', error);
+      throw new InternalServerErrorException(
+        'Error al generar contenido con IA: ' + error.message,
       );
     }
   }

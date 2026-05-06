@@ -45,7 +45,7 @@ export const CreateWorkspaceSchema = z.object({
   customContext: z.string().optional(),
   icon: z.string().optional(),
   emoji: z.string().optional(),
-  coverImage: z.string().url().nullable().optional(),
+  bgColor: z.string().nullable().optional(),
   isFavorite: z.boolean().optional(),
   document: DocumentSchema.optional(),
   documents: z.array(DocumentSchema).optional(),
@@ -58,4 +58,16 @@ export const UpdateWorkspaceSchema = z.object({
   name: z.string().min(1, 'El nombre no puede estar vacío').optional(),
   description: z.string().nullable().optional(),
   icon: z.string().nullable().optional(),
+  bgColor: z.string().nullable().optional(),
+});
+
+export type UpdateWorkspaceDTO = z.infer<typeof UpdateWorkspaceSchema>;
+
+export const FlashcardUpdateSchema = z.object({
+  front: z.string().optional(),
+  back: z.string().optional(),
+});
+
+export const FlashcardsUpdateSchema = z.object({
+  flashcards: z.array(FlashcardUpdateSchema),
 });

@@ -2,10 +2,6 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { UsersService } from '@modules/users/services/users.service';
-import {
-  CreateWorkspaceDto,
-  UpdateWorkspaceDto,
-} from '@modules/workspaces/dto/workspace-update.dto';
 import { WorkspacesRepository } from '@modules/workspaces/repositories/workspaces.repository';
 import * as cacheManager from 'cache-manager';
 
@@ -14,6 +10,8 @@ import { type WorkspaceWithRelations } from '@repo/db';
 import { CACHE_KEYS } from '@/common/constants/cache-keys';
 import { AiService } from '@/modules/ai/services/ai.service';
 import { StorageService } from '@/modules/storage/services/storage.service';
+
+import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dto/workspace.dto';
 
 export type WorkspaceWithCounts = WorkspaceWithRelations & {
   flashcards?: number;
@@ -68,9 +66,10 @@ export class WorkspacesService {
       ? `${basePrompt}\n\nINSTRUCCIONES ADICIONALES DEL USUARIO: ${customPrompt}`
       : basePrompt;
 
-    const aiData = await this.aiService.processDocument(
-      undefined,
+    const aiData = await this.aiService.generateContentFromPrompt(
+      'Eres un asistente experto en la creación de contenido educativo a partir de documentos. Tu objetivo es generar material didáctico de alta calidad, optimizado para el aprendizaje.',
       `${history}\n\n${finalPrompt}`,
+      type,
     );
 
     // 4. Guardar el nuevo contenido
@@ -244,36 +243,38 @@ export class WorkspacesService {
     userId: string,
     workspaceId: string,
   ): Promise<{ success: boolean }> {
-    // 1. Buscar el workspace para obtener las llaves de los archivos
     const workspaceDetail = await this.workspaceRepo.findById(
       userId,
       workspaceId,
     );
-    if (!workspaceDetail) {
+    if (!workspaceDetail)
       throw new NotFoundException('Workspace no encontrado');
-    }
-
-    // 2. Borrar archivos de S3 si existen
-    if (workspaceDetail.documents && workspaceDetail.documents.length > 0) {
+    console.log(
+      `[WorkspacesService] Iniciando proceso de eliminación para workspace: ${workspaceId}`,
+    );
+    // 1. Borrar documentos de S3
+    const docs = workspaceDetail.documents || [];
+    if (docs.length > 0) {
       console.log(
-        `[WorkspacesService] Borrando ${workspaceDetail.documents.length} archivos de S3...`,
+        `[WorkspacesService] Borrando ${docs.length} documentos de S3...`,
       );
-      for (const doc of workspaceDetail.documents) {
+      for (const doc of docs) {
         if (doc.key) {
           try {
             await this.storageService.deleteFile(doc.key);
+            console.log(
+              `[WorkspacesService] Archivo borrado de S3: ${doc.key}`,
+            );
           } catch (error) {
             console.error(
               `[WorkspacesService] Error al borrar archivo ${doc.key} de S3:`,
               error,
             );
-            // No bloqueamos el proceso si falla el borrado en S3 (puedes decidir si quieres que falle)
           }
         }
       }
     }
-
-    // 3. Borrar de la base de datos (repositorio)
+    // 2. Borrar de la base de datos (repositorio)
     const success = await this.workspaceRepo.delete(userId, workspaceId);
 
     if (!success) {
@@ -306,8 +307,8 @@ export class WorkspacesService {
       return { success: false };
     }
 
-    const { name, icon, description } = data;
-    const updatedData = { name, icon, description };
+    const { name, icon, description, bgColor } = data;
+    const updatedData = { name, icon, description, bgColor };
 
     const success = await this.workspaceRepo.update(
       userId,

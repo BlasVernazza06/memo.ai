@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { toast } from 'sonner';
 
 import { Button } from '@repo/ui/components/ui/button';
+import { UpdateWorkspaceDTO } from '@repo/validators';
 
 import {
   deleteWorkspaceAction,
@@ -27,6 +28,7 @@ interface WorkspaceSettingsModalProps {
     name: string;
     description: string | null;
     icon: string | null;
+    bgColor?: string | null;
     updatedAt?: Date;
   };
 }
@@ -44,10 +46,11 @@ export default function WorkspaceSettingsModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UpdateWorkspaceDTO>({
     name: workspace.name,
     icon: workspace.icon || '',
     description: workspace.description || '',
+    bgColor: workspace.bgColor || '#7C3AED',
   });
 
   // Sincronizar el estado interno con las props cuando el modal se abre
@@ -58,9 +61,16 @@ export default function WorkspaceSettingsModal({
         name: workspace.name,
         icon: workspace.icon || '',
         description: workspace.description || '',
+        bgColor: workspace.bgColor || '#7C3AED',
       });
     }
-  }, [isOpen, workspace.name, workspace.icon, workspace.description]);
+  }, [
+    isOpen,
+    workspace.name,
+    workspace.icon,
+    workspace.description,
+    workspace.bgColor,
+  ]);
 
   // Volver a la vista principal al cerrar
   const handleClose = () => {
@@ -123,7 +133,7 @@ export default function WorkspaceSettingsModal({
             initial={{ scale: 0.95, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
-            className="bg-[#f8fafc] border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl relative z-101 overflow-hidden"
+            className="bg-[#f8fafc] border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl relative z-101"
           >
             {/* Header */}
             <div className="px-8 py-6 flex items-center justify-between border-b border-white">

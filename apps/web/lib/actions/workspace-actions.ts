@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+
 import { z } from 'zod';
 
 import { UpdateWorkspaceSchema } from '@repo/validators';
@@ -15,20 +16,23 @@ export async function deleteWorkspaceAction(workspaceId: string) {
 
     // Invalida el cache del dashboard para que el workspace desaparezca
     revalidatePath('/dashboard');
-    
+
     return { success: true };
   } catch (error) {
     console.error('[ACTION] Error deleting workspace:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Error al eliminar el workspace' 
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error al eliminar el workspace',
     };
   }
 }
 
 export async function updateWorkspaceAction(
   workspaceId: string,
-  data: z.infer<typeof UpdateWorkspaceSchema>
+  data: z.infer<typeof UpdateWorkspaceSchema>,
 ) {
   try {
     const validatedData = UpdateWorkspaceSchema.safeParse(data);
@@ -54,7 +58,36 @@ export async function updateWorkspaceAction(
     console.error('[ACTION] Error updating workspace:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error al actualizar el workspace',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error al actualizar el workspace',
+    };
+  }
+}
+
+export async function generateMoreContent(
+  type: string,
+  id: string,
+  prompt?: string | undefined,
+) {
+  try {
+    await apiFetch(`/workspaces/${id}/generate-more`, {
+      method: 'POST',
+      body: JSON.stringify({ type, prompt }),
+    });
+
+    revalidatePath(`/dashboard/workspaces/${id}`);
+
+    return { success: true };
+  } catch (error) {
+    console.error('[ACTION] Error generating more content:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Error al generar más contenido',
     };
   }
 }

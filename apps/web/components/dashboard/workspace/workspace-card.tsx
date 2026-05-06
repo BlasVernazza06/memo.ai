@@ -74,7 +74,9 @@ export default function WorkspaceCard({
         >
           {/* List Icon */}
           <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center shrink-0 group-hover/ws:bg-primary/10 transition-colors">
-            <Icon className="w-5 h-5 text-primary" />
+            <span className="text-xl">
+              {ws.icon || '📚'}
+            </span>
           </div>
 
           {/* List Content */}
@@ -133,35 +135,25 @@ export default function WorkspaceCard({
         <div className="h-full flex flex-col bg-card rounded-3xl border border-border/60 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 group-hover/ws:-translate-y-1 overflow-hidden">
           {/* Minimal Header */}
           <div className="relative h-32 shrink-0 bg-muted/10 overflow-hidden isolate">
-            {ws.coverImage ? (
-              <Image
-                src={ws.coverImage}
-                alt={ws.name}
-                width={400}
-                height={200}
-                className="w-full h-full object-cover transform-gpu group-hover/ws:scale-110 transition-transform duration-700 will-change-transform"
-              />
-            ) : (
+            <div
+              className="w-full h-full relative transition-all duration-500 group-hover/ws:scale-110 transform-gpu will-change-transform"
+              style={{
+                background: `linear-gradient(135deg, ${ws.bgColor || '#7C3AED'}33 0%, ${ws.bgColor || '#7C3AED'}11 100%)`,
+              }}
+            >
+              {/* Decorative mesh/gradient blobs */}
               <div
-                className="w-full h-full relative transition-all duration-500 group-hover/ws:scale-110 transform-gpu will-change-transform"
-                style={{
-                  background: `linear-gradient(135deg, ${ws.color || '#3b82f6'}33 0%, ${ws.color || '#3b82f6'}11 100%)`,
-                }}
-              >
-                {/* Decorative mesh/gradient blobs */}
-                <div
-                  className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-40 animate-pulse"
-                  style={{ backgroundColor: ws.color || '#3b82f6' }}
-                />
-                <div
-                  className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full blur-3xl opacity-20"
-                  style={{ backgroundColor: ws.color || '#3b82f6' }}
-                />
+                className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-40 animate-pulse"
+                style={{ backgroundColor: ws.bgColor || '#7C3AED' }}
+              />
+              <div
+                className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full blur-3xl opacity-20"
+                style={{ backgroundColor: ws.bgColor || '#7C3AED' }}
+              />
 
-                {/* Subtle Grid Pattern Overlay */}
-                <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150 pointer-events-none" />
-              </div>
-            )}
+              {/* Subtle Grid Pattern Overlay */}
+              <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150 pointer-events-none" />
+            </div>
 
             {/* Top Right Actions */}
             <div className="absolute top-4 right-4 z-10">
@@ -191,14 +183,13 @@ export default function WorkspaceCard({
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-300 group-hover/ws:scale-110 group-hover/ws:rotate-3 shadow-sm"
                 style={{
-                  backgroundColor: `${ws.color || '#3b82f6'}1a`,
-                  borderColor: `${ws.color || '#3b82f6'}33`,
+                  backgroundColor: `${ws.bgColor || '#7C3AED'}1a`,
+                  borderColor: `${ws.bgColor || '#7C3AED'}33`,
                 }}
               >
-                <Icon
-                  className="w-6 h-6"
-                  style={{ color: ws.color || '#3b82f6' }}
-                />
+                <span className="text-2xl">
+                  {ws.icon || '📚'}
+                </span>
               </div>
             </div>
 
@@ -206,7 +197,7 @@ export default function WorkspaceCard({
               className="text-xl font-bold text-foreground mb-2 transition-colors duration-300"
               style={
                 {
-                  '--hover-color': ws.color || '#3b82f6',
+                  '--hover-color': ws.bgColor || '#7C3AED',
                 } as React.CSSProperties
               }
             >
@@ -225,11 +216,11 @@ export default function WorkspaceCard({
               <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/20 border border-border/40 group-hover/ws:bg-muted/40 transition-colors">
                 <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: `${ws.color || '#3b82f6'}15` }}
+                  style={{ backgroundColor: `${ws.bgColor || '#7C3AED'}15` }}
                 >
                   <Layers
                     className="w-4 h-4"
-                    style={{ color: ws.color || '#3b82f6' }}
+                    style={{ color: ws.bgColor || '#7C3AED' }}
                   />
                 </div>
                 <div>
@@ -266,12 +257,12 @@ export default function WorkspaceCard({
                 className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground transition-all duration-300 hover:text-white"
                 style={
                   {
-                    '--hover-bg': ws.color || '#3b82f6',
+                    '--hover-bg': ws.bgColor || '#7C3AED',
                   } as React.CSSProperties
                 }
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.backgroundColor =
-                    ws.color || '#3b82f6')
+                    ws.bgColor || '#7C3AED')
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = '')

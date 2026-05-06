@@ -13,17 +13,20 @@ import { AnalysisTabContent } from './analysis-tab-content';
 import { EmptyTabListState } from './empty-tab-list-state';
 
 interface TabMetadata {
-  id: 'flashcards' | 'quizzes' | 'analysis';
+  id: string;
   label: string;
   icon: any;
   count: number | null;
+  canGenerate?: boolean;
 }
 
 interface WorkspaceContentColumnProps {
-  activeTab: 'flashcards' | 'quizzes' | 'analysis';
+  activeTab: string;
   workspace: WorkspaceWithRelations;
   primaryDoc: DbDocument | null | undefined;
   tabs: TabMetadata[];
+  isGenerating?: boolean;
+  onGenerateMore?: (type: any) => void;
 }
 
 export function WorkspaceContentColumn({
@@ -31,6 +34,8 @@ export function WorkspaceContentColumn({
   workspace,
   primaryDoc,
   tabs,
+  isGenerating = false,
+  onGenerateMore,
 }: WorkspaceContentColumnProps) {
   const activeTabData = tabs.find((t) => t.id === activeTab);
   const title = activeTabData?.label || '';
@@ -52,13 +57,21 @@ export function WorkspaceContentColumn({
           </AnimatePresence>
           <span className="h-px flex-1 bg-border/50" />
         </h2>
-        <Button
-          variant="ghost"
-          className="h-8 rounded-lg px-2 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5"
-        >
-          <Plus className="w-3.5 h-3.5 mr-1" />
-          Crear Nuevo
-        </Button>
+        {activeTabData?.canGenerate && (
+          <Button
+            onClick={() => {
+              if (onGenerateMore) {
+                onGenerateMore(activeTab);
+              }
+            }}
+            disabled={isGenerating}
+            variant="ghost"
+            className="h-8 rounded-lg px-2 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1" />
+            Crear Nuevo
+          </Button>
+        )}
       </div>
 
       <AnimatePresence mode="wait">
@@ -69,28 +82,76 @@ export function WorkspaceContentColumn({
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
         >
-          {activeTab === 'flashcards' &&
-          (workspace.flashcardDecks?.length ?? 0) > 0 ? (
+          {activeTab === 'flashcards' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {workspace.flashcardDecks?.map((deck, idx) => (
-                <DeckCard key={deck.id} deck={deck} index={idx} />
-              ))}
+              {(workspace.flashcardDecks?.length ?? 0) > 0 ? (
+                workspace.flashcardDecks?.map((deck, idx) => (
+                  <DeckCard key={deck.id} deck={deck} index={idx} />
+                ))
+              ) : !isGenerating ? (
+                <div className="col-span-full">
+                  <EmptyTabListState tabName={title} icon={icon} />
+                </div>
+              ) : null}
+
+              {isGenerating && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative group h-40 rounded-3xl border-2 border-dashed border-primary/20 bg-primary/5 flex flex-col items-center justify-center p-6 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-primary/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-3 animate-pulse">
+                    <Layers className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="space-y-2 w-full max-w-[120px]">
+                    <div className="h-2 bg-primary/10 rounded-full w-full animate-pulse" />
+                    <div className="h-2 bg-primary/10 rounded-full w-2/3 animate-pulse" />
+                  </div>
+                </motion.div>
+              )}
             </div>
-          ) : activeTab === 'quizzes' &&
-            (workspace.quizzes?.length ?? 0) > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {workspace.quizzes?.map((quiz, idx) => (
-                <QuizCard key={quiz.id} quiz={quiz} index={idx} />
-              ))}
-            </div>
-          ) : activeTab === 'analysis' &&
-            (primaryDoc?.aiSummary || workspace.customContext) ? (
-            <AnalysisTabContent
-              summary={primaryDoc?.aiSummary || workspace.customContext || ''}
-            />
-          ) : (
-            <EmptyTabListState tabName={title} icon={icon} />
           )}
+
+          {activeTab === 'quizzes' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(workspace.quizzes?.length ?? 0) > 0 ? (
+                workspace.quizzes?.map((quiz, idx) => (
+                  <QuizCard key={quiz.id} quiz={quiz} index={idx} />
+                ))
+              ) : !isGenerating ? (
+                <div className="col-span-full">
+                  <EmptyTabListState tabName={title} icon={icon} />
+                </div>
+              ) : null}
+
+              {isGenerating && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative group h-40 rounded-3xl border-2 border-dashed border-primary/20 bg-primary/5 flex flex-col items-center justify-center p-6 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-primary/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-3 animate-pulse">
+                    <Plus className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="space-y-2 w-full max-w-[120px]">
+                    <div className="h-2 bg-primary/10 rounded-full w-full animate-pulse" />
+                    <div className="h-2 bg-primary/10 rounded-full w-2/3 animate-pulse" />
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'analysis' &&
+            (primaryDoc?.aiSummary || workspace.customContext ? (
+              <AnalysisTabContent
+                summary={primaryDoc?.aiSummary || workspace.customContext || ''}
+              />
+            ) : (
+              <EmptyTabListState tabName={title} icon={icon} />
+            ))}
         </motion.div>
       </AnimatePresence>
     </div>

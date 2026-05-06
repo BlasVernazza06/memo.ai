@@ -102,6 +102,36 @@ async def process_document(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+class GenerateContentRequest(BaseModel):
+    system_prompt: Optional[str] = None
+    user_prompt: str
+    type: str  # 'flashcards' | 'quizzes'
+    count: int = 10
+
+@app.post("/ai/generate-content")
+async def generate_content(req: GenerateContentRequest):
+    try:
+        # 1. Definir el prompt del sistema (usar el proporcionado o el por defecto)
+        system_content = req.system_prompt if req.system_prompt else SYSTEM_PROMPT
+
+        # 2. Llamada a Groq
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": req.user_prompt}
+            ],
+            response_format={ "type": "json_object" }
+        )
+
+        return {
+            "success": True,
+            "data": json.loads(response.choices[0].message.content)
+        }
+    except Exception as e:
+        print(f"Error in generate_content: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}

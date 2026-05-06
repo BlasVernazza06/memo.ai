@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { FileText, Layers } from 'lucide-react';
+import { FileText, LucideIcon } from 'lucide-react';
 
 import type { DbDocument, WorkspaceWithRelations } from '@repo/db';
 
@@ -17,7 +17,8 @@ interface WorkspaceInfoColumnProps {
     id: TabId;
     label: string;
     count: number | null;
-    icon: any;
+    icon: LucideIcon;
+    canGenerate?: boolean;
   }[];
 }
 

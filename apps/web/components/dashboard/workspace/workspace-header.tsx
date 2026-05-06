@@ -65,15 +65,20 @@ export function WorkspaceHeader({
         <div className="absolute -top-32 -right-32 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-primary/20 transition-colors duration-1000" />
         <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-blue-500/20 transition-colors duration-1000" />
 
-        {workspace.coverImage && (
+        {/* Glow de color personalizado */}
+        {workspace.bgColor && (
           <div
-            className="absolute top-0 right-0 w-2/3 h-full opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-1000 pointer-events-none"
-            style={{
-              backgroundImage: `url(${workspace.coverImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              maskImage: 'linear-gradient(to left, black, transparent)',
-              WebkitMaskImage: 'linear-gradient(to left, black, transparent)',
+            className="absolute -top-24 -left-24 w-80 h-80 rounded-full blur-[80px] opacity-20 pointer-events-none"
+            style={{ backgroundColor: workspace.bgColor }}
+          />
+        )}
+        
+        {workspace.bgColor && (
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{ 
+              backgroundColor: workspace.bgColor,
+              background: `linear-gradient(135deg, ${workspace.bgColor}22 0%, transparent 100%)`
             }}
           />
         )}

@@ -28,6 +28,7 @@ import { WorkspaceInfoColumn } from '@/components/dashboard/workspace/workspace-
 import { WorkspaceInsightsColumn } from '@/components/dashboard/workspace/workspace-insights-column';
 import WorkspaceLoading from '@/components/dashboard/workspace/workspace-loading';
 import WorkspaceSettingsModal from '@/components/dashboard/workspace/workspace-settings-modal';
+import { generateMoreContent } from '@/lib/actions/workspace-actions';
 import { apiFetchClient } from '@/lib/api-client';
 
 // ============================================================
@@ -75,11 +76,7 @@ export default function WorkspaceDetailPage() {
   ) => {
     try {
       setIsGenerating(true);
-      await apiFetchClient(`/workspaces/${id}/generate-more`, {
-        method: 'POST',
-        body: JSON.stringify({ type, prompt }),
-      });
-
+      await generateMoreContent(type, id as string, prompt);
       // Refrescar data
       const data = await apiFetchClient<WorkspaceWithRelations>(
         `/workspaces/${id}`,
@@ -120,12 +117,14 @@ export default function WorkspaceDetailPage() {
       label: 'Flashcards',
       count: workspace?.flashcardDecks?.length || 0,
       icon: Layers,
+      canGenerate: true,
     },
     {
       id: 'quizzes' as const,
       label: 'Quizzes',
       count: workspace?.quizzes?.length || 0,
       icon: Brain,
+      canGenerate: true,
     },
     {
       id: 'analysis' as const,
@@ -152,21 +151,17 @@ export default function WorkspaceDetailPage() {
   return (
     <div className="min-h-screen w-full">
       {/* Notion-style Cover Area */}
-      <div className="relative h-72 md:h-96 w-full overflow-hidden group bg-muted">
-        {workspace.coverImage ? (
-          <Image
-            src={workspace.coverImage}
-            alt="Cover"
-            fill
-            className="object-cover transition-transform duration-1000 group-hover:scale-105"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-linear-to-tr from-primary/30 via-primary/10 to-background relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(var(--primary-rgb),0.15),transparent)]" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
-          </div>
-        )}
+      <div className="relative h-72 md:h-96 w-full overflow-hidden group">
+        <div 
+          className="w-full h-full relative"
+          style={{ 
+            backgroundColor: workspace.bgColor || '#7C3AED',
+            backgroundImage: `linear-gradient(to bottom right, ${workspace.bgColor || '#7C3AED'}99, ${workspace.bgColor || '#7C3AED'}22)`
+          }}
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent)]" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+        </div>
         <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-background via-background/60 to-transparent" />
       </div>
 
@@ -257,6 +252,8 @@ export default function WorkspaceDetailPage() {
             workspace={workspace}
             primaryDoc={primaryDoc}
             tabs={TABS}
+            isGenerating={isGenerating}
+            onGenerateMore={handleGenerateMore}
           />
 
           <WorkspaceInsightsColumn
