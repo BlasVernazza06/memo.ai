@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 
-import DashHero from '@/components/dashboard/dash-hero';
-import WorkspacesList from '@/components/dashboard/workspace/workspaces-list';
-import WorkspacesSkeleton from '@/components/dashboard/workspace/workspaces-skeleton';
+import DashHero from '@/components/dashboard/home/dash-hero';
+import WorkspacesList from '@/components/dashboard/workspace/list/workspaces-list';
+import WorkspacesSkeleton from '@/components/dashboard/workspace/shared/workspaces-skeleton';
 import { apiFetch } from '@/lib/api-fetch';
 
 export default async function DashboardPage() {

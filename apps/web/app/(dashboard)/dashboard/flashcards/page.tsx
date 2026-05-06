@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/api-fetch';
-import FlashcardsList from '@/components/dashboard/flashcards/flashcards-list';
+import FlashcardsList from '@/components/dashboard/flashcards/list/flashcards-list';
 
 interface FlashcardDeckWithContext {
   id: string;

@@ -26,7 +26,7 @@ import InputChat from '@/components/chat/input-chat';
 import SuggestionCard from '@/components/chat/suggestion-card';
 import SuggestionList from '@/components/chat/suggestion-list';
 import WorkspaceCreationActions from '@/components/chat/workspace-creation-actions';
-import { LocalFile } from '@/hooks/use-file-upload';
+import { LocalFile } from '@/hooks/functionalities/use-file-upload';
 import { apiFetchClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-provider';
 import { ChatMessage } from '@/types/workspace-chat-types';

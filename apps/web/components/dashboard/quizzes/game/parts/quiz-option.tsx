@@ -14,7 +14,7 @@ export default function QuizOption({
   shake,
   cardClass,
 }: {
-  option: string;
+  option: string | undefined;
   index: number;
   handleOptionSelect: (index: number) => void;
   isAnswered: boolean;

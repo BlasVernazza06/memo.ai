@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/api-fetch';
-import QuizzesList from '@/components/dashboard/quizzes/quizzes-list';
+import QuizzesList from '@/components/dashboard/quizzes/list/quizzes-list';
 
 interface QuizWithContext {
   id: string;

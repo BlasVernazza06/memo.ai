@@ -23,11 +23,11 @@ import type { WorkspaceWithRelations } from '@repo/db';
 // Components
 import { Button } from '@repo/ui/components/ui/button';
 
-import { WorkspaceContentColumn } from '@/components/dashboard/workspace/workspace-content-column';
-import { WorkspaceInfoColumn } from '@/components/dashboard/workspace/workspace-info-column';
-import { WorkspaceInsightsColumn } from '@/components/dashboard/workspace/workspace-insights-column';
-import WorkspaceLoading from '@/components/dashboard/workspace/workspace-loading';
-import WorkspaceSettingsModal from '@/components/dashboard/workspace/workspace-settings-modal';
+import { WorkspaceContentColumn } from '@/components/dashboard/workspace/layout/workspace-content-column';
+import { WorkspaceInfoColumn } from '@/components/dashboard/workspace/layout/workspace-info-column';
+import { WorkspaceInsightsColumn } from '@/components/dashboard/workspace/layout/workspace-insights-column';
+import WorkspaceLoading from '@/components/dashboard/workspace/shared/workspace-loading';
+import WorkspaceSettingsModal from '@/components/dashboard/workspace/forms/workspace-settings-modal';
 import { generateMoreContent } from '@/lib/actions/workspace-actions';
 import { apiFetchClient } from '@/lib/api-client';
 

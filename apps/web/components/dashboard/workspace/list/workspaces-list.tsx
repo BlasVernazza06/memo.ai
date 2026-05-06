@@ -1,4 +1,4 @@
-import DashWorkspacesSec from '@/components/dashboard/dash-workspaces-sec';
+import DashWorkspacesSec from '@/components/dashboard/home/dash-workspaces-sec';
 import { apiFetch } from '@/lib/api-fetch';
 import type { Workspace } from '@/types/workspaces';
 

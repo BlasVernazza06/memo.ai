@@ -1,4 +1,4 @@
-import { SettingsLoading } from '@/components/dashboard/loading-skeletons';
+import { SettingsLoading } from '@/components/dashboard/shared/loading-skeletons';
 
 export default function Loading() {
   return <SettingsLoading />;

@@ -9,7 +9,7 @@ import type { DbDocument } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
 import SearchInput from '@/components/shared/search-input';
-import { formatFileSize } from '@/hooks/use-file-size';
+import { formatFileSize } from '@/hooks/formats/use-file-size';
 
 export function DocsList({ docs }: { docs: DbDocument[] }) {
   const [filteredDocs, setFilteredDocs] = useState(docs);

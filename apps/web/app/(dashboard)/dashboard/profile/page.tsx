@@ -9,7 +9,7 @@ import { Button } from '@repo/ui/components/ui/button';
 import { ProfileAchievements } from '@/components/profile/profile-achievements';
 import { ProfileActivity } from '@/components/profile/profile-activity';
 import { ProfileStats } from '@/components/profile/profile-stats';
-import { getInitials } from '@/hooks/use-Initials';
+import { getInitials } from '@/hooks/formats/use-Initials';
 import { getSession } from '@/lib/auth-session';
 
 export default async function ProfilePage() {

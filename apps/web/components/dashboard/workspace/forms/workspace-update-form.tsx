@@ -1,6 +1,6 @@
 import { UpdateWorkspaceDTO } from '@repo/validators';
 
-import IconSelector from '@/components/dashboard/workspace/icon-selector';
+import IconSelector from '@/components/dashboard/workspace/forms/icon-selector';
 
 interface UpdateWorkspaceFormProps {
   formData: UpdateWorkspaceDTO;

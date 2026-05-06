@@ -15,8 +15,8 @@ import { Label } from '@repo/ui/components/ui/label';
 import AppearanceSection from '@/components/dashboard/settings/appearance';
 import SecuritySection from '@/components/dashboard/settings/security';
 import { SidebarUserAvatar } from '@/components/shared/dash-aside/user-avatar';
-import { useFileUpload } from '@/hooks/use-file-upload';
-import { useStorage } from '@/hooks/use-storage';
+import { useFileUpload } from '@/hooks/functionalities/use-file-upload';
+import { useStorage } from '@/hooks/functionalities/use-storage';
 import { deleteUser } from '@/lib/actions/auth-actions';
 import { useAuth } from '@/lib/auth-provider';
 

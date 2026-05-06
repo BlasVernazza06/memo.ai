@@ -11,7 +11,7 @@ import { Button } from '@repo/ui/components/ui/button';
 
 import WorkspaceCard, {
   Workspace,
-} from '@/components/dashboard/workspace/workspace-card';
+} from '@/components/dashboard/workspace/list/workspace-card';
 import SearchInput from '@/components/shared/search-input';
 
 interface WorkspacesClientProps {

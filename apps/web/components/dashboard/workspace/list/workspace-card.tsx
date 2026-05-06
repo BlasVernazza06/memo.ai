@@ -19,7 +19,7 @@ import {
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 
-import { formatDate } from '@/hooks/use-formate-date';
+import { formatDate } from '@/hooks/formats/use-formate-date';
 import { apiFetchClient } from '@/lib/api-client';
 import type { Workspace } from '@/types/workspaces';
 
@@ -74,9 +74,7 @@ export default function WorkspaceCard({
         >
           {/* List Icon */}
           <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center shrink-0 group-hover/ws:bg-primary/10 transition-colors">
-            <span className="text-xl">
-              {ws.icon || '📚'}
-            </span>
+            <span className="text-xl">{ws.icon || '📚'}</span>
           </div>
 
           {/* List Content */}
@@ -187,9 +185,7 @@ export default function WorkspaceCard({
                   borderColor: `${ws.bgColor || '#7C3AED'}33`,
                 }}
               >
-                <span className="text-2xl">
-                  {ws.icon || '📚'}
-                </span>
+                <span className="text-2xl">{ws.icon || '📚'}</span>
               </div>
             </div>
 

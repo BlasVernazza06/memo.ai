@@ -1,19 +1,33 @@
-import QuizOption from '@/components/dashboard/quizzes/quiz-option';
+import { useMemo } from 'react';
+
+import QuizOption from '@/components/dashboard/quizzes/game/parts/quiz-option';
 import { Question } from '@/types/quiz';
+
+interface QuizBodyProps {
+  question: Question;
+  selectedOption: number | null;
+  isAnswered: boolean;
+  handleOptionSelect: (index: number) => void;
+  shake?: boolean;
+}
 
 export default function QuizBody({
   question,
-  handleOptionSelect,
-  isAnswered,
   selectedOption,
-  shake,
-}: {
-  question: Question;
-  handleOptionSelect: (index: number) => void;
-  isAnswered: boolean;
-  selectedOption: number | null;
-  shake: boolean;
-}) {
+  isAnswered,
+  handleOptionSelect,
+  shake = false,
+}: QuizBodyProps) {
+  // Fisher-Yates shuffle algorithm for the indices
+  const shuffledIndices = useMemo(() => {
+    const indices = question.options.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices;
+  }, [question.id]);
+
   return (
     <div className="space-y-8">
       <h2 className="text-2xl md:text-3xl font-black text-foreground leading-tight">
@@ -21,9 +35,10 @@ export default function QuizBody({
       </h2>
 
       <div className="grid gap-3">
-        {question.options.map((option, index) => {
-          const isSelected = selectedOption === index;
-          const isCorrect = index === question.correctAnswer;
+        {shuffledIndices.map((originalIndex) => {
+          const option = question.options[originalIndex];
+          const isSelected = selectedOption === originalIndex;
+          const isCorrect = originalIndex === question.correctAnswer;
           const showResult = isAnswered;
 
           let cardClass =
@@ -45,9 +60,9 @@ export default function QuizBody({
 
           return (
             <QuizOption
-              key={index}
+              key={originalIndex}
               option={option}
-              index={index}
+              index={originalIndex}
               handleOptionSelect={handleOptionSelect}
               isAnswered={isAnswered}
               isSelected={isSelected}

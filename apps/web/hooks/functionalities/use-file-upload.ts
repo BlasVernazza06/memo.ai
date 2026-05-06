@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { type LocalFile } from '@repo/validators';
 
-import { getFileType } from '@/hooks/use-file-type';
+import { getFileType } from '@/hooks/formats/use-file-type';
 
 export type { LocalFile };
 

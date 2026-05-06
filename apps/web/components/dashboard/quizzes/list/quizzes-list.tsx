@@ -1,40 +1,31 @@
 'use client';
 
-import Link from 'next/link';
-
 import { useState } from 'react';
-
-import { Brain, Layers, Plus, Search, Sparkles } from 'lucide-react';
-
-import { DbFlashcard } from '@repo/db';
-import { Button } from '@repo/ui/components/ui/button';
-
+import { Brain, ClipboardCheck, GraduationCap, Trophy } from 'lucide-react';
 import SearchInput from '@/components/shared/search-input';
+import { QuizCard } from '@/components/dashboard/quizzes/list/quiz-card';
+import EmptyQuizPage from '@/components/dashboard/quizzes/shared/empty-quiz-page';
 
-import { DeckCard } from './deck-card';
-import EmptyFlashcardPage from './empty-flashcard-page';
-
-interface FlashcardDeckWithContext {
+interface QuizWithContext {
   id: string;
   name: string;
   description: string | null;
-  color: string | null;
+  totalQuestions: number;
   workspaceId: string;
   createdAt: string;
-  flashcards: DbFlashcard[];
   workspace: {
     id: string;
     name: string;
   };
 }
 
-export default function FlashcardsList({
-  initialDecks,
+export default function QuizzesList({
+  initialQuizzes,
 }: {
-  initialDecks: FlashcardDeckWithContext[];
+  initialQuizzes: QuizWithContext[];
 }) {
-  const [filteredDecks, setFilteredDecks] =
-    useState<FlashcardDeckWithContext[]>(initialDecks);
+  const [filteredQuizzes, setFilteredQuizzes] =
+    useState<QuizWithContext[]>(initialQuizzes);
 
   return (
     <div className="flex flex-col gap-8">
@@ -42,25 +33,25 @@ export default function FlashcardsList({
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-primary">
-            <Brain className="w-5 h-5" />
+            <GraduationCap className="w-5 h-5" />
             <span className="text-sm font-medium tracking-wider uppercase">
-              Mis Estudios
+              Evaluaciones
             </span>
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
-            Flashcards <span className="text-muted-foreground/50">Decks</span>
+            Mis <span className="text-muted-foreground/50">Quizzes</span>
           </h1>
           <p className="text-muted-foreground">
-            Explora y repasa tus colecciones de tarjetas generadas por IA.
+            Pone a prueba tus conocimientos con cuestionarios personalizados.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <SearchInput
-            data={initialDecks}
-            onResultsChange={setFilteredDecks}
+            data={initialQuizzes}
+            onResultsChange={setFilteredQuizzes}
             searchKeys={['name', 'description']}
-            placeholder="Buscar mazo..."
+            placeholder="Buscar quiz..."
             variant="compact"
             className="w-full sm:w-64"
           />
@@ -71,25 +62,22 @@ export default function FlashcardsList({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           {
-            label: 'Mazos Totales',
-            value: initialDecks.length,
-            icon: Layers,
-            color: 'text-blue-500',
+            label: 'Exámenes Totales',
+            value: initialQuizzes.length,
+            icon: ClipboardCheck,
+            color: 'text-emerald-500',
           },
           {
-            label: 'Tarjetas Listas',
-            value: initialDecks.reduce(
-              (acc, d) => acc + d.flashcards.length,
-              0,
-            ),
+            label: 'Preguntas Respondidas',
+            value: initialQuizzes.reduce((acc, q) => acc + q.totalQuestions, 0),
             icon: Brain,
-            color: 'text-purple-500',
+            color: 'text-orange-500',
           },
           {
-            label: 'Promedio Dominio',
-            value: '78%',
-            icon: Sparkles,
-            color: 'text-amber-500',
+            label: 'Mejor Puntuación',
+            value: '92%',
+            icon: Trophy,
+            color: 'text-yellow-500',
           },
         ].map((stat, i) => (
           <div
@@ -109,13 +97,13 @@ export default function FlashcardsList({
         ))}
       </div>
 
-      {/* Grid of Decks */}
-      {filteredDecks.length === 0 ? (
-        <EmptyFlashcardPage hasSearch={initialDecks.length > 0} />
+      {/* Grid of Quizzes */}
+      {filteredQuizzes.length === 0 ? (
+        <EmptyQuizPage hasSearch={initialQuizzes.length > 0} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDecks.map((deck, idx) => (
-            <DeckCard key={deck.id} deck={deck} index={idx} />
+          {filteredQuizzes.map((quiz, idx) => (
+            <QuizCard key={quiz.id} quiz={quiz} index={idx} />
           ))}
         </div>
       )}

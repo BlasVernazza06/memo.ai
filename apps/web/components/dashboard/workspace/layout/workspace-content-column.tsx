@@ -6,11 +6,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { DbDocument, WorkspaceWithRelations } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
-import { DeckCard } from '@/components/dashboard/flashcards/deck-card';
+import { DeckCard } from '@/components/dashboard/flashcards/list/deck-card';
 
-import { QuizCard } from '../quizzes/quiz-card';
-import { AnalysisTabContent } from './analysis-tab-content';
-import { EmptyTabListState } from './empty-tab-list-state';
+import { QuizCard } from '@/components/dashboard/quizzes/list/quiz-card';
+import { AnalysisTabContent } from '@/components/dashboard/workspace/tabs/analysis-tab-content';
+import { EmptyTabListState } from '@/components/dashboard/workspace/shared/empty-tab-list-state';
 
 interface TabMetadata {
   id: string;
