@@ -8,6 +8,7 @@ export const DocumentSchema = z.object({
   sizeBytes: z.number().optional(),
   aiSummary: z.string().optional(),
   thumbnailBase64: z.string().optional(),
+  thumbnailUrl: z.string().optional(),
 });
 
 export const FlashcardSchema = z.object({

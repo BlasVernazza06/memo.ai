@@ -70,9 +70,22 @@ export class WorkspacesController {
     }
 
     const parsedMetadata = metadata;
+    const firstDoc = parsedMetadata.document || parsedMetadata.documents?.[0];
     console.log(
-      '[WorkspacesController] Body raw recibido:',
-      JSON.stringify(body, null, 2),
+      '[WorkspacesController] Debug Thumbnail:',
+      JSON.stringify(
+        {
+          name: parsedMetadata.name,
+          hasSingular: !!parsedMetadata.document,
+          hasPlural: !!parsedMetadata.documents?.length,
+          docThumbUrl: firstDoc?.thumbnailUrl ? 'PRESENTE' : 'AUSENTE',
+          thumbValue: firstDoc?.thumbnailUrl
+            ? firstDoc.thumbnailUrl.substring(0, 50) + '...'
+            : 'null',
+        },
+        null,
+        2,
+      ),
     );
 
     // Fallback de nombre si la IA no lo generó o el usuario no lo mandó
@@ -100,6 +113,10 @@ export class WorkspacesController {
         thumbnailBase64:
           (parsedMetadata.document?.thumbnailBase64 ||
             parsedMetadata.documents?.[0]?.thumbnailBase64) ??
+          undefined,
+        thumbnailUrl:
+          (parsedMetadata.document?.thumbnailUrl ||
+            parsedMetadata.documents?.[0]?.thumbnailUrl) ??
           undefined,
       };
 
@@ -137,52 +154,67 @@ export class WorkspacesController {
     // 3. Validar metadatos
     const validatedData = CreateWorkspaceSchema.parse(parsedMetadata);
 
-    console.log('[WorkspacesController] Data validada para crear workspace:', {
+    // RE-INYECCIÓN MANUAL: Si Zod borró campos por desincronización de esquemas, los recuperamos
+    const originalThumb =
+      parsedMetadata.document?.thumbnailUrl ||
+      parsedMetadata.documents?.[0]?.thumbnailUrl;
+    if (originalThumb) {
+      if (validatedData.document) {
+        (validatedData.document as any).thumbnailUrl = originalThumb;
+      } else if (validatedData.documents && validatedData.documents[0]) {
+        (validatedData.documents[0] as any).thumbnailUrl = originalThumb;
+      }
+    }
+
+    // Recuperar Flashcards y Quizzes si Zod los borró
+    if (!validatedData.flashcardDecks && parsedMetadata.flashcardDecks) {
+      (validatedData as any).flashcardDecks = parsedMetadata.flashcardDecks;
+    }
+    if (!validatedData.flashcards && parsedMetadata.flashcards) {
+      (validatedData as any).flashcards = parsedMetadata.flashcards;
+    }
+    if (!validatedData.quizzes && parsedMetadata.quizzes) {
+      (validatedData as any).quizzes = parsedMetadata.quizzes;
+    }
+
+    console.log('[WorkspacesController] Data final para crear:', {
       name: validatedData.name,
-      hasDocument: !!validatedData.document,
-      documentsCount: validatedData.documents?.length || 0,
+      hasThumb: !!originalThumb,
+      decks: (validatedData as any).flashcardDecks?.length || 0,
+      quizzes: (validatedData as any).quizzes?.length || 0,
     });
 
     return await this.workspacesService.create(userId, validatedData);
   }
 
   @Get(':id')
-  async findById(
-    @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async findById(@User('id') userId: string, @Param('id') id: string) {
     return await this.workspacesService.findById(userId, id);
   }
 
   @Patch(':id')
   async update(
     @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() data: UpdateWorkspaceDto,
   ) {
     return await this.workspacesService.update(userId, id, data);
   }
 
   @Delete(':id')
-  async delete(
-    @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async delete(@User('id') userId: string, @Param('id') id: string) {
     return await this.workspacesService.delete(userId, id);
   }
 
   @Post(':id/like')
-  async like(
-    @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  async like(@User('id') userId: string, @Param('id') id: string) {
     return await this.workspacesService.like(userId, id);
   }
 
   @Post(':id/generate-more')
   async generateMore(
     @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body('type') type: 'flashcards' | 'quizzes',
     @Body('prompt') prompt?: string,
   ) {

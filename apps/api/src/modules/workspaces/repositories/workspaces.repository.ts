@@ -4,12 +4,11 @@ import type {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
 } from '@modules/workspaces/dto/workspace.dto';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, ilike, or, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
   type Database,
-  DbQuiz,
   NewFlashcard,
   QuizWithQuestions,
   type WorkspaceWithRelations,
@@ -59,6 +58,12 @@ export class WorkspacesRepository {
     // 2. Preparar Documento (si existe)
     const docData = data.document ?? data.documents?.[0];
     if (docData) {
+      console.log('[WorkspacesRepository] Insertando documento:', {
+        name: docData.name,
+        hasThumbUrl: !!docData.thumbnailUrl,
+        hasThumbBase64: !!docData.thumbnailBase64,
+        finalThumb: docData.thumbnailUrl ?? docData.thumbnailBase64 ?? 'NULL'
+      });
       batchRequests.push(
         this.db.insert(document).values({
           id: uuidv4(),
@@ -67,7 +72,7 @@ export class WorkspacesRepository {
           type: docData.type || 'pdf',
           url: docData.url,
           key: docData.key,
-          thumbnailUrl: docData.thumbnailBase64 ?? null,
+          thumbnailUrl: docData.thumbnailUrl ?? docData.thumbnailBase64 ?? null,
           sizeBytes: docData.sizeBytes ?? null,
           status: 'analyzed',
           aiSummary: docData.aiSummary ?? null,
@@ -212,7 +217,13 @@ export class WorkspacesRepository {
     workspaceId: string,
   ): Promise<WorkspaceWithRelations | undefined> {
     const result = await this.db.query.workspace.findFirst({
-      where: and(eq(workspace.id, workspaceId), eq(workspace.userId, userId)),
+      where: and(
+        or(
+          eq(workspace.id, workspaceId),
+          ilike(workspace.id, `${workspaceId}%`),
+        ),
+        eq(workspace.userId, userId),
+      ),
       with: {
         documents: true,
         quizzes: {
@@ -264,7 +275,15 @@ export class WorkspacesRepository {
         isFavorite: sql`NOT ${workspace.isFavorite}`,
         updatedAt: new Date(),
       })
-      .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)))
+      .where(
+        and(
+          eq(workspace.userId, userId),
+          or(
+            eq(workspace.id, workspaceId),
+            ilike(workspace.id, `${workspaceId}%`),
+          ),
+        ),
+      )
       .returning({ id: workspace.id });
 
     return rows.length > 0;
@@ -277,7 +296,15 @@ export class WorkspacesRepository {
 
     const result = await this.db
       .delete(workspace)
-      .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)))
+      .where(
+        and(
+          eq(workspace.userId, userId),
+          or(
+            eq(workspace.id, workspaceId),
+            ilike(workspace.id, `${workspaceId}%`),
+          ),
+        ),
+      )
       .returning({ id: workspace.id });
 
     const deleted = result.length > 0;
@@ -306,7 +333,15 @@ export class WorkspacesRepository {
         ...data,
         updatedAt: new Date(),
       })
-      .where(and(eq(workspace.userId, userId), eq(workspace.id, workspaceId)));
+      .where(
+        and(
+          eq(workspace.userId, userId),
+          or(
+            eq(workspace.id, workspaceId),
+            ilike(workspace.id, `${workspaceId}%`),
+          ),
+        ),
+      );
 
     return !!result;
   }
