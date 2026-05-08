@@ -1,6 +1,6 @@
 import { type Metadata } from 'next';
 
-import PricingPageContent from '@/components/landing/pricing-section';
+import PricingPageContent from '@/components/landing/pricing/pricing-section';
 
 export const metadata: Metadata = {
   title: 'Planes y Precios — memo.ai',

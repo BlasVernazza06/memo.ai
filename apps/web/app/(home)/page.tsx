@@ -5,13 +5,13 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import CTASection from '@/components/landing/cta-section';
-import FeaturesSection from '@/components/landing/features-section';
+import FeaturesSection from '@/components/landing/features/features-section';
 import Footer from '@/components/landing/footer';
 import HeroSection from '@/components/landing/hero-section';
 import HowItWorkSection from '@/components/landing/howitworks-section';
 import Header from '@/components/landing/landing-header';
-import PricingSection from '@/components/landing/pricing-section';
-import TestimonialsSection from '@/components/landing/testimonials-section';
+import PricingSection from '@/components/landing/pricing/pricing-section';
+import TestimonialsSection from '@/components/landing/testimonials/testimonials-section';
 import TrustSection from '@/components/landing/trust-section';
 
 export default function Home() {

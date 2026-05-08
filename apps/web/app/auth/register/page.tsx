@@ -8,8 +8,8 @@ import { Sparkles, User } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import AuthLeftPanel from '@/components/auth/auth-left-panel';
+import OAuthButtons from '@/components/auth/forms/oauth-buttons';
 import SignUpForm from '@/components/auth/forms/signUp-form';
-import OAuthButtons from '@/components/auth/oauth-buttons';
 
 export default function RegisterPage() {
   const searchParams = useSearchParams();

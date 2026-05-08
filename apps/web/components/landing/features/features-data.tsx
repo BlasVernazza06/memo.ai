@@ -1,7 +1,12 @@
-'use client';
-
-import { Check, Search, Sparkles, Zap } from 'lucide-react';
+import { Check, Search, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
+
+export interface Feature {
+  title: string;
+  description: string;
+  className: string;
+  mockup: React.ReactNode;
+}
 
 const MockupBrowser = ({
   children,
@@ -22,7 +27,7 @@ const MockupBrowser = ({
   </div>
 );
 
-const featureDetails = [
+export const featureDetails: Feature[] = [
   {
     title: 'Flashcards con IA',
     description:
@@ -117,109 +122,54 @@ const featureDetails = [
   },
   {
     title: 'Resúmenes Inteligentes',
-    description: 'Condensa horas de material en puntos clave listos para repasar en segundos.',
+    description:
+      'Condensa horas de material en puntos clave listos para repasar en segundos.',
     className: 'lg:col-span-1 lg:row-span-1',
     mockup: (
       <div className="w-full h-full flex flex-col p-8 bg-indigo-500/5 gap-4">
         <div className="bg-card p-4 rounded-xl border border-border shadow-sm space-y-3">
-           <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 rounded-full bg-indigo-500" />
-              <div className="h-1.5 w-20 bg-indigo-500/20 rounded-full" />
-           </div>
-           {[1, 2, 3].map(i => (
-             <div key={i} className="flex gap-2">
-                <div className="w-1 h-1 rounded-full bg-indigo-400/30 mt-1" />
-                <div className="h-1.5 w-full bg-muted/40 rounded-full" />
-             </div>
-           ))}
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2 rounded-full bg-indigo-500" />
+            <div className="h-1.5 w-20 bg-indigo-500/20 rounded-full" />
+          </div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex gap-2">
+              <div className="w-1 h-1 rounded-full bg-indigo-400/30 mt-1" />
+              <div className="h-1.5 w-full bg-muted/40 rounded-full" />
+            </div>
+          ))}
         </div>
         <div className="h-32 bg-card/40 rounded-xl border border-dashed border-indigo-500/20" />
       </div>
-    )
+    ),
   },
   {
     title: 'Evaluaciones Dinámicas',
-    description: 'Ponte a prueba con cuestionarios generados a partir de tu propio material.',
+    description:
+      'Ponte a prueba con cuestionarios generados a partir de tu propio material.',
     className: 'lg:col-span-1 lg:row-span-1',
     mockup: (
       <div className="w-full h-full flex items-center justify-center p-8 bg-linear-to-b from-transparent to-primary/5">
         <div className="w-full max-w-[220px] bg-card rounded-2xl border border-border shadow-xl p-5 space-y-4">
-           <div className="space-y-1.5">
-              <div className="h-2 w-full bg-muted rounded-full" />
-              <div className="h-2 w-2/3 bg-muted rounded-full" />
-           </div>
-           <div className="space-y-2">
-              {[1, 2].map(i => (
-                <div key={i} className={`h-8 w-full rounded-lg border flex items-center px-3 gap-3 transition-colors ${i === 1 ? 'border-primary/30 bg-primary/5' : 'border-border'}`}>
-                   <div className={`w-3 h-3 rounded-full border ${i === 1 ? 'border-primary bg-primary' : 'border-border'}`} />
-                   <div className="h-1.5 w-16 bg-muted rounded-full" />
-                </div>
-              ))}
-           </div>
+          <div className="space-y-1.5">
+            <div className="h-2 w-full bg-muted rounded-full" />
+            <div className="h-2 w-2/3 bg-muted rounded-full" />
+          </div>
+          <div className="space-y-2">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className={`h-8 w-full rounded-lg border flex items-center px-3 gap-3 transition-colors ${i === 1 ? 'border-primary/30 bg-primary/5' : 'border-border'}`}
+              >
+                <div
+                  className={`w-3 h-3 rounded-full border ${i === 1 ? 'border-primary bg-primary' : 'border-border'}`}
+                />
+                <div className="h-1.5 w-16 bg-muted rounded-full" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    )
+    ),
   },
 ];
-
-export default function FeaturesSection() {
-  return (
-    <section id="features" className="py-24 bg-background relative">
-      <div className="memo-container px-4">
-        {/* Minimal Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary border border-primary/10 text-[10px] font-bold uppercase tracking-widest mx-auto"
-          >
-            <Sparkles className="w-3 h-3" />
-            <span>Memo Features</span>
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl md:text-5xl font-black tracking-tight"
-          >
-            Todo lo que necesitas para <br />
-            <span className="memo-gradient-text italic">
-              dominar tus materias.
-            </span>
-          </motion.h2>
-        </div>
-
-        {/* Bento Grid layout with Light Design */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 auto-rows-[340px]">
-          {featureDetails.map((feature, index) => (
-              <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: index * 0.05 }}
-              className={`group flex flex-col rounded-[2.5rem] border border-border/60 bg-card overflow-hidden hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-700 ${feature.className}`}
-            >
-              {/* Mockup Area */}
-              <div className="flex-1 overflow-hidden relative border-b border-border/40">
-                {feature.mockup}
-              </div>
-
-              {/* Text Area */}
-              <div className="p-8">
-                <h3 className="text-xl font-bold text-foreground mb-2 tracking-tight group-hover:text-primary transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}

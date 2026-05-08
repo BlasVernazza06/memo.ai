@@ -16,7 +16,7 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { type LoginFormValues, loginSchema } from '@repo/validators';
 
-import OAuthButtons from '@/components/auth/oauth-buttons';
+import OAuthButtons from '@/components/auth/forms/oauth-buttons';
 
 export default function SignInForm() {
   const router = useRouter();
