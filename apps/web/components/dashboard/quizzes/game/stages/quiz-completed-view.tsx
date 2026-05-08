@@ -5,6 +5,8 @@ import { motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
+import { getShortId, slugify } from '@/hooks/formats/use-slugify';
+
 export default function QuizCompletedView({
   workspaceId,
   percentage,
@@ -75,7 +77,7 @@ export default function QuizCompletedView({
           Repetir Quiz
         </Button>
         <Link
-          href={`/dashboard/workspaces/${workspaceId}`}
+          href={`/dashboard/workspaces/${slugify(workspaceId)}-${getShortId(workspaceId)}`}
           className="flex-1 w-full block"
         >
           <Button className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold shadow-xl shadow-primary/20 transition-all active:scale-95">

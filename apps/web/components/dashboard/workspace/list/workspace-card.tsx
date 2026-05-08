@@ -20,6 +20,7 @@ import { motion } from 'motion/react';
 import { toast } from 'sonner';
 
 import { formatDate } from '@/hooks/formats/use-formate-date';
+import { getShortId, slugify } from '@/hooks/formats/use-slugify';
 import { apiFetchClient } from '@/lib/api-client';
 import type { Workspace } from '@/types/workspaces';
 
@@ -69,7 +70,7 @@ export default function WorkspaceCard({
         className="group/ws relative"
       >
         <Link
-          href={`/dashboard/workspaces/${ws.id}`}
+          href={`/dashboard/workspaces/${slugify(ws.name)}-${getShortId(ws.id)}`}
           className="flex items-center gap-5 p-4 rounded-2xl bg-card border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-all duration-200 active:scale-[0.995]"
         >
           {/* List Icon */}
@@ -129,7 +130,10 @@ export default function WorkspaceCard({
       transition={{ duration: 0.4, delay: idx * 0.08 }}
       className="group/ws h-full relative"
     >
-      <Link href={`/dashboard/workspaces/${ws.id}`} className="block h-full">
+      <Link
+        href={`/dashboard/workspaces/${slugify(ws.name)}-${getShortId(ws.id)}`}
+        className="block h-full"
+      >
         <div className="h-full flex flex-col bg-card rounded-3xl border border-border/60 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 group-hover/ws:-translate-y-1 overflow-hidden">
           {/* Minimal Header */}
           <div className="relative h-32 shrink-0 bg-muted/10 overflow-hidden isolate">

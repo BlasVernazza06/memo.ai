@@ -8,6 +8,8 @@ import { motion } from 'motion/react';
 import { DbFlashcard } from '@repo/db';
 import { Badge } from '@repo/ui/components/ui/badge';
 
+import { getShortId, slugify } from '@/hooks/formats/use-slugify';
+
 interface FlashcardDeckWithContext {
   id: string;
   name: string;
@@ -42,7 +44,7 @@ export function DeckCard({
       className="group"
     >
       <Link
-        href={`/dashboard/workspaces/${deck.workspaceId}/flashcards/${deck.id}`}
+        href={`/dashboard/workspaces/${slugify(deck.workspace?.name || '')}-${getShortId(deck.workspaceId)}/flashcards/${slugify(deck.name)}-${getShortId(deck.id)}`}
         className="block"
       >
         <div className="relative h-full bg-card hover:bg-card/80 border border-border/50 hover:border-primary/50 rounded-3xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5">

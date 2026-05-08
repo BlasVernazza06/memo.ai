@@ -1,7 +1,7 @@
-import { json, urlencoded } from 'express';
 import { NestFactory } from '@nestjs/core';
 
 import 'dotenv/config';
+import { json, urlencoded } from 'express';
 
 import { AppModule } from '@/app.module';
 import { HttpExceptionFilter } from '@/common/filters/http-exception.filter';
@@ -10,9 +10,9 @@ import { LoggingInterceptor } from '@/common/interceptors/logging.interceptor';
 async function bootstrap() {
   console.log('--- Starting API Bootstrap ---');
   // Deshabilitamos el bodyParser por defecto para configurarlo manualmente con límites más altos
-  const app = await NestFactory.create(AppModule, { 
+  const app = await NestFactory.create(AppModule, {
     bodyParser: false,
-    rawBody: true 
+    rawBody: true,
   });
 
   // Aumentar el límite para JSON y URL encoded (necesario para workspaces grandes)

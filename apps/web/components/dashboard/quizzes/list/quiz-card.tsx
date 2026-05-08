@@ -12,6 +12,8 @@ import { motion } from 'motion/react';
 
 import { Badge } from '@repo/ui/components/ui/badge';
 
+import { getShortId, slugify } from '@/hooks/formats/use-slugify';
+
 interface QuizWithContext {
   id: string;
   name: string;
@@ -41,7 +43,7 @@ export function QuizCard({
       className="group"
     >
       <Link
-        href={`/dashboard/workspaces/${quiz.workspaceId}/quizzes/${quiz.id}`}
+        href={`/dashboard/workspaces/${slugify(quiz.workspace?.name || '')}-${getShortId(quiz.workspaceId)}/quizzes/${slugify(quiz.name)}-${getShortId(quiz.id)}`}
         className="block"
       >
         <div className="relative h-full bg-card hover:bg-card/80 border border-border/50 hover:border-primary/50 rounded-3xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5">

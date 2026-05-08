@@ -27,8 +27,12 @@ export function useQuizGame() {
   const [isLoading, setIsLoading] = useState(true);
   const [shake, setShake] = useState(false);
 
-  const workspaceId = params.id as string;
-  const quizId = params.quizId as string;
+  const workspaceId = (params.id as string)?.includes('-')
+    ? (params.id as string).split('-').pop()!
+    : (params.id as string);
+  const quizId = (params.quizId as string)?.includes('-')
+    ? (params.quizId as string).split('-').pop()!
+    : (params.quizId as string);
 
   useEffect(() => {
     async function loadData() {
