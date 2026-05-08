@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@thallesp/nestjs-better-auth';
 import { User } from '@/common/decorators/user.decorator';
 import { QuizzesService } from '../services/quizzes.service';
@@ -16,7 +16,7 @@ export class QuizzesController {
   @Get('workspace/:workspaceId')
   async findByWorkspace(
     @User('id') userId: string,
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
+    @Param('workspaceId') workspaceId: string,
   ) {
     return await this.quizzesService.findByWorkspace(userId, workspaceId);
   }
@@ -24,7 +24,7 @@ export class QuizzesController {
   @Get(':id')
   async findById(
     @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ) {
     return await this.quizzesService.findById(userId, id);
   }

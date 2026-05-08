@@ -38,8 +38,12 @@ export default function FlashcardGamePage() {
   );
   const [score, setScore] = useState({ known: 0, unknown: 0 });
 
-  const workspaceId = params.id as string;
-  const deckId = params.deckId as string;
+  const workspaceId = (params.id as string)?.includes('-')
+    ? (params.id as string).split('-').pop()!
+    : (params.id as string);
+  const deckId = (params.deckId as string)?.includes('-')
+    ? (params.deckId as string).split('-').pop()!
+    : (params.deckId as string);
 
   useEffect(() => {
     async function loadData() {

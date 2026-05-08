@@ -26,7 +26,7 @@ export class FlashcardsController {
   @Get('workspace/:workspaceId')
   async findByWorkspace(
     @User('id') userId: string,
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
+    @Param('workspaceId') workspaceId: string,
   ) {
     return await this.flashcardsService.findByWorkspace(userId, workspaceId);
   }
@@ -34,7 +34,7 @@ export class FlashcardsController {
   @Get(':id')
   async findById(
     @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ) {
     return await this.flashcardsService.findById(userId, id);
   }
@@ -42,7 +42,7 @@ export class FlashcardsController {
   @Post(':id')
   async createFlashcard(
     @User('id') userId: string,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ) {
     return await this.flashcardsService.findById(userId, id);
   }

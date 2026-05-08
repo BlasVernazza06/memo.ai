@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, ilike, or } from 'drizzle-orm';
 import {
   type Database,
   quiz,
@@ -39,7 +39,10 @@ export class QuizzesRepository {
 
   async findByWorkspace(userId: string, workspaceId: string) {
     return await this.db.query.quiz.findMany({
-      where: eq(quiz.workspaceId, workspaceId),
+      where: or(
+        eq(quiz.workspaceId, workspaceId),
+        ilike(quiz.workspaceId, `${workspaceId}%`),
+      ),
       with: {
         questions: true,
       },
@@ -48,7 +51,7 @@ export class QuizzesRepository {
 
   async findById(userId: string, quizId: string) {
     return await this.db.query.quiz.findFirst({
-      where: eq(quiz.id, quizId),
+      where: or(eq(quiz.id, quizId), ilike(quiz.id, `${quizId}%`)),
       with: {
         questions: true,
         workspace: true,
