@@ -10,12 +10,14 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import {
+  ArrowRight,
   BarChart3,
   Brain,
   ChevronLeft,
   Heart,
   Layers,
   Settings,
+  TriangleAlert,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -23,11 +25,11 @@ import type { WorkspaceWithRelations } from '@repo/db';
 // Components
 import { Button } from '@repo/ui/components/ui/button';
 
+import WorkspaceSettingsModal from '@/components/dashboard/workspace/forms/workspace-settings-modal';
 import { WorkspaceContentColumn } from '@/components/dashboard/workspace/layout/workspace-content-column';
 import { WorkspaceInfoColumn } from '@/components/dashboard/workspace/layout/workspace-info-column';
 import { WorkspaceInsightsColumn } from '@/components/dashboard/workspace/layout/workspace-insights-column';
 import WorkspaceLoading from '@/components/dashboard/workspace/shared/workspace-loading';
-import WorkspaceSettingsModal from '@/components/dashboard/workspace/forms/workspace-settings-modal';
 import { generateMoreContent } from '@/lib/actions/workspace-actions';
 import { apiFetchClient } from '@/lib/api-client';
 
@@ -36,7 +38,9 @@ import { apiFetchClient } from '@/lib/api-client';
 // ============================================================
 
 export default function WorkspaceDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const rawId = params.id as string;
+  const id = rawId.includes('-') ? rawId.split('-').pop() : rawId;
   const [activeTab, setActiveTab] = useState<
     'flashcards' | 'quizzes' | 'analysis'
   >('flashcards');
@@ -142,8 +146,66 @@ export default function WorkspaceDetailPage() {
 
   if (!workspace) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Workspace no encontrado</p>
+      <div className="relative flex flex-col items-center justify-center min-h-screen bg-background overflow-hidden">
+        {/* Background Decorative Elements */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-rose-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="relative z-10 flex flex-col items-center text-center px-6"
+        >
+          {/* Animated Icon Container */}
+          <div className="relative mb-8">
+            <motion.div
+              animate={{
+                scale: [1, 1.05, 1],
+                rotate: [0, 5, -5, 0],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+              className="p-8 rounded-[2.5rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 relative z-10"
+            >
+              <div className="w-20 h-20 rounded-3xl bg-rose-50 flex items-center justify-center">
+                <TriangleAlert className="w-10 h-10 text-rose-500" />
+              </div>
+            </motion.div>
+            {/* Background Glow */}
+            <div className="absolute inset-0 bg-rose-500/20 blur-3xl rounded-full opacity-30 -z-10 scale-150" />
+          </div>
+
+          {/* Text Content */}
+          <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3 tracking-tight">
+            Workspace no encontrado
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-md mb-10 leading-relaxed">
+            Parece que el espacio de trabajo que buscas ha sido movido,
+            eliminado o no tienes permisos para acceder a él.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link href="/dashboard">
+              <Button
+                size="lg"
+                className="h-14 px-8 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-bold gap-3 shadow-xl shadow-foreground/10 transition-all active:scale-95"
+              >
+                Volver a Dashboard
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
+
+          {/* Decorative Footer */}
+          <p className="mt-16 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+            Memo.AI • Error 404
+          </p>
+        </motion.div>
       </div>
     );
   }
@@ -152,11 +214,11 @@ export default function WorkspaceDetailPage() {
     <div className="min-h-screen w-full">
       {/* Notion-style Cover Area */}
       <div className="relative h-72 md:h-96 w-full overflow-hidden group">
-        <div 
+        <div
           className="w-full h-full relative"
-          style={{ 
+          style={{
             backgroundColor: workspace.bgColor || '#7C3AED',
-            backgroundImage: `linear-gradient(to bottom right, ${workspace.bgColor || '#7C3AED'}99, ${workspace.bgColor || '#7C3AED'}22)`
+            backgroundImage: `linear-gradient(to bottom right, ${workspace.bgColor || '#7C3AED'}99, ${workspace.bgColor || '#7C3AED'}22)`,
           }}
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent)]" />
@@ -176,29 +238,12 @@ export default function WorkspaceDetailPage() {
             className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 bg-white rounded-[2.5rem] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-20 group/icon border border-white/40"
           >
             <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative flex items-center justify-center bg-slate-50">
-              {primaryDoc?.thumbnailUrl ? (
-                <Image
-                  src={
-                    primaryDoc.thumbnailUrl.startsWith('data:')
-                      ? primaryDoc.thumbnailUrl
-                      : primaryDoc.thumbnailUrl.length > 100
-                        ? `data:image/png;base64,${primaryDoc.thumbnailUrl}`
-                        : primaryDoc.thumbnailUrl
-                  }
-                  alt="Workspace Icon"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover/icon:scale-110"
-                />
-              ) : (
-                <>
-                  {/* Fondo holográfico para cuando no hay imagen */}
-                  <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-sky-400/10 to-emerald-400/10" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.8),transparent)]" />
-                  <span className="text-5xl md:text-6xl relative z-10 transition-transform duration-500 group-hover/icon:scale-110 group-hover/icon:rotate-3">
-                    {workspace.icon || '📚'}
-                  </span>
-                </>
-              )}
+              {/* Fondo holográfico para cuando no hay imagen */}
+              <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-sky-400/10 to-emerald-400/10" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.8),transparent)]" />
+              <span className="text-5xl md:text-6xl relative z-10 transition-transform duration-500 group-hover/icon:scale-110 group-hover/icon:rotate-3">
+                {workspace.icon || '📚'}
+              </span>
             </div>
           </motion.div>
 
