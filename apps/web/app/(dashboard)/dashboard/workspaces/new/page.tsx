@@ -233,7 +233,7 @@ export default function NewWorkspaceChatPage() {
 
       {/* Chat Area */}
       <div
-        className="flex-1 overflow-y-auto px-4 scrollbar-hide flex flex-col pt-10"
+        className="flex-1 overflow-y-auto px-4 scrollbar-hide flex flex-col pt-10 pb-32"
         ref={scrollRef}
       >
         <AnimatePresence mode="wait">
@@ -243,23 +243,23 @@ export default function NewWorkspaceChatPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="flex-1 flex flex-col justify-center items-center text-center pb-20 mt-auto"
+              className="flex-1 flex flex-col justify-center items-center text-center pb-10 sm:pb-20 mt-auto"
             >
-              <div className="space-y-4 mb-20">
-                <h2 className="text-4xl md:text-5xl font-bl tracking-tighter text-foreground">
+              <div className="space-y-2 md:space-y-4 mb-10 sm:mb-20">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-foreground">
                   Hola,{' '}
                   <span className="text-primary">
                     {user?.name.split(' ')[0] || 'estudiante'}
                   </span>
                 </h2>
-                <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-gray-700 leading-none">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-muted-foreground leading-none">
                   ¿Qué te gustaría aprender hoy?
                 </h3>
               </div>
 
               <SuggestionList setInputValue={setInputValue} />
 
-              <button className="flex items-center gap-2 mt-12 text-[10px] font-black text-muted-foreground/30 hover:text-primary transition-colors uppercase tracking-[0.3em]">
+              <button className="flex items-center gap-2 mt-8 sm:mt-12 text-[10px] font-black text-muted-foreground/30 hover:text-primary transition-colors uppercase tracking-[0.3em]">
                 <ArrowDown className="w-3 h-3" />
                 Define tus propias reglas
               </button>
@@ -339,15 +339,18 @@ export default function NewWorkspaceChatPage() {
         </AnimatePresence>
       </div>
 
-      {/* Input Area */}
-      <WorkspaceCreationActions
-        pendingWorkspaceData={pendingWorkspaceData}
-        handleCreateWorkspace={handleCreateWorkspace}
-        inputValue={inputValue}
-        setInputValue={setInputValue}
-        handleSend={handleSend}
-        isLoading={isCreating}
-      />
+      {/* Input Area - Fixed at bottom */}
+      <div className="shrink-0 w-full max-w-4xl mx-auto relative z-20 pb-4 md:pb-8">
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-background via-background/95 to-transparent pointer-events-none -z-10" />
+        <WorkspaceCreationActions
+          pendingWorkspaceData={pendingWorkspaceData}
+          handleCreateWorkspace={handleCreateWorkspace}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          handleSend={handleSend}
+          isLoading={isCreating}
+        />
+      </div>
     </div>
   );
 }

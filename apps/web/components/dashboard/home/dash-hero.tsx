@@ -69,7 +69,7 @@ export default function DashHero({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden border border-border/80 rounded-[2.5rem] bg-card p-6 md:p-10 text-foreground shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-all"
+        className="relative overflow-hidden border border-border/80 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 text-foreground shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-all"
       >
         {/* Decorative Background Assets */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
@@ -100,7 +100,7 @@ export default function DashHero({
                 </span>
               </motion.div>
 
-              <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.95] italic max-w-xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[1.1] sm:leading-[0.95] italic max-w-xl">
                 ¿Qué vamos a{' '}
                 <span className="text-primary not-italic relative inline-block group/learn">
                   aprender

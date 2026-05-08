@@ -69,7 +69,7 @@ export default function InputChat({ onSend, value, onChange }: InputChatProps) {
 
   return (
     <div
-      className="shrink-0 p-4 md:p-6 lg:p-8 pt-0"
+      className="shrink-0 p-2 sm:p-4 pt-0"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -83,7 +83,7 @@ export default function InputChat({ onSend, value, onChange }: InputChatProps) {
       />
 
       <div
-        className={`bg-card border ${isDragging ? 'border-primary ring-4 ring-primary/10 scale-[1.01]' : 'border-border/60'} rounded-[2.5rem] p-4 transition-all focus-within:border-primary/50 group relative overflow-hidden backdrop-blur-xl`}
+        className={`bg-card border ${isDragging ? 'border-primary ring-4 ring-primary/10 scale-[1.01]' : 'border-border/60'} rounded-[1.5rem] sm:rounded-[2.5rem] p-3 sm:p-4 transition-all focus-within:border-primary/50 group relative overflow-hidden backdrop-blur-xl shadow-2xl shadow-black/5`}
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[60px] rounded-full pointer-events-none" />
 
@@ -124,7 +124,7 @@ export default function InputChat({ onSend, value, onChange }: InputChatProps) {
           )}
         </AnimatePresence>
 
-        <div className="flex flex-col gap-4 relative z-10">
+        <div className="flex flex-col gap-2 sm:gap-4 relative z-10">
           <textarea
             ref={textareaRef}
             value={value}
@@ -136,25 +136,26 @@ export default function InputChat({ onSend, value, onChange }: InputChatProps) {
               }
             }}
             rows={1}
-            placeholder="¿Qué vamos a estudiar hoy? Describe tu proyecto o adjunta archivos..."
-            className="w-full bg-transparent border-none focus:ring-0 outline-none focus:outline-none resize-none px-2 py-1 text-base font-medium text-foreground placeholder:text-muted-foreground/30 overflow-y-auto max-h-[150px] scrollbar-hide transition-all"
+            placeholder="¿Qué vamos a estudiar hoy? Describe tu proyecto..."
+            className="w-full bg-transparent border-none focus:ring-0 outline-none focus:outline-none resize-none px-2 py-1 text-sm sm:text-base font-medium text-foreground placeholder:text-muted-foreground/30 overflow-y-auto max-h-[150px] scrollbar-hide transition-all"
           />
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-all active:scale-95 text-[11px] font-black uppercase tracking-widest border border-transparent hover:border-border/50"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-all active:scale-95 text-[9px] sm:text-[11px] font-black uppercase tracking-widest border border-transparent hover:border-border/50"
               >
-                <FileText className="w-4 h-4" />
-                Adjuntar Material
+                <FileText className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+                <span className="hidden xs:inline">Adjuntar Material</span>
+                <span className="xs:hidden">Adjuntar</span>
               </button>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <span
-                className={`text-[10px] font-black tabular-nums transition-colors ${charCount > 900 ? 'text-orange-500' : 'text-muted-foreground/20'}`}
+                className={`text-[9px] sm:text-[10px] font-black tabular-nums transition-colors ${charCount > 900 ? 'text-orange-500' : 'text-muted-foreground/20'}`}
               >
                 {charCount}/1000
               </span>
@@ -163,9 +164,9 @@ export default function InputChat({ onSend, value, onChange }: InputChatProps) {
                 type="button"
                 onClick={handleSend}
                 disabled={!value.trim() && files.length === 0}
-                className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 disabled:grayscale disabled:scale-100 group/btn shadow-lg shadow-primary/20"
+                className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-primary text-white rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-20 disabled:grayscale disabled:scale-100 group/btn shadow-lg shadow-primary/20"
               >
-                <Zap className="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform" />
+                <Zap className="w-3 sm:w-3.5 h-3 sm:h-3.5 fill-current group-hover:scale-110 transition-transform" />
                 Generar
               </button>
             </div>
@@ -182,10 +183,6 @@ export default function InputChat({ onSend, value, onChange }: InputChatProps) {
           {error}
         </motion.p>
       )}
-
-      <p className="text-center text-[9px] font-bold text-muted-foreground/10 uppercase tracking-[0.4em] mt-8">
-        Memo IA · Inteligencia Artificial para el Aprendizaje
-      </p>
     </div>
   );
 }
