@@ -29,7 +29,9 @@ import WorkspaceCreationActions from '@/components/chat/workspace-creation-actio
 import { LocalFile } from '@/hooks/functionalities/use-file-upload';
 import { apiFetchClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-provider';
+import { getShortId, slugify } from '@/hooks/formats/use-slugify';
 import { ChatMessage } from '@/types/workspace-chat-types';
+import { generatePDFThumbnail } from '@/lib/pdf-utils';
 
 export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceSchema>;
 
@@ -154,7 +156,35 @@ export default function NewWorkspaceChatPage() {
 
       // 1. Si hay un archivo pendiente, subirlo a S3 ahora
       if (lastFile) {
-        console.log('[NewWorkspace] Obteniendo Presigned URL...');
+        console.log('[NewWorkspace] Generando miniatura...');
+        const thumbnailBase64 = await generatePDFThumbnail(lastFile);
+        let thumbnailUrl = '';
+
+        if (thumbnailBase64) {
+          console.log('[NewWorkspace] Subiendo miniatura a S3...');
+          // Convertir base64 a archivo para subir
+          const thumbBlob = await (await fetch(thumbnailBase64)).blob();
+          const thumbFile = new File([thumbBlob], 'thumbnail.png', {
+            type: 'image/png',
+          });
+
+          const thumbPresigned = await apiFetchClient<{
+            uploadUrl: string;
+            url: string;
+          }>(
+            `/storage/presigned-url?fileName=thumb_${Date.now()}.png&contentType=image/png`,
+          );
+
+          await fetch(thumbPresigned.uploadUrl, {
+            method: 'PUT',
+            body: thumbFile,
+            headers: { 'Content-Type': 'image/png' },
+          });
+
+          thumbnailUrl = thumbPresigned.url;
+        }
+
+        console.log('[NewWorkspace] Obteniendo Presigned URL para PDF...');
         const presignedData = await apiFetchClient<{
           uploadUrl: string;
           key: string;
@@ -163,7 +193,7 @@ export default function NewWorkspaceChatPage() {
           `/storage/presigned-url?fileName=${encodeURIComponent(lastFile.name)}&contentType=${encodeURIComponent(lastFile.type)}`,
         );
 
-        console.log('[NewWorkspace] Subiendo archivo directamente a S3...');
+        console.log('[NewWorkspace] Subiendo PDF directamente a S3...');
         await fetch(presignedData.uploadUrl, {
           method: 'PUT',
           body: lastFile,
@@ -172,7 +202,7 @@ export default function NewWorkspaceChatPage() {
           },
         });
 
-        // Actualizar los datos del documento con la info real de S3
+        // Actualizar los datos del documento con la info real de S3 y la miniatura
         if (
           finalWorkspaceData.documents &&
           finalWorkspaceData.documents.length > 0
@@ -182,6 +212,7 @@ export default function NewWorkspaceChatPage() {
               ...doc,
               key: presignedData.key,
               url: presignedData.url,
+              thumbnailUrl: thumbnailUrl || doc.thumbnailUrl,
             }),
           );
         } else if (finalWorkspaceData.document) {
@@ -189,9 +220,15 @@ export default function NewWorkspaceChatPage() {
             ...finalWorkspaceData.document,
             key: presignedData.key,
             url: presignedData.url,
+            thumbnailUrl: thumbnailUrl || finalWorkspaceData.document.thumbnailUrl,
           };
         }
       }
+
+      console.log('[NewWorkspace] Enviando datos finales:', {
+        name: finalWorkspaceData.name,
+        thumb: finalWorkspaceData.documents?.[0]?.thumbnailUrl || finalWorkspaceData.document?.thumbnailUrl
+      });
 
       console.log('[NewWorkspace] Creando registro en la base de datos...');
       const data = await apiFetchClient<{ id: string }>(`/workspaces`, {
@@ -199,7 +236,9 @@ export default function NewWorkspaceChatPage() {
         body: JSON.stringify(finalWorkspaceData),
       });
 
-      router.push(`/dashboard/workspaces/${data.id}`);
+      router.push(
+        `/dashboard/workspaces/${slugify(finalWorkspaceData.name)}-${getShortId(data.id)}`,
+      );
     } catch (error) {
       console.error('ERROR CREATING WORKSPACE:', error);
     } finally {
