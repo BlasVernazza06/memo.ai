@@ -1,16 +1,17 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import type {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
 } from '@modules/workspaces/dto/workspace.dto';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
   type Database,
   DbQuiz,
   NewFlashcard,
+  QuizWithQuestions,
   type WorkspaceWithRelations,
   chat,
   document,
@@ -23,7 +24,7 @@ import {
 
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
-import { FlashcardsUpdateDto } from '../dto/workspace.dto';
+import { FlashcardUpdateDto } from '../dto/workspace.dto';
 
 @Injectable()
 export class WorkspacesRepository {
@@ -34,22 +35,26 @@ export class WorkspacesRepository {
     data: CreateWorkspaceDto,
   ): Promise<{ id: string }> {
     const workspaceId = uuidv4();
-    const batchRequests: any[] = [];
+    const batchRequests: unknown[] = [];
 
-    // 1. Preparar Workspace
-    batchRequests.push(
-      this.db.insert(workspace).values({
-        id: workspaceId,
-        userId,
-        name: data.name,
-        description: data.description,
-        category: data.category,
-        customContext: data.customContext || null,
-        icon: data.emoji || data.icon || '📚', // Usar emoji de la IA si existe, sino fallback a libro
-        bgColor: data.bgColor || '#7C3AED', // Color violeta por defecto
-        isFavorite: data.isFavorite || false,
-      }),
+    console.log(
+      `[WorkspacesRepository] Creando workspace ${workspaceId} para usuario ${userId}`,
     );
+
+    // 1. Crear el Workspace PRIMERO (Operación independiente para asegurar FKs)
+    await this.db.insert(workspace).values({
+      id: workspaceId,
+      userId,
+      name: data.name,
+      description: data.description,
+      category: data.category,
+      customContext: data.customContext || null,
+      icon: data.emoji || data.icon || '📚',
+      bgColor: data.bgColor || '#7C3AED',
+      isFavorite: data.isFavorite || false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
     // 2. Preparar Documento (si existe)
     const docData = data.document ?? data.documents?.[0];
@@ -70,9 +75,12 @@ export class WorkspacesRepository {
       );
     }
 
-    // 3. Preparar Mazos y Flashcards (si existen)
-    // Soportar tanto el formato antiguo (flashcards plano) como el nuevo (flashcardDecks)
+    // 3. Preparar Mazos y Flashcards
+    // Procesar flashcardDecks (formato preferido de la IA)
     if (data.flashcardDecks && data.flashcardDecks.length > 0) {
+      console.log(
+        `[WorkspacesRepository] Procesando ${data.flashcardDecks.length} mazos`,
+      );
       for (const deck of data.flashcardDecks) {
         const deckId = uuidv4();
         batchRequests.push(
@@ -82,39 +90,57 @@ export class WorkspacesRepository {
             name: deck.name || 'Mazo de estudio',
             description: deck.description || null,
             color: deck.color || null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           }),
         );
 
-        const cardsToInsert = deck.flashcards.map((f: any) => ({
+        const cardsToInsert: NewFlashcard[] = deck.flashcards.map((f) => ({
           id: uuidv4(),
           deckId,
           front: f.front || f.question || '',
           back: f.back || f.answer || '',
           mastery: 0,
           reviewCount: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         }));
 
         if (cardsToInsert.length > 0) {
           batchRequests.push(this.db.insert(flashcard).values(cardsToInsert));
         }
       }
-    } else if (data.flashcards && data.flashcards.length > 0) {
+    }
+
+    // Fallback: Procesar flashcards sueltas si existen y no hay mazos
+    if (
+      data.flashcards &&
+      data.flashcards.length > 0 &&
+      (!data.flashcardDecks || data.flashcardDecks.length === 0)
+    ) {
+      console.log(
+        `[WorkspacesRepository] Procesando ${data.flashcards.length} flashcards sueltas`,
+      );
       const deckId = uuidv4();
       batchRequests.push(
         this.db.insert(flashcardDeck).values({
           id: deckId,
           workspaceId,
           name: data.name || 'Mazo de estudio',
+          createdAt: new Date(),
+          updatedAt: new Date(),
         }),
       );
 
-      const cardsToInsert = data.flashcards.map((f: any) => ({
+      const cardsToInsert: NewFlashcard[] = data.flashcards.map((f) => ({
         id: uuidv4(),
         deckId,
         front: f.front || f.question || '',
         back: f.back || f.answer || '',
         mastery: 0,
         reviewCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }));
 
       batchRequests.push(this.db.insert(flashcard).values(cardsToInsert));
@@ -122,6 +148,9 @@ export class WorkspacesRepository {
 
     // 4. Preparar Quizzes (si existen)
     if (data.quizzes && data.quizzes.length > 0) {
+      console.log(
+        `[WorkspacesRepository] Procesando ${data.quizzes.length} quizzes`,
+      );
       for (const q of data.quizzes) {
         const quizId = uuidv4();
         batchRequests.push(
@@ -132,6 +161,8 @@ export class WorkspacesRepository {
             description: q.description || '',
             totalQuestions: q.questions?.length || 0,
             isAiGenerated: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           }),
         );
 
@@ -156,6 +187,9 @@ export class WorkspacesRepository {
     // Ejecutar todo de forma atómica (si el driver lo soporta) o en ráfaga
     // En neon-http, batch() envía todas las sentencias en una sola petición HTTP
     if (batchRequests.length > 0) {
+      console.log(
+        `[WorkspacesRepository] Ejecutando lote de ${batchRequests.length} operaciones para workspace ${workspaceId}`,
+      );
       await this.db.batch(batchRequests as [any, ...any[]]);
     }
 
@@ -279,11 +313,11 @@ export class WorkspacesRepository {
 
   async addFlashcards(
     workspaceId: string,
-    cards: FlashcardsUpdateDto[],
+    cards: FlashcardUpdateDto[],
     deckName?: string,
   ): Promise<void> {
     const deckId = uuidv4();
-    const batchRequests: any[] = [];
+    const batchRequests: unknown[] = [];
 
     batchRequests.push(
       this.db.insert(flashcardDeck).values({
@@ -294,7 +328,7 @@ export class WorkspacesRepository {
     );
 
     const cardsToInsert: NewFlashcard[] = cards.map(
-      (f: FlashcardsUpdateDto) => ({
+      (f: FlashcardUpdateDto) => ({
         id: uuidv4(),
         deckId,
         front: f.front || f.question || '',
@@ -313,8 +347,11 @@ export class WorkspacesRepository {
     }
   }
 
-  async addQuizzes(workspaceId: string, quizzes: DbQuiz[]): Promise<void> {
-    const batchRequests: any[] = [];
+  async addQuizzes(
+    workspaceId: string,
+    quizzes: QuizWithQuestions[],
+  ): Promise<void> {
+    const batchRequests: unknown[] = [];
 
     for (const q of quizzes) {
       const quizId = uuidv4();
@@ -330,17 +367,15 @@ export class WorkspacesRepository {
       );
 
       if (q.questions && q.questions.length > 0) {
-        const questionsToInsert = q.questions.map(
-          (ques: any, index: number) => ({
-            id: uuidv4(),
-            quizId,
-            question: ques.question,
-            options: ques.options,
-            correctAnswer: ques.correctAnswer,
-            explanation: ques.explanation || null,
-            order: index,
-          }),
-        );
+        const questionsToInsert = q.questions.map((ques, index) => ({
+          id: uuidv4(),
+          quizId,
+          question: ques.question,
+          options: ques.options,
+          correctAnswer: ques.correctAnswer,
+          explanation: ques.explanation || null,
+          order: index,
+        }));
 
         batchRequests.push(
           this.db.insert(quizQuestion).values(questionsToInsert),
@@ -348,6 +383,8 @@ export class WorkspacesRepository {
       }
     }
 
-    await (this.db as any).batch(batchRequests);
+    if (batchRequests.length > 0) {
+      await this.db.batch(batchRequests as [any, ...any[]]);
+    }
   }
 }
