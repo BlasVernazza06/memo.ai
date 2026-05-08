@@ -2,9 +2,11 @@
 
 import Image from 'next/image';
 
-import { FileText, LucideIcon } from 'lucide-react';
+import { Download, FileText, LucideIcon } from 'lucide-react';
 
 import type { DbDocument, WorkspaceWithRelations } from '@repo/db';
+import { Button } from '@repo/ui/components/ui/button';
+import { useDownloadFile } from '@/hooks/functionalities/use-download-file';
 
 type TabId = 'flashcards' | 'quizzes' | 'analysis';
 
@@ -31,6 +33,14 @@ export function WorkspaceInfoColumn({
 }: WorkspaceInfoColumnProps) {
   console.log(workspace.documents?.[0]?.name);
 
+  const { downloadFile, isDownloading } = useDownloadFile();
+
+  const handleDownload = () => {
+    if (primaryDoc) {
+      downloadFile(primaryDoc.url, primaryDoc.name);
+    }
+  };
+
   return (
     <div className="lg:col-span-3 space-y-8 sticky top-8">
       <div className="space-y-6">
@@ -53,42 +63,51 @@ export function WorkspaceInfoColumn({
         )}
 
         <div className="space-y-3">
-          {/* File Escalón - Directly above tabs */}
+          {/* File Card - Drive Style */}
           {primaryDoc && (
-            <div className="group/file relative bg-card/50 backdrop-blur-xl border border-border/40 rounded-3xl overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-primary/20">
-              <div className="aspect-video relative bg-muted flex items-center justify-center overflow-hidden">
+            <div className="group/file relative bg-card border border-border/60 rounded-[2rem] overflow-hidden shadow-sm transition-all hover:shadow-xl hover:border-primary/30">
+              {/* Header estilo Drive */}
+              <div className="p-4 flex items-center gap-3 border-b border-border/40 bg-muted/5">
+                <div className="shrink-0 w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-red-500" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-black text-foreground truncate uppercase tracking-tight">
+                    {primaryDoc.name}
+                  </p>
+                  <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+                    Documento PDF
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  disabled={isDownloading}
+                  onClick={handleDownload}
+                  className="mr-4 cursor-pointer rounded-full hover:bg-gray-200 p-2 transition-colors"
+                >
+                  <Download className="size-5 text-muted-foreground" />
+                </Button>
+              </div>
+
+              {/* Preview Area */}
+              <div className="aspect-[4/3] relative bg-muted/30 flex items-center justify-center p-4">
                 {primaryDoc.thumbnailUrl ? (
-                  <Image
-                    src={
-                      primaryDoc.thumbnailUrl.startsWith('data:')
-                        ? primaryDoc.thumbnailUrl
-                        : primaryDoc.thumbnailUrl.length > 100
-                          ? `data:image/png;base64,${primaryDoc.thumbnailUrl}`
-                          : primaryDoc.thumbnailUrl
-                    }
-                    alt={primaryDoc.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover/file:scale-105"
-                  />
+                  <div className="relative w-full h-full rounded-xl overflow-hidden shadow-2xl border border-border/20">
+                    <Image
+                      src={primaryDoc.thumbnailUrl}
+                      alt={primaryDoc.name}
+                      fill
+                      className="object-cover object-top transition-transform duration-700 group-hover/file:scale-110"
+                    />
+                  </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <FileText className="w-10 h-10 text-muted-foreground/30" />
-                    <span className="text-[10px] font-bold text-muted-foreground/20 uppercase tracking-widest">
-                      Sin Miniatura
+                  <div className="flex flex-col items-center gap-4 opacity-20">
+                    <FileText className="w-12 h-12" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                      Cargando vista previa...
                     </span>
                   </div>
                 )}
-                <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-4 flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                    <span className="text-[8px] font-black uppercase tracking-widest text-white/90">
-                      Doc. Origen
-                    </span>
-                  </div>
-                  <p className="text-[11px] font-bold text-white truncate pr-4">
-                    {primaryDoc.name}
-                  </p>
-                </div>
               </div>
             </div>
           )}
