@@ -7,15 +7,16 @@ import { useState } from 'react';
 import { Grid, List, Plus } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import type { WorkspaceCardDTO } from '@repo/validators';
+
 import EmptySearchWorkspaceSec from '@/components/dashboard/shared/empty-search-workspace-sec';
 import EmptyWorkspacesSec from '@/components/dashboard/shared/empty-workspaces-sec';
 import WorkspaceCard from '@/components/dashboard/workspace/list/workspace-card';
 import SearchInput from '@/components/shared/search-input';
-import type { Workspace } from '@/types/workspaces';
 
 interface DashWorkspacesSecProps {
-  workspaces?: Workspace[];
-  initialWorkspaces?: Workspace[];
+  workspaces?: WorkspaceCardDTO[];
+  initialWorkspaces?: WorkspaceCardDTO[];
 }
 
 const normalizeString = (str: string) =>

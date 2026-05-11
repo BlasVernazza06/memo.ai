@@ -19,10 +19,11 @@ import {
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 
+import type { WorkspaceCardDTO } from '@repo/validators';
+
 import { formatDate } from '@/hooks/formats/use-formate-date';
 import { getShortId, slugify } from '@/hooks/formats/use-slugify';
 import { apiFetchClient } from '@/lib/api-client';
-import type { Workspace } from '@/types/workspaces';
 
 const ICON_MAP: Record<string, LucideIcon> = {
   'book-open': BookOpen,
@@ -36,7 +37,7 @@ export default function WorkspaceCard({
   idx,
   viewMode,
 }: {
-  ws: Workspace;
+  ws: WorkspaceCardDTO;
   idx: number;
   viewMode: 'grid' | 'list';
 }) {
@@ -92,7 +93,7 @@ export default function WorkspaceCard({
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary/80 uppercase tracking-wider">
                   <Zap className="w-3 h-3" />
-                  {ws.flashcards || 0} Flashcards
+                  {ws.flashcardsCount || 0} Flashcards
                 </span>
                 <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600/80 uppercase tracking-wider">
                   <Brain className="w-3 h-3" />
@@ -225,7 +226,7 @@ export default function WorkspaceCard({
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground leading-none">
-                    {ws.flashcards || 0}
+                    {ws.flashcardsCount || 0}
                   </p>
                   <p className="text-[10px] font-medium text-muted-foreground mt-1 uppercase tracking-tighter">
                     Flashcards
