@@ -3,8 +3,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type {
   CreateWorkspaceDto,
   UpdateWorkspaceDto,
+  WorkspaceCardDto,
 } from '@modules/workspaces/dto/workspace.dto';
-import { and, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, count, countDistinct, eq, ilike, or, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
@@ -62,7 +63,7 @@ export class WorkspacesRepository {
         name: docData.name,
         hasThumbUrl: !!docData.thumbnailUrl,
         hasThumbBase64: !!docData.thumbnailBase64,
-        finalThumb: docData.thumbnailUrl ?? docData.thumbnailBase64 ?? 'NULL'
+        finalThumb: docData.thumbnailUrl ?? docData.thumbnailBase64 ?? 'NULL',
       });
       batchRequests.push(
         this.db.insert(document).values({
@@ -201,15 +202,30 @@ export class WorkspacesRepository {
     return { id: workspaceId };
   }
 
-  async findAll(userId: string): Promise<WorkspaceWithRelations[]> {
-    return (await this.db.query.workspace.findMany({
-      where: eq(workspace.userId, userId),
-      with: {
-        documents: true,
-        quizzes: { with: { questions: true } },
-        flashcardDecks: { with: { flashcards: true } },
-      },
-    })) as WorkspaceWithRelations[];
+  async findAllForCards(userId: string): Promise<WorkspaceCardDto[]> {
+    const data = await this.db
+      .select({
+        id: workspace.id,
+        name: workspace.name,
+        description: workspace.description,
+        createdAt: workspace.createdAt,
+        icon: workspace.icon,
+        bgColor: workspace.bgColor,
+        isFavorite: workspace.isFavorite,
+        quizzesCount: countDistinct(quiz.id),
+        flashcardsCount: countDistinct(flashcardDeck.id),
+      })
+      .from(workspace)
+      .leftJoin(quiz, eq(workspace.id, quiz.workspaceId))
+      .leftJoin(flashcardDeck, eq(workspace.id, flashcardDeck.workspaceId))
+      .where(eq(workspace.userId, userId))
+      .groupBy(workspace.id);
+
+    return data.map((item) => ({
+      ...item,
+      flashcardsCount: Number(item.flashcardsCount),
+      quizzesCount: Number(item.quizzesCount),
+    }));
   }
 
   async findById(
@@ -421,5 +437,20 @@ export class WorkspacesRepository {
     if (batchRequests.length > 0) {
       await this.db.batch(batchRequests as [any, ...any[]]);
     }
+  }
+
+  async getSummary(userId: string) {
+    const [result] = await this.db
+      .select({
+        workspaces: countDistinct(workspace.id),
+        docs: countDistinct(document.id),
+        flashcards: countDistinct(flashcardDeck.id),
+      })
+      .from(workspace)
+      .leftJoin(document, eq(workspace.id, document.workspaceId))
+      .leftJoin(flashcardDeck, eq(workspace.id, flashcardDeck.workspaceId))
+      .where(eq(workspace.userId, userId));
+
+    return result || { workspaces: 0, docs: 0, flashcards: 0 };
   }
 }

@@ -24,7 +24,7 @@ import { User } from '@/common/decorators/user.decorator';
 import { StorageService } from '@/modules/storage/services/storage.service';
 import { WorkspacesService } from '@/modules/workspaces/services/workspaces.service';
 
-import { UpdateWorkspaceDto } from '../dto/workspace.dto';
+import { UpdateWorkspaceDto, WorkspaceCardDto } from '../dto/workspace.dto';
 
 @Controller('workspaces')
 @UseGuards(AuthGuard, ThrottlerGuard)
@@ -35,8 +35,8 @@ export class WorkspacesController {
   ) {}
 
   @Get()
-  async findAll(@User('id') userId: string): Promise<DbWorkspace[]> {
-    return await this.workspacesService.findAll(userId);
+  async findAll(@User('id') userId: string): Promise<WorkspaceCardDto[]> {
+    return await this.workspacesService.findAllForCards(userId);
   }
 
   @Get('summary')

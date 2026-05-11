@@ -62,6 +62,20 @@ export const UpdateWorkspaceSchema = z.object({
   bgColor: z.string().nullable().optional(),
 });
 
+export const WorkspaceCardSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  icon: z.string().nullable(),
+  bgColor: z.string().nullable(),
+  isFavorite: z.boolean(),
+  createdAt: z.date().or(z.string()),
+  flashcardsCount: z.number(),
+  quizzesCount: z.number(),
+});
+
+export type WorkspaceCardDTO = z.infer<typeof WorkspaceCardSchema>;
+
 export type UpdateWorkspaceDTO = z.infer<typeof UpdateWorkspaceSchema>;
 
 export const FlashcardUpdateSchema = z.object({

@@ -11,7 +11,11 @@ import { CACHE_KEYS } from '@/common/constants/cache-keys';
 import { AiService } from '@/modules/ai/services/ai.service';
 import { StorageService } from '@/modules/storage/services/storage.service';
 
-import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dto/workspace.dto';
+import {
+  CreateWorkspaceDto,
+  UpdateWorkspaceDto,
+  WorkspaceCardDto,
+} from '../dto/workspace.dto';
 
 export type WorkspaceWithCounts = WorkspaceWithRelations & {
   flashcards?: number;
@@ -118,30 +122,15 @@ export class WorkspacesService {
     return result;
   }
 
-  async findAll(userId: string): Promise<WorkspaceWithCounts[]> {
-    const cacheKey = `workspaces:list:${userId}`;
+  async findAllForCards(userId: string): Promise<WorkspaceCardDto[]> {
+    const cacheKey = `workspaces:cards:${userId}`;
+    const cached = await this.cacheManager.get<WorkspaceCardDto[]>(cacheKey);
 
-    const cachedWorkspaces =
-      await this.cacheManager.get<WorkspaceWithRelations[]>(cacheKey);
-    if (cachedWorkspaces) {
-      return cachedWorkspaces;
-    }
+    if (cached) return cached;
+    const workspaces = await this.workspaceRepo.findAllForCards(userId);
 
-    const workspaces = await this.workspaceRepo.findAll(userId);
-
-    const formattedWorkspaces = workspaces.map((ws) => ({
-      ...ws,
-      flashcards: ws.flashcardDecks?.reduce(
-        (acc, deck) => acc + (deck.flashcards?.length || 0),
-        0,
-      ),
-      quizzesCount: ws.quizzes?.length || 0,
-      docs: ws.documents?.length || 0,
-    }));
-
-    await this.cacheManager.set(cacheKey, formattedWorkspaces, 1800);
-
-    return formattedWorkspaces as WorkspaceWithCounts[];
+    await this.cacheManager.set(cacheKey, workspaces, 1800);
+    return workspaces;
   }
 
   async getSummary(userId: string): Promise<{
@@ -149,26 +138,13 @@ export class WorkspacesService {
     docs: number;
     flashcards: number;
   }> {
-    const workspaces = await this.workspaceRepo.findAll(userId);
+    const summary = await this.workspaceRepo.getSummary(userId);
 
-    const summary = {
-      workspaces: workspaces.length,
-      docs: workspaces.reduce(
-        (acc, ws) => acc + (ws.documents?.length || 0),
-        0,
-      ),
-      flashcards: workspaces.reduce(
-        (acc, ws) =>
-          acc +
-          (ws.flashcardDecks?.reduce(
-            (dAcc, deck) => dAcc + (deck.flashcards?.length || 0),
-            0,
-          ) || 0),
-        0,
-      ),
+    return {
+      workspaces: Number(summary.workspaces),
+      docs: Number(summary.docs),
+      flashcards: Number(summary.flashcards),
     };
-
-    return summary;
   }
 
   async findById(
