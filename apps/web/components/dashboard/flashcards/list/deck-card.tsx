@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { BookOpen, Calendar, ChevronRight, LayoutGrid } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { DbFlashcard } from '@repo/db';
 import { Badge } from '@repo/ui/components/ui/badge';
 
 import { getShortId, slugify } from '@/hooks/formats/use-slugify';
@@ -17,7 +16,7 @@ interface FlashcardDeckWithContext {
   color: string | null;
   workspaceId: string;
   createdAt: string | Date;
-  flashcards: DbFlashcard[];
+  cardsCount: number;
   workspace?: {
     id: string;
     name: string;
@@ -31,10 +30,6 @@ export function DeckCard({
   deck: FlashcardDeckWithContext;
   index: number;
 }) {
-  const cardCount = deck.flashcards?.length || 0;
-
-  console.log(deck);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -66,7 +61,7 @@ export function DeckCard({
                 variant="secondary"
                 className="bg-secondary/50 border border-gray-300 backdrop-blur-md"
               >
-                {cardCount} cards
+                {deck.cardsCount} cards
               </Badge>
             </div>
 

@@ -12,8 +12,26 @@ interface AnalysisTabContentProps {
 }
 
 export function AnalysisTabContent({ summary }: AnalysisTabContentProps) {
-  // Simple markdown-ish to HTML converter for basic formatting (paragraphs and bold)
-  const paragraphs = summary.split('\n\n').filter((p) => p.trim() !== '');
+  // Split into paragraphs by double newlines first
+  const rawParagraphs = summary.split(/\n\n+/).filter((p) => p.trim() !== '');
+
+  // For each paragraph, if it's too long, split it into chunks of ~3 sentences for better readability
+  const paragraphs = rawParagraphs.flatMap((p) => {
+    if (p.length > 400) {
+      const sentences = p.match(/[^.!?]+[.!?]+(?:\s|$)/g) || [p];
+      const chunks = [];
+      for (let i = 0; i < sentences.length; i += 3) {
+        chunks.push(
+          sentences
+            .slice(i, i + 3)
+            .join('')
+            .trim(),
+        );
+      }
+      return chunks;
+    }
+    return [p];
+  });
 
   const [copied, setCopied] = useState(false);
 
@@ -54,23 +72,47 @@ export function AnalysisTabContent({ summary }: AnalysisTabContentProps) {
           </div>
         </div>
 
-        <div className="space-y-6 max-w-none">
-          {paragraphs.map((para, i) => (
-            <p
-              key={i}
-              className="text-base text-muted-foreground/90 leading-relaxed font-medium"
-            >
-              {para.split('**').map((part, j) =>
-                j % 2 === 1 ? (
-                  <strong key={j} className="text-foreground font-black">
-                    {part}
-                  </strong>
-                ) : (
-                  part
-                ),
-              )}
-            </p>
-          ))}
+        <div className="relative">
+          {/* Decorative side line */}
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-linear-to-b from-primary/30 via-primary/5 to-transparent -ml-6 md:-ml-10 hidden md:block" />
+
+          <div className="space-y-12 max-w-3xl">
+            {paragraphs.map((para, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.1 }}
+                className="relative group"
+              >
+                {/* Optional divider between major blocks */}
+                {i > 0 && (
+                  <div className="absolute -top-6 left-0 w-12 h-px bg-primary/10 group-hover:w-24 transition-all duration-500" />
+                )}
+
+                <p
+                  className={`text-lg md:text-xl text-muted-foreground/90 font-medium selection:bg-primary/20 ${
+                    i === 0
+                      ? 'first-letter:text-4xl first-letter:font-black first-letter:text-primary first-letter:mt-3'
+                      : ''
+                  }`}
+                >
+                  {para.split('**').map((part, j) =>
+                    j % 2 === 1 ? (
+                      <strong
+                        key={j}
+                        className="text-foreground font-bold border-b-2 border-primary/20 bg-primary/5 px-1 pb-0.5 rounded-xs transition-colors hover:bg-primary/10"
+                      >
+                        {part}
+                      </strong>
+                    ) : (
+                      part
+                    ),
+                  )}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-16 pt-10 border-t border-border/30 flex flex-col md:flex-row md:items-center justify-between gap-6">

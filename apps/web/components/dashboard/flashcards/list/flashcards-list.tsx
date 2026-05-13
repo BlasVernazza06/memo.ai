@@ -6,7 +6,6 @@ import { useState } from 'react';
 
 import { Brain, Layers, Plus, Search, Sparkles } from 'lucide-react';
 
-import { DbFlashcard } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
 import SearchInput from '@/components/shared/search-input';
@@ -21,7 +20,7 @@ interface FlashcardDeckWithContext {
   color: string | null;
   workspaceId: string;
   createdAt: string;
-  flashcards: DbFlashcard[];
+  cardsCount: number;
   workspace: {
     id: string;
     name: string;
@@ -79,7 +78,7 @@ export default function FlashcardsList({
           {
             label: 'Tarjetas Listas',
             value: initialDecks.reduce(
-              (acc, d) => acc + d.flashcards.length,
+              (acc, d) => acc + d.cardsCount,
               0,
             ),
             icon: Brain,

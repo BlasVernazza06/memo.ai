@@ -1,5 +1,5 @@
-import { apiFetch } from '@/lib/api-fetch';
 import FlashcardsList from '@/components/dashboard/flashcards/list/flashcards-list';
+import { apiFetch } from '@/lib/api-fetch';
 
 interface FlashcardDeckWithContext {
   id: string;
@@ -8,7 +8,7 @@ interface FlashcardDeckWithContext {
   color: string | null;
   workspaceId: string;
   createdAt: string;
-  flashcards: any[];
+  cardsCount: number;
   workspace: {
     id: string;
     name: string;

@@ -1,15 +1,16 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { Edit3, Sparkles } from 'lucide-react';
 
+import { DbStreake } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
 
 import { ProfileAchievements } from '@/components/profile/profile-achievements';
 import { ProfileActivity } from '@/components/profile/profile-activity';
 import { ProfileStats } from '@/components/profile/profile-stats';
-import { getInitials } from '@/hooks/formats/use-Initials';
+import { UserAvatar } from '@/components/shared/dash-aside/user-avatar';
+import { apiFetch } from '@/lib/api-fetch';
 import { getSession } from '@/lib/auth-session';
 
 export default async function ProfilePage() {
@@ -20,65 +21,53 @@ export default async function ProfilePage() {
     return redirect('/auth/login');
   }
 
-  return (
-    <div className="max-w-6xl mx-auto py-6 space-y-8">
-      {/* Top Profile Section */}
-      <div className="flex flex-col lg:flex-row gap-8 items-stretch">
-        {/* User Card */}
-        <div className="lg:w-1/3 bg-card border border-border rounded-4xl p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-br from-primary/10 to-blue-500/5" />
+  const streak = await apiFetch<DbStreake>(`/streaks`);
 
-          <div className="relative mt-4">
-            <div className="w-32 h-32 rounded-3xl bg-linear-to-br from-primary to-blue-600 p-1.5 shadow-2xl shadow-primary/20">
-              {user.image ? (
-                <Image
-                  src={user.image}
-                  alt={user.name}
-                  width={128}
-                  height={128}
-                  className="w-full h-full rounded-[1.25rem] object-cover"
-                />
-              ) : (
-                <div className="w-full h-full rounded-[1.25rem] bg-background flex items-center justify-center">
-                  <span className="text-5xl font-black text-primary italic">
-                    {getInitials(user.name)}
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-xl border-4 border-white shadow-lg">
-              <Sparkles className="w-4 h-4" />
-            </div>
+  return (
+    <div className="max-w-6xl mx-auto py-10 space-y-12">
+      {/* Top Profile Section */}
+      <div className="flex flex-col lg:flex-row gap-10 items-start">
+        {/* User Identity Card */}
+        <div className="w-full lg:w-[320px] bg-card border border-border/50 rounded-[3rem] p-10 shadow-xs flex flex-col items-center text-center relative overflow-hidden shrink-0">
+          <div className="absolute top-0 left-0 w-full h-32 bg-linear-to-b from-primary/5 to-transparent" />
+
+          <div className="relative mt-2">
+            <UserAvatar
+              user={user}
+              className="w-32 h-32 rounded-[2.5rem] border-4 border-background shadow-2xl shadow-primary/10"
+            />
           </div>
 
-          <div className="mt-6 space-y-2">
-            <h1 className="text-2xl font-black text-foreground tracking-tight">
+          <div className="mt-8 space-y-2 relative z-10">
+            <h1 className="text-3xl font-black text-foreground tracking-tight">
               {user.name}
             </h1>
-            <p className="text-xs text-muted-foreground font-medium">
+            <p className="text-sm text-muted-foreground font-medium opacity-70">
               {user.email}
             </p>
-            <p className="text-sm font-bold text-primary/80 uppercase tracking-widest px-4 py-1.5 bg-primary/5 rounded-full inline-block mt-2">
-              Pro Member
-            </p>
+            <div className="pt-4">
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] px-5 py-2 bg-primary/5 rounded-full border border-primary/10">
+                PRO MEMBER
+              </span>
+            </div>
           </div>
 
-          <div className="w-full flex items-center justify-center gap-3 mt-8">
+          <div className="w-full mt-10">
             <Link href="/dashboard/settings">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl h-12 shadow-lg shadow-primary/20 flex gap-2">
+              <Button className="w-full bg-foreground hover:bg-foreground/90 text-background font-bold rounded-2xl h-12 shadow-lg transition-all flex gap-2">
                 <Edit3 className="w-4 h-4" />
-                Editar
+                Editar Perfil
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Stats & Weekly Progress */}
-        <ProfileStats />
+        {/* Stats & Streak (Duolingo Style) */}
+        <ProfileStats user={user} streak={streak} />
       </div>
 
       {/* Bottom Section: Achievements & Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <ProfileAchievements />
         <ProfileActivity />
       </div>

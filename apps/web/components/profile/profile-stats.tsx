@@ -2,12 +2,18 @@
 
 import {
   Award,
+  Check,
   FileText,
   Flame,
   MessageSquare,
-  TrendingUp,
+  Sparkles,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+
+import { DbStreake } from '@repo/db';
+import { cn } from '@repo/ui/utils';
+
+import { AuthUser } from '@/lib/auth-provider';
 
 const STATS = [
   {
@@ -15,88 +21,169 @@ const STATS = [
     value: '48',
     icon: FileText,
     color: 'text-blue-500',
-    bg: 'bg-blue-50',
+    bg: 'bg-blue-500/10',
   },
   {
     label: 'Flashcards',
     value: '1.2k',
     icon: Award,
-    color: 'text-purple-500',
-    bg: 'bg-purple-50',
+    color: 'text-violet-500',
+    bg: 'bg-violet-500/10',
   },
   {
-    label: 'Racha',
-    value: '12d',
-    icon: Flame,
-    color: 'text-orange-500',
-    bg: 'bg-orange-50',
-  },
-  {
-    label: 'IA',
+    label: 'Consultas IA',
     value: '320',
     icon: MessageSquare,
     color: 'text-emerald-500',
-    bg: 'bg-emerald-50',
+    bg: 'bg-emerald-500/10',
   },
 ];
 
-export function ProfileStats() {
-  return (
-    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-      {STATS.map((stat, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.1 }}
-          className="bg-card border border-border rounded-4xl p-8 flex items-center gap-6 shadow-sm hover:shadow-md transition-shadow group"
-        >
-          <div
-            className={`w-16 h-16 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}
-          >
-            <stat.icon className="w-8 h-8" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-3xl font-black text-foreground leading-none">
-              {stat.value}
-            </p>
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-              {stat.label}
-            </p>
-          </div>
-        </motion.div>
-      ))}
+const WEEK_DAYS = [
+  { label: 'Lu', active: true, today: false },
+  { label: 'Ma', active: true, today: false },
+  { label: 'Mi', active: true, today: false },
+  { label: 'Ju', active: true, today: true },
+  { label: 'Vi', active: false, today: false },
+  { label: 'Sa', active: false, today: false },
+  { label: 'Do', active: false, today: false },
+];
 
-      {/* Weekly Progress */}
-      <div className="md:col-span-2 bg-foreground rounded-4xl p-8 text-background relative overflow-hidden flex flex-col justify-between">
-        <div className="absolute top-0 right-0 w-64 h-full bg-linear-to-l from-primary/20 to-transparent pointer-events-none" />
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h3 className="text-lg font-bold">Progreso Semanal</h3>
-            <p className="text-xs text-background/70 font-medium">
-              Vas un +12% mejor que la semana pasada.
-            </p>
-          </div>
-          <div className="w-10 h-10 bg-background/10 rounded-xl flex items-center justify-center">
-            <TrendingUp className="w-5 h-5 text-primary" />
-          </div>
-        </div>
-        <div className="flex items-end gap-2 h-16">
-          {[40, 60, 45, 90, 65, 80, 50].map((h, i) => (
+interface ProfileStatsProps {
+  user: AuthUser | null | undefined;
+  streak: DbStreake;
+}
+
+export function ProfileStats({ user, streak }: ProfileStatsProps) {
+  return (
+    <div className="flex-1 flex flex-col gap-6">
+      {/* Top Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {STATS.map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="bg-card border border-border/50 rounded-3xl p-6 flex flex-col gap-4 shadow-xs hover:shadow-md hover:border-primary/20 transition-all group"
+          >
             <div
-              key={i}
-              className="flex-1 bg-background/10 rounded-t-lg relative group overflow-hidden"
+              className={cn(
+                'w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110',
+                stat.bg,
+                stat.color,
+              )}
             >
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                transition={{ delay: 0.5 + i * 0.1, duration: 1 }}
-                className="absolute bottom-0 left-0 w-full bg-primary"
-              />
+              <stat.icon className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <div className="space-y-0.5">
+              <p className="text-2xl font-black text-foreground tracking-tight">
+                {stat.value}
+              </p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                {stat.label}
+              </p>
+            </div>
+          </motion.div>
+        ))}
       </div>
+
+      {/* Professional Premium Streak Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-orange-500 rounded-[2.5rem] p-8 shadow-2xl shadow-orange-500/20 relative overflow-hidden group border border-orange-400/20"
+      >
+        {/* Abstract Background Effects */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-600/50 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col gap-10">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
+                  <Flame className="w-6 h-6 text-white fill-white" />
+                </div>
+                <h3 className="text-5xl font-black text-white tracking-tighter">
+                  {streak?.currentStreak || 12} Días
+                </h3>
+              </div>
+              <p className="text-orange-100/80 text-sm font-bold flex items-center gap-2 mt-2">
+                ¡Es un pájaro, es un avión... ES{' '}
+                {user?.name?.toUpperCase() || 'ESTUDIANTE'}!
+                <Sparkles className="w-4 h-4 fill-white text-white" />
+              </p>
+            </div>
+            <div className="hidden md:block">
+              <div className="w-24 h-24 bg-white/10 backdrop-blur-xl rounded-[2rem] border border-white/20 flex items-center justify-center shadow-inner">
+                <Flame className="w-12 h-12 text-white fill-white animate-pulse" />
+              </div>
+            </div>
+          </div>
+
+          {/* Connected Days Timeline */}
+          <div className="relative">
+            {/* Labels Row */}
+            <div className="flex items-center justify-between mb-6 px-1">
+              {WEEK_DAYS.map((day, i) => (
+                <span
+                  key={i}
+                  className={cn(
+                    'text-[10px] font-black uppercase tracking-widest w-11 text-center transition-colors',
+                    day.active || day.today ? 'text-white' : 'text-white/40',
+                  )}
+                >
+                  {day.label}
+                </span>
+              ))}
+            </div>
+
+            {/* Path and Circles Container */}
+            <div className="relative">
+              {/* The Connecting Line (Path) */}
+              <div className="absolute top-1/2 left-0 w-full h-1 bg-white/20 -translate-y-1/2 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: '57%' }} // Adjusted to match the last active day
+                  transition={{ duration: 1, delay: 0.5 }}
+                  className="h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                />
+              </div>
+
+              {/* Circles Row */}
+              <div className="flex items-center justify-between relative z-10">
+                {WEEK_DAYS.map((day, i) => (
+                  <div key={i} className="flex flex-col items-center">
+                    <div
+                      className={cn(
+                        'w-11 h-11 rounded-full flex items-center justify-center transition-all duration-500 border-4',
+                        day.active
+                          ? 'bg-white border-white text-orange-600 shadow-lg scale-110'
+                          : day.today
+                            ? 'bg-orange-500 border-white/60 text-white animate-pulse scale-105'
+                            : 'bg-orange-600 border-transparent text-white/20',
+                      )}
+                    >
+                      {day.active ? (
+                        <Check className="w-5 h-5 stroke-[4]" />
+                      ) : (
+                        <div
+                          className={cn(
+                            'w-2.5 h-2.5 rounded-full',
+                            day.today ? 'bg-white' : 'bg-white/20',
+                          )}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

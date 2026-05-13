@@ -1,3 +1,22 @@
+import { DbUserActivity } from './activity';
+import * as activity from './activity';
+import { ChatWithMessages } from './chats';
+import * as chats from './chats';
+import { DbFlashcard, DbFlashcardDeck } from './flashcards';
+import * as flashcards from './flashcards';
+import * as plans from './plans';
+import { DbQuiz, DbQuizAttempt, DbQuizQuestion } from './quizzes';
+import * as quizzes from './quizzes';
+import * as strake from './strake';
+import { DbUser } from './users';
+// ============================================================
+// SCHEMA GROUPS
+// ============================================================
+
+import * as users from './users';
+import { DbDocument, DbWorkspace } from './workspaces';
+import * as workspaces from './workspaces';
+
 export * from './users';
 export * from './plans';
 export * from './workspaces';
@@ -5,13 +24,7 @@ export * from './flashcards';
 export * from './quizzes';
 export * from './activity';
 export * from './chats';
-
-import { DbUser } from './users';
-import { DbWorkspace, DbDocument } from './workspaces';
-import { DbFlashcardDeck, DbFlashcard } from './flashcards';
-import { DbQuiz, DbQuizQuestion, DbQuizAttempt } from './quizzes';
-import { ChatWithMessages } from './chats';
-import { DbUserActivity } from './activity';
+export * from './strake';
 
 // ============================================================
 // RELATION TYPES (DEEP)
@@ -21,6 +34,20 @@ export type FlashcardDeckWithCards = DbFlashcardDeck & {
   flashcards: DbFlashcard[];
 };
 
+interface FlashcardDeckWithContext {
+  id: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  workspaceId: string;
+  createdAt: string;
+  cardsCount: number;
+  workspace: {
+    id: string;
+    name: string;
+  };
+}
+
 export type QuizWithQuestions = DbQuiz & {
   questions: DbQuizQuestion[];
   attempts?: DbQuizAttempt[];
@@ -28,24 +55,12 @@ export type QuizWithQuestions = DbQuiz & {
 
 export type WorkspaceWithRelations = DbWorkspace & {
   documents: DbDocument[];
-  flashcardDecks: FlashcardDeckWithCards[];
+  flashcardDecks: FlashcardDeckWithContext[];
   quizzes: QuizWithQuestions[];
   user?: DbUser;
   chats?: ChatWithMessages[];
   activities?: DbUserActivity[];
 };
-
-// ============================================================
-// SCHEMA GROUPS
-// ============================================================
-
-import * as users from './users';
-import * as plans from './plans';
-import * as workspaces from './workspaces';
-import * as flashcards from './flashcards';
-import * as quizzes from './quizzes';
-import * as activity from './activity';
-import * as chats from './chats';
 
 export const workspaceSchema = {
   workspace: workspaces.workspace,
@@ -90,4 +105,9 @@ export const authSchema = {
 
 export const planSchema = {
   plan: plans.plan,
+};
+
+export const streakSchema = {
+  strake: strake.strake,
+  strakeRelations: strake.StreakeRelations,
 };

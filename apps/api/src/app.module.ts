@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
 
+import { MockDataInterceptor } from '@/common/interceptors/mock-data.interceptor';
 import configuration from '@/config/configuration';
 import { envSchema } from '@/config/env.validation';
 import { BetterAuthModule } from '@/core/auth/better-auth.module';
@@ -14,6 +16,7 @@ import { DatabaseModule } from '@/modules/database/database.module';
 import { EmailModule } from '@/modules/email/email.module';
 import { FlashcardsModule } from '@/modules/flashcards/flashcards.module';
 import { QuizzesModule } from '@/modules/quizzes/quizzes.module';
+import { StreakModule } from '@/modules/streak/streak.module';
 import { UsersModule } from '@/modules/users/users.module';
 import { WorkspacesModule } from '@/modules/workspaces/workspaces.module';
 
@@ -33,6 +36,7 @@ import { WorkspacesModule } from '@/modules/workspaces/workspaces.module';
     WorkspacesModule,
     FlashcardsModule,
     QuizzesModule,
+    StreakModule,
     PlansModule,
     CheckoutModule,
     WebhooksModule,
@@ -44,6 +48,11 @@ import { WorkspacesModule } from '@/modules/workspaces/workspaces.module';
     ]),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MockDataInterceptor,
+    },
+  ],
 })
 export class AppModule {}

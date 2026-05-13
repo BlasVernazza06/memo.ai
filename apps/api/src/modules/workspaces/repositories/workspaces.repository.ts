@@ -252,7 +252,9 @@ export class WorkspacesRepository {
         },
         flashcardDecks: {
           with: {
-            flashcards: true,
+            flashcards: {
+              columns: { id: true },
+            },
             workspace: {
               columns: { id: true, name: true },
             },
@@ -266,6 +268,14 @@ export class WorkspacesRepository {
         },
       },
     });
+
+    if (!result) return undefined;
+
+    // Map flashcardDecks to include cardsCount for the frontend cards
+    const mappedFlashcardDecks = result.flashcardDecks.map((deck) => ({
+      ...deck,
+      cardsCount: deck.flashcards?.length || 0,
+    }));
 
     // Búsqueda directa para confirmar si el join de Drizzle está fallando
     const directDocs = await this.db.query.document.findMany({
@@ -281,7 +291,10 @@ export class WorkspacesRepository {
       result.documents = directDocs;
     }
 
-    return result as WorkspaceWithRelations | undefined;
+    return {
+      ...result,
+      flashcardDecks: mappedFlashcardDecks,
+    } as unknown as WorkspaceWithRelations;
   }
 
   async like(userId: string, workspaceId: string): Promise<boolean> {

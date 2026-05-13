@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+
 import { AnimatePresence, motion } from 'motion/react';
-import Header from '@/components/landing/landing-header';
+
 import HeroSection from '@/components/landing/hero-section';
+import Header from '@/components/landing/landing-header';
 
 export default function LandingHeroWithHeader() {
   const [isSandboxOpen, setIsSandboxOpen] = useState(false);

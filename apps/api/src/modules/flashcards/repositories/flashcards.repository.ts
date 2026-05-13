@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { and, eq, ilike, or } from 'drizzle-orm';
+import { and, eq, ilike, or, sql } from 'drizzle-orm';
 
-import { type Database, flashcardDeck, workspace } from '@repo/db';
+import { type Database, flashcard, flashcardDeck, workspace } from '@repo/db';
 
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
@@ -11,50 +11,99 @@ export class FlashcardsRepository {
   constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
 
   async findAllByUser(userId: string) {
-    return await this.db.query.flashcardDeck.findMany({
-      where: (deck, { exists }) =>
-        exists(
-          this.db
-            .select()
-            .from(workspace)
-            .where(
-              and(
-                eq(workspace.id, deck.workspaceId),
-                eq(workspace.userId, userId),
-              ),
-            ),
-        ),
-      with: {
-        flashcards: true,
+    const data = await this.db
+      .select({
+        id: flashcardDeck.id,
+        name: flashcardDeck.name,
+        description: flashcardDeck.description,
+        color: flashcardDeck.color,
+        workspaceId: flashcardDeck.workspaceId,
+        createdAt: flashcardDeck.createdAt,
+        cardsCount: sql<number>`count(${flashcard.id})`.mapWith(Number),
         workspace: {
-          columns: {
-            name: true,
-            id: true,
-          },
+          id: workspace.id,
+          name: workspace.name,
         },
-      },
-    });
+      })
+      .from(flashcardDeck)
+      .innerJoin(workspace, eq(flashcardDeck.workspaceId, workspace.id))
+      .leftJoin(flashcard, eq(flashcardDeck.id, flashcard.deckId))
+      .where(eq(workspace.userId, userId))
+      .groupBy(flashcardDeck.id, workspace.id, workspace.name);
+
+    return data;
   }
 
   async findByWorkspace(userId: string, workspaceId: string) {
-    return await this.db.query.flashcardDeck.findMany({
-      where: or(
-        eq(flashcardDeck.workspaceId, workspaceId),
-        ilike(flashcardDeck.workspaceId, `${workspaceId}%`),
-      ),
-      with: {
-        flashcards: true,
-      },
-    });
+    const data = await this.db
+      .select({
+        id: flashcardDeck.id,
+        name: flashcardDeck.name,
+        description: flashcardDeck.description,
+        color: flashcardDeck.color,
+        workspaceId: flashcardDeck.workspaceId,
+        createdAt: flashcardDeck.createdAt,
+        cardsCount: sql<number>`count(${flashcard.id})`.mapWith(Number),
+        workspace: {
+          id: workspace.id,
+          name: workspace.name,
+        },
+      })
+      .from(flashcardDeck)
+      .innerJoin(workspace, eq(flashcardDeck.workspaceId, workspace.id))
+      .leftJoin(flashcard, eq(flashcardDeck.id, flashcard.deckId))
+      .where(
+        and(
+          eq(workspace.userId, userId),
+          or(
+            eq(flashcardDeck.workspaceId, workspaceId),
+            ilike(flashcardDeck.workspaceId, `${workspaceId}%`),
+          ),
+        ),
+      )
+      .groupBy(flashcardDeck.id, workspace.id, workspace.name);
+
+    return data;
   }
 
   async findById(userId: string, deckId: string) {
-    return await this.db.query.flashcardDeck.findFirst({
-      where: or(eq(flashcardDeck.id, deckId), ilike(flashcardDeck.id, `${deckId}%`)),
-      with: {
-        flashcards: true,
-        workspace: true,
-      },
-    });
+    const [deck] = await this.db
+      .select({
+        id: flashcardDeck.id,
+        name: flashcardDeck.name,
+        description: flashcardDeck.description,
+        color: flashcardDeck.color,
+        workspaceId: flashcardDeck.workspaceId,
+        createdAt: flashcardDeck.createdAt,
+        workspace: {
+          id: workspace.id,
+          name: workspace.name,
+          userId: workspace.userId,
+        },
+      })
+      .from(flashcardDeck)
+      .innerJoin(workspace, eq(flashcardDeck.workspaceId, workspace.id))
+      .where(
+        and(
+          eq(workspace.userId, userId),
+          or(
+            eq(flashcardDeck.id, deckId),
+            ilike(flashcardDeck.id, `${deckId}%`),
+          ),
+        ),
+      )
+      .limit(1);
+
+    if (!deck) return undefined;
+
+    const cards = await this.db
+      .select()
+      .from(flashcard)
+      .where(eq(flashcard.deckId, deck.id));
+
+    return {
+      ...deck,
+      flashcards: cards,
+    };
   }
 }

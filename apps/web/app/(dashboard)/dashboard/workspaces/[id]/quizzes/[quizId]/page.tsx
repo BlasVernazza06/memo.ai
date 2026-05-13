@@ -88,59 +88,61 @@ export default function QuizGamePage() {
   if (!currentQuestion) return null;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 pb-10 pt-4 px-4 md:px-0 relative">
-      <QuizHeader
-        workspaceId={workspaceId}
-        timer={timer}
-        timeState={timerState}
-        onToggleTimer={toggleTimer}
-      />
+    <div className="flex flex-col justify-center min-h-[calc(100vh-80px)] py-4">
+      <div className="max-w-3xl w-full mx-auto space-y-8 px-4 md:px-0 relative">
+        <QuizHeader
+          workspaceId={workspaceId}
+          timer={timer}
+          timeState={timerState}
+          onToggleTimer={toggleTimer}
+        />
 
-      <QuizProgressBar
-        currentQuestionIndex={currentQuestionIndex}
-        isAnswered={isAnswered}
-        questions={questions}
-        results={results}
-      />
+        <QuizProgressBar
+          currentQuestionIndex={currentQuestionIndex}
+          isAnswered={isAnswered}
+          questions={questions}
+          results={results}
+        />
 
-      <QuizBody
-        question={currentQuestion}
-        handleOptionSelect={handleOptionSelect}
-        isAnswered={isAnswered}
-        selectedOption={selectedOption}
-        shake={shake}
-      />
+        <QuizBody
+          question={currentQuestion}
+          handleOptionSelect={handleOptionSelect}
+          isAnswered={isAnswered}
+          selectedOption={selectedOption}
+          shake={shake}
+        />
 
-      <div className="min-h-[140px]">
-        <AnimatePresence mode="wait">
-          {isAnswered ? (
-            <QuizAnsweredView
-              currentQuestionIndex={currentQuestionIndex}
-              questions={questions}
-              handleNextQuestion={handleNextQuestion}
-              question={currentQuestion}
-            />
-          ) : (
-            <div className="flex justify-end pt-4">
-              <Button
-                onClick={handleSubmitAnswer}
-                disabled={selectedOption === null}
-                className="h-14 px-10 rounded-2xl font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 disabled:opacity-50 disabled:shadow-none transition-all active:scale-95"
-              >
-                Confirmar Respuesta
-              </Button>
-            </div>
-          )}
-        </AnimatePresence>
+        <div className="min-h-[140px]">
+          <AnimatePresence mode="wait">
+            {isAnswered ? (
+              <QuizAnsweredView
+                currentQuestionIndex={currentQuestionIndex}
+                questions={questions}
+                handleNextQuestion={handleNextQuestion}
+                question={currentQuestion}
+              />
+            ) : (
+              <div className="flex justify-end pt-4">
+                <Button
+                  onClick={handleSubmitAnswer}
+                  disabled={selectedOption === null}
+                  className="h-14 px-10 rounded-2xl font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 disabled:opacity-50 disabled:shadow-none transition-all active:scale-95"
+                >
+                  Confirmar Respuesta
+                </Button>
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <QuizGamePreview
+          gameStage={gameStage}
+          questions={questions}
+          quiz={quiz}
+          handleStart={handleStart}
+          countdown={countdown}
+        />
       </div>
-
-      <QuizGamePreview
-        gameStage={gameStage}
-        questions={questions}
-        quiz={quiz}
-        handleStart={handleStart}
-        countdown={countdown}
-      />
     </div>
   );
 }
