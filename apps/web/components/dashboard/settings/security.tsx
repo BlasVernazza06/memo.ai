@@ -118,25 +118,6 @@ export default function Security() {
           </Button>
         </div>
       </div>
-
-      <div className="bg-card border border-border/80 rounded-4xl p-8">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center border border-emerald-500/20">
-              <Smartphone className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-foreground">Doble Factor (2FA)</h4>
-              <p className="text-xs text-muted-foreground font-medium">
-                Añade una capa extra de seguridad a tu cuenta.
-              </p>
-            </div>
-          </div>
-          <div className="w-12 h-6 bg-muted rounded-full relative cursor-pointer p-1">
-            <div className="w-4 h-4 bg-background rounded-full" />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

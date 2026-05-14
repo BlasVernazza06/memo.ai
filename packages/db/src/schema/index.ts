@@ -108,6 +108,6 @@ export const planSchema = {
 };
 
 export const streakSchema = {
-  strake: strake.strake,
-  strakeRelations: strake.StreakeRelations,
+  streaks: strake.streaks,
+  streakRelations: strake.StreakeRelations,
 };

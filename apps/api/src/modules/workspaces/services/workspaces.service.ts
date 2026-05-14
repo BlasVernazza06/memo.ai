@@ -63,40 +63,71 @@ export class WorkspacesService {
         .join('\n') || '';
 
     // 3. Llamar a la IA con el contexto histórico y el prompt personalizado
-    const basePrompt = `Basándote en el material anterior, genera MÁS ${type === 'flashcards' ? 'Flashcards' : 'Quizzes'}.
-    IMPORTANTE: No repitas lo que ya generaste. Enfócate en detalles o temas que no se hayan cubierto profundamente aún.`;
+    const context = `
+CONTEXTO DEL WORKSPACE:
+Nombre: ${workspaceDetail.name}
+Descripción: ${workspaceDetail.description || 'No proporcionada'}
 
-    const finalPrompt = customPrompt
-      ? `${basePrompt}\n\nINSTRUCCIONES ADICIONALES DEL USUARIO: ${customPrompt}`
-      : basePrompt;
+HISTORIAL DE CREACIÓN:
+${history || 'No hay mensajes previos.'}
+`;
+
+    const jsonSchema =
+      type === 'flashcards'
+        ? `{ "flashcards": [ { "front": "pregunta", "back": "respuesta" } ] }`
+        : `{ "quizzes": [ { "name": "Título", "description": "...", "questions": [ { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": "A", "explanation": "..." } ] } ] }`;
+
+    const basePrompt = `Eres un experto en el tema "${workspaceDetail.name}". 
+Tu tarea es generar contenido educativo ADICIONAL basado ESTRICTAMENTE en el contexto y el historial proporcionados.
+
+REGLAS CRÍTICAS:
+1. No inventes temas nuevos ajenos al material.
+2. No repitas preguntas o tarjetas que ya aparezcan en el historial.
+3. Responde ÚNICAMENTE con un objeto JSON siguiendo este esquema: ${jsonSchema}
+4. Si el historial no es suficiente, básate en el nombre y descripción del workspace.`;
+
+    const userInstruction = customPrompt
+      ? `\n\nINSTRUCCIONES ESPECÍFICAS DEL USUARIO: ${customPrompt}`
+      : '';
 
     const aiData = await this.aiService.generateContentFromPrompt(
-      'Eres un asistente experto en la creación de contenido educativo a partir de documentos. Tu objetivo es generar material didáctico de alta calidad, optimizado para el aprendizaje.',
-      `${history}\n\n${finalPrompt}`,
+      basePrompt,
+      `${context}${userInstruction}\n\nGenera ${type === 'flashcards' ? 'más flashcards' : 'un nuevo quiz'} ahora:`,
       type,
     );
 
     // 4. Guardar el nuevo contenido
     if (type === 'flashcards') {
-      if (aiData.flashcardDecks && aiData.flashcardDecks.length > 0) {
-        // Si la IA devolvió mazos estructurados, los agregamos todos
-        for (const deck of aiData.flashcardDecks) {
+      const decks = aiData.flashcardDecks || [];
+      const singleCards = aiData.flashcards || (Array.isArray(aiData) ? aiData : null);
+
+      if (decks.length > 0) {
+        // Si la IA devolvió mazos estructurados
+        for (const deck of decks) {
           await this.workspaceRepo.addFlashcards(
             workspaceId,
             deck.flashcards,
             deck.name || workspaceDetail.name,
           );
         }
-      } else if (aiData.flashcards) {
-        // Formato antiguo o simplificado
+      } else if (singleCards && singleCards.length > 0) {
+        // Formato de array simple de flashcards
         await this.workspaceRepo.addFlashcards(
           workspaceId,
-          aiData.flashcards,
+          singleCards,
           workspaceDetail.name,
         );
+      } else {
+        console.warn('[WorkspacesService] No se encontraron flashcards en la respuesta de la IA:', aiData);
       }
-    } else if (type === 'quizzes' && aiData.quizzes) {
-      await this.workspaceRepo.addQuizzes(workspaceId, aiData.quizzes);
+    } else if (type === 'quizzes') {
+      const quizzesToSave = aiData.quizzes || (Array.isArray(aiData) ? aiData : null);
+
+      if (quizzesToSave && quizzesToSave.length > 0) {
+        await this.workspaceRepo.addQuizzes(workspaceId, quizzesToSave);
+      } else {
+        console.warn('[WorkspacesService] No se encontraron quizzes en la respuesta de la IA:', aiData);
+      }
     }
 
     // Invalidad caché
@@ -182,7 +213,7 @@ export class WorkspacesService {
       flashcardDecks: foundWorkspace.flashcardDecks || [],
       quizzes: foundWorkspace.quizzes || [],
       flashcards: (foundWorkspace.flashcardDecks || []).reduce(
-        (acc, deck) => acc + (deck.flashcards?.length || 0),
+        (acc, deck) => acc + (deck.cardsCount || 0),
         0,
       ),
       quizzesCount: foundWorkspace.quizzes?.length || 0,

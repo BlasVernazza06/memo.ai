@@ -8,10 +8,14 @@ import {
 import { Skeleton } from '@repo/ui/components/ui/skeleton';
 import { cn } from '@repo/ui/utils';
 
-import { AuthUser } from '@/lib/auth-provider';
+type User = {
+  name?: string | null;
+  image?: string | null;
+  email?: string | null;
+};
 
 interface UserAvatarProps {
-  user: AuthUser | null | undefined;
+  user: User | null | undefined;
   isLoading?: boolean;
   className?: string;
 }

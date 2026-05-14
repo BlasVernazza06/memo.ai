@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm';
 
 import { user } from '../users/schema';
-import { strake } from './schema';
+import { streaks } from './schema';
 
-export const StreakeRelations = relations(strake, ({ one }) => ({
+export const StreakeRelations = relations(streaks, ({ one }) => ({
   user: one(user, {
-    fields: [strake.userId],
+    fields: [streaks.userId],
     references: [user.id],
   }),
 }));
