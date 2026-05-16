@@ -1,32 +1,24 @@
 'use client';
 
-import { Layers, Plus } from 'lucide-react';
+import { Layers, type LucideIcon, Plus } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
-import type { DbDocument, WorkspaceWithRelations } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
+import { DocumentDTO, WorkspaceDetailDTO } from '@repo/validators';
 
 import { DeckCard } from '@/components/dashboard/flashcards/list/deck-card';
-
 import { QuizCard } from '@/components/dashboard/quizzes/list/quiz-card';
-import { AnalysisTabContent } from '@/components/dashboard/workspace/tabs/analysis-tab-content';
 import { EmptyTabListState } from '@/components/dashboard/workspace/shared/empty-tab-list-state';
-
-interface TabMetadata {
-  id: string;
-  label: string;
-  icon: any;
-  count: number | null;
-  canGenerate?: boolean;
-}
+import { AnalysisTabContent } from '@/components/dashboard/workspace/tabs/analysis-tab-content';
+import { TabData } from '@/types/workspaces';
 
 interface WorkspaceContentColumnProps {
-  activeTab: string;
-  workspace: WorkspaceWithRelations;
-  primaryDoc: DbDocument | null | undefined;
-  tabs: TabMetadata[];
+  activeTab: 'flashcards' | 'quizzes' | 'analysis';
+  workspace: WorkspaceDetailDTO;
+  primaryDoc: DocumentDTO | null | undefined;
+  tabs: TabData[];
   isGenerating?: boolean;
-  onGenerateMore?: (type: any) => void;
+  onGenerateMore?: (type: 'flashcards' | 'quizzes') => void;
 }
 
 export function WorkspaceContentColumn({
@@ -60,7 +52,7 @@ export function WorkspaceContentColumn({
         {activeTabData?.canGenerate && (
           <Button
             onClick={() => {
-              if (onGenerateMore) {
+              if (onGenerateMore && activeTab !== 'analysis') {
                 onGenerateMore(activeTab);
               }
             }}

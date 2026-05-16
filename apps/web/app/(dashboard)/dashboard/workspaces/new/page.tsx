@@ -19,7 +19,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { z } from 'zod';
 
 import { Button } from '@repo/ui/components/ui/button';
-import { CreateWorkspaceSchema } from '@repo/validators';
+import { CreateWorkspaceDTO, CreateWorkspaceSchema } from '@repo/validators';
 
 import AttachmentCard from '@/components/chat/attachment-card';
 import InputChat from '@/components/chat/input-chat';
@@ -33,7 +33,7 @@ import { getShortId, slugify } from '@/hooks/formats/use-slugify';
 import { ChatMessage } from '@/types/workspace-chat-types';
 import { generatePDFThumbnail } from '@/lib/pdf-utils';
 
-export type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceSchema>;
+export type CreateWorkspaceInput = CreateWorkspaceDTO;
 
 export default function NewWorkspaceChatPage() {
   const { user } = useAuth();

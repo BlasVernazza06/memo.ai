@@ -3,15 +3,15 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 import { PDF } from '@ridemountainpig/svgl-react';
-import { Download, FileText, ImageIcon } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 
-import type { DbDocument } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
+import { DocumentDTO } from '@repo/validators';
 
 import SearchInput from '@/components/shared/search-input';
 import { formatFileSize } from '@/hooks/formats/use-file-size';
 
-export function DocsList({ docs }: { docs: DbDocument[] }) {
+export function DocsList({ docs }: { docs: DocumentDTO[] }) {
   const [filteredDocs, setFilteredDocs] = useState(docs);
 
   const handleDownload = async (

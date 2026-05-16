@@ -4,14 +4,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { HelpCircle, LogOut, Search } from 'lucide-react';
+import { HelpCircle, LogOut } from 'lucide-react';
 
-import { NavItemConfig, SidebarNavItem } from './nav-item';
+import { AuthUser } from '@/lib/auth-provider';
+import { SideNavItem } from '@/types/nav-item';
+
+import { SidebarNavItem } from './nav-item';
 import { SidebarUserAvatar } from './user-avatar';
 
 interface SidebarDesktopProps {
-  navItems: NavItemConfig[];
-  user: any;
+  navItems: SideNavItem[];
+  user: AuthUser;
   isLoading: boolean;
   onSignOut: () => void;
 }

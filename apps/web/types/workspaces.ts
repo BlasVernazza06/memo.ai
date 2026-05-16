@@ -1,3 +1,5 @@
+import { LucideIcon } from 'lucide-react';
+
 export type Workspace = {
   id: string | number;
   userId?: string;
@@ -17,4 +19,12 @@ export type Workspace = {
   quizzesCount?: number;
   color?: string;
   lastActive?: string;
+};
+
+export type TabData = {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  count: number | null;
+  canGenerate?: boolean;
 };

@@ -2,21 +2,21 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+
 import { useState } from 'react';
+
 import {
-  ArrowRight,
   BarChart3,
   Brain,
   ChevronLeft,
   Heart,
   Layers,
   Settings,
-  TriangleAlert,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import type { WorkspaceWithRelations } from '@repo/db';
 import { Button } from '@repo/ui/components/ui/button';
+import { WorkspaceDetailDTO } from '@repo/validators';
 
 import WorkspaceSettingsModal from '@/components/dashboard/workspace/forms/workspace-settings-modal';
 import { WorkspaceContentColumn } from '@/components/dashboard/workspace/layout/workspace-content-column';
@@ -26,7 +26,7 @@ import { generateMoreContent } from '@/lib/actions/workspace-actions';
 import { apiFetchClient } from '@/lib/api-client';
 
 interface WorkspaceDetailClientProps {
-  initialWorkspace: WorkspaceWithRelations;
+  initialWorkspace: WorkspaceDetailDTO;
   workspaceId: string;
 }
 
@@ -34,15 +34,20 @@ export default function WorkspaceDetailClient({
   initialWorkspace,
   workspaceId,
 }: WorkspaceDetailClientProps) {
-  const [activeTab, setActiveTab] = useState<'flashcards' | 'quizzes' | 'analysis'>('flashcards');
-  const [workspace, setWorkspace] = useState<WorkspaceWithRelations>(initialWorkspace);
+  const [activeTab, setActiveTab] = useState<
+    'flashcards' | 'quizzes' | 'analysis'
+  >('flashcards');
+  const [workspace, setWorkspace] =
+    useState<WorkspaceDetailDTO>(initialWorkspace);
   const [isFavorite, setIsFavorite] = useState(workspace.isFavorite);
   const [showSettings, setShowSettings] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const fetchWorkspace = async () => {
     try {
-      const data = await apiFetchClient<WorkspaceWithRelations>(`/workspaces/${workspaceId}`);
+      const data = await apiFetchClient<WorkspaceDetailDTO>(
+        `/workspaces/${workspaceId}`,
+      );
       setWorkspace(data);
       setIsFavorite(data.isFavorite);
     } catch (error) {
@@ -50,7 +55,10 @@ export default function WorkspaceDetailClient({
     }
   };
 
-  const handleGenerateMore = async (type: 'flashcards' | 'quizzes', prompt?: string) => {
+  const handleGenerateMore = async (
+    type: 'flashcards' | 'quizzes',
+    prompt?: string,
+  ) => {
     try {
       setIsGenerating(true);
       await generateMoreContent(type, workspaceId, prompt);
@@ -158,7 +166,9 @@ export default function WorkspaceDetailClient({
                     : 'bg-background/50 backdrop-blur-md border border-border/50 text-muted-foreground hover:text-rose-500'
                 }`}
               >
-                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                <Heart
+                  className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`}
+                />
               </Button>
               <Button
                 onClick={() => setShowSettings(true)}
@@ -189,7 +199,10 @@ export default function WorkspaceDetailClient({
             onGenerateMore={handleGenerateMore}
           />
 
-          <WorkspaceInsightsColumn onGenerateMore={handleGenerateMore} isGenerating={isGenerating} />
+          <WorkspaceInsightsColumn
+            onGenerateMore={handleGenerateMore}
+            isGenerating={isGenerating}
+          />
         </div>
       </div>
 

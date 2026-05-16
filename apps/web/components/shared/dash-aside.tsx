@@ -9,7 +9,6 @@ import {
   HelpCircle,
   Layers,
   LayoutDashboard,
-  Loader2,
   LogOut,
   Settings,
 } from 'lucide-react';

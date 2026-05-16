@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { toast } from 'sonner';
 
 import { Button } from '@repo/ui/components/ui/button';
-import { UpdateWorkspaceDTO } from '@repo/validators';
+import { UpdateWorkspaceDTO, WorkspaceDetailDTO } from '@repo/validators';
 
 import {
   deleteWorkspaceAction,
@@ -23,14 +23,7 @@ interface WorkspaceSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  workspace: {
-    id: string;
-    name: string;
-    description: string | null;
-    icon: string | null;
-    bgColor?: string | null;
-    updatedAt?: Date;
-  };
+  workspace: WorkspaceDetailDTO;
 }
 
 type ViewState = 'settings' | 'delete-confirm';

@@ -4,15 +4,15 @@ import Image from 'next/image';
 
 import { Download, FileText, LucideIcon } from 'lucide-react';
 
-import type { DbDocument, WorkspaceWithRelations } from '@repo/db';
+import { DocumentDTO, WorkspaceDetailDTO } from '@repo/validators';
 import { Button } from '@repo/ui/components/ui/button';
 import { useDownloadFile } from '@/hooks/functionalities/use-download-file';
 
 type TabId = 'flashcards' | 'quizzes' | 'analysis';
 
 interface WorkspaceInfoColumnProps {
-  workspace: WorkspaceWithRelations;
-  primaryDoc: DbDocument | null | undefined;
+  workspace: WorkspaceDetailDTO;
+  primaryDoc: DocumentDTO | null | undefined;
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
   tabs: {
