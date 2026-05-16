@@ -1,11 +1,11 @@
 import { motion } from 'motion/react';
 import { Check, X } from 'lucide-react';
-import { Question } from '@/types/quiz';
+import { QuizQuestionDTO } from '@repo/validators';
 
 interface QuizProgressBarProps {
   currentQuestionIndex: number;
   isAnswered: boolean;
-  questions: Question[];
+  questions: QuizQuestionDTO[];
   results: (null | 'correct' | 'incorrect')[];
 }
 

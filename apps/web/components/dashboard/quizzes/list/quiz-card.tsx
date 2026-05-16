@@ -11,27 +11,17 @@ import {
 import { motion } from 'motion/react';
 
 import { Badge } from '@repo/ui/components/ui/badge';
+import { QuizCardDTO } from '@repo/validators';
 
 import { getShortId, slugify } from '@/hooks/formats/use-slugify';
 
-interface QuizWithContext {
-  id: string;
-  name: string;
-  description: string | null;
-  totalQuestions: number;
-  workspaceId: string;
-  createdAt: string | Date;
-  workspace?: {
-    id: string;
-    name: string;
-  };
-}
+
 
 export function QuizCard({
   quiz,
   index,
 }: {
-  quiz: QuizWithContext;
+  quiz: QuizCardDTO;
   index: number;
 }) {
   return (

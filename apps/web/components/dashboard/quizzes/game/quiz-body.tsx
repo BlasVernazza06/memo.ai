@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 
 import QuizOption from '@/components/dashboard/quizzes/game/parts/quiz-option';
-import { Question } from '@/types/quiz';
+import { QuizQuestionDTO } from '@repo/validators';
 
 interface QuizBodyProps {
-  question: Question;
+  question: QuizQuestionDTO;
   selectedOption: number | null;
   isAnswered: boolean;
   handleOptionSelect: (index: number) => void;
@@ -23,10 +23,10 @@ export default function QuizBody({
     const indices = question.options.map((_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
+      [indices[i], indices[j]] = [indices[j]!, indices[i]!];
     }
     return indices;
-  }, [question.id]);
+  }, [question.options]);
 
   return (
     <div className="space-y-8">

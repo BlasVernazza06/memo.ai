@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { apiFetchClient } from '@/lib/api-client';
-import { Question, Quiz } from '@/types/quiz';
+import { QuizDetailDTO, QuizQuestionDTO } from '@repo/validators';
 
 export function useQuizGame() {
   const params = useParams();
@@ -23,7 +23,7 @@ export function useQuizGame() {
   const [results, setResults] = useState<(null | 'correct' | 'incorrect')[]>(
     [],
   );
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [quiz, setQuiz] = useState<QuizDetailDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shake, setShake] = useState(false);
 
@@ -38,7 +38,7 @@ export function useQuizGame() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const data = await apiFetchClient<Quiz>(`/quizzes/${quizId}`);
+        const data = await apiFetchClient<QuizDetailDTO>(`/quizzes/${quizId}`);
         setQuiz(data);
       } catch (error) {
         console.error('Error loading quiz:', error);
@@ -52,7 +52,7 @@ export function useQuizGame() {
     }
   }, [quizId]);
 
-  const questions: Question[] = quiz?.questions || [];
+  const questions: QuizQuestionDTO[] = quiz?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
 
   useEffect(() => {

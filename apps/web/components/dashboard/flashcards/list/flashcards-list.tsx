@@ -1,39 +1,22 @@
 'use client';
 
-import Link from 'next/link';
-
 import { useState } from 'react';
 
-import { Brain, Layers, Plus, Search, Sparkles } from 'lucide-react';
+import { Brain, Layers, Sparkles } from 'lucide-react';
 
-import { Button } from '@repo/ui/components/ui/button';
-
-import SearchInput from '@/components/shared/search-input';
+import { FlashcardDeckCardDTO } from '@repo/validators';
 
 import { DeckCard } from '@/components/dashboard/flashcards/list/deck-card';
 import EmptyFlashcardPage from '@/components/dashboard/flashcards/shared/empty-flashcard-page';
-
-interface FlashcardDeckWithContext {
-  id: string;
-  name: string;
-  description: string | null;
-  color: string | null;
-  workspaceId: string;
-  createdAt: string;
-  cardsCount: number;
-  workspace: {
-    id: string;
-    name: string;
-  };
-}
+import SearchInput from '@/components/shared/search-input';
 
 export default function FlashcardsList({
   initialDecks,
 }: {
-  initialDecks: FlashcardDeckWithContext[];
+  initialDecks: FlashcardDeckCardDTO[];
 }) {
   const [filteredDecks, setFilteredDecks] =
-    useState<FlashcardDeckWithContext[]>(initialDecks);
+    useState<FlashcardDeckCardDTO[]>(initialDecks);
 
   return (
     <div className="flex flex-col gap-8">
@@ -77,10 +60,7 @@ export default function FlashcardsList({
           },
           {
             label: 'Tarjetas Listas',
-            value: initialDecks.reduce(
-              (acc, d) => acc + d.cardsCount,
-              0,
-            ),
+            value: initialDecks.reduce((acc, d) => acc + d.cardsCount, 0),
             icon: Brain,
             color: 'text-purple-500',
           },

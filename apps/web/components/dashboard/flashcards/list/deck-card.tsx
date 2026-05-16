@@ -6,28 +6,15 @@ import { BookOpen, Calendar, ChevronRight, LayoutGrid } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import { Badge } from '@repo/ui/components/ui/badge';
+import { FlashcardDeckCardDTO } from '@repo/validators';
 
 import { getShortId, slugify } from '@/hooks/formats/use-slugify';
-
-interface FlashcardDeckWithContext {
-  id: string;
-  name: string;
-  description: string | null;
-  color: string | null;
-  workspaceId: string;
-  createdAt: string | Date;
-  cardsCount: number;
-  workspace?: {
-    id: string;
-    name: string;
-  };
-}
 
 export function DeckCard({
   deck,
   index,
 }: {
-  deck: FlashcardDeckWithContext;
+  deck: FlashcardDeckCardDTO;
   index: number;
 }) {
   return (

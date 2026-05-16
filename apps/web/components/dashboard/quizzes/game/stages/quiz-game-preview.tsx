@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
-import { Question, Quiz } from '@/types/quiz';
+import { QuizDetailDTO, QuizQuestionDTO } from '@repo/validators';
 
 export default function QuizGamePreview({
   gameStage,
@@ -13,8 +13,8 @@ export default function QuizGamePreview({
   countdown,
 }: {
   gameStage: 'preview' | 'countdown' | 'playing';
-  questions: Question[];
-  quiz: Quiz;
+  questions: QuizQuestionDTO[];
+  quiz: QuizDetailDTO;
   handleStart: () => void;
   countdown: number;
 }) {

@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
 
-import { Question } from '@/types/quiz';
+import { QuizQuestionDTO } from '@repo/validators';
 
 export default function QuizAnsweredView({
   handleNextQuestion,
@@ -11,9 +11,9 @@ export default function QuizAnsweredView({
   currentQuestionIndex,
   question,
 }: {
-  question: Question;
+  question: QuizQuestionDTO;
   handleNextQuestion: () => void;
-  questions: Question[];
+  questions: QuizQuestionDTO[];
   currentQuestionIndex: number;
 }) {
   return (
