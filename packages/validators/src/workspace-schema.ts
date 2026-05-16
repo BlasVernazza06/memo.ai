@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const DocumentSchema = z.object({
+  id: z.string(),
   name: z.string(),
   type: z.string(),
   url: z.string().url(),
@@ -76,7 +77,52 @@ export const WorkspaceCardSchema = z.object({
 
 export type WorkspaceCardDTO = z.infer<typeof WorkspaceCardSchema>;
 
+export const WorkspaceDetailSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  icon: z.string().nullable(),
+  bgColor: z.string().nullable(),
+  isFavorite: z.boolean(),
+  createdAt: z.date().or(z.string()),
+  updatedAt: z.date().or(z.string()),
+  documents: z.array(DocumentSchema),
+  quizzes: z.array(z.any()), // Simplified for now as it can be complex
+  flashcardDecks: z.array(z.any()),
+  flashcardsCount: z.number().optional(),
+  quizzesCount: z.number().optional(),
+});
+
+export type WorkspaceDetailDTO = z.infer<typeof WorkspaceDetailSchema>;
+
 export type UpdateWorkspaceDTO = z.infer<typeof UpdateWorkspaceSchema>;
+export type CreateWorkspaceDTO = z.infer<typeof CreateWorkspaceSchema>;
+export type DocumentDTO = z.infer<typeof DocumentSchema>;
+export type FlashcardDTO = z.infer<typeof FlashcardSchema>;
+export type FlashcardDeckDTO = z.infer<typeof FlashcardDeckSchema>;
+export type QuizQuestionDTO = z.infer<typeof QuizQuestionSchema>;
+export type QuizDTO = z.infer<typeof QuizSchema>;
+
+export const QuizCardSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  totalQuestions: z.number(),
+  workspaceId: z.string(),
+  createdAt: z.date().or(z.string()),
+  workspace: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+});
+
+export type QuizCardDTO = z.infer<typeof QuizCardSchema>;
+
+export const QuizDetailSchema = QuizCardSchema.extend({
+  questions: z.array(QuizQuestionSchema),
+});
+
+export type QuizDetailDTO = z.infer<typeof QuizDetailSchema>;
 
 export const FlashcardUpdateSchema = z.object({
   front: z.string().optional(),
@@ -86,3 +132,23 @@ export const FlashcardUpdateSchema = z.object({
 export const FlashcardsUpdateSchema = z.object({
   flashcards: z.array(FlashcardUpdateSchema),
 });
+
+export type FlashcardUpdateDTO = z.infer<typeof FlashcardUpdateSchema>;
+export type FlashcardsUpdateDTO = z.infer<typeof FlashcardsUpdateSchema>;
+
+export const FlashcardDeckCardSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  color: z.string().nullable(),
+  workspaceId: z.string(),
+  createdAt: z.date().or(z.string()),
+  cardsCount: z.number(),
+  workspace: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .optional(),
+});
+export type FlashcardDeckCardDTO = z.infer<typeof FlashcardDeckCardSchema>;
