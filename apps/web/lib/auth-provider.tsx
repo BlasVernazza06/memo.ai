@@ -9,20 +9,11 @@ import {
   useCallback,
 } from 'react';
 
+import { UserDTO } from '@repo/validators';
 import { apiFetchClient } from './api-client';
 import { authClient } from './auth-client';
 
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-  image?: string | null;
-  plan: 'free' | 'pro';
-  stripeCustomerId?: string | null;
-  stripeSubscriptionId?: string | null;
-  stripeSubscriptionStatus?: string | null;
-  stripePriceId?: string | null;
-}
+export type AuthUser = UserDTO;
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -35,12 +26,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({
   children,
   initialSession,
+  initialUser,
 }: {
   children: ReactNode;
   initialSession?: any;
+  initialUser?: AuthUser | null;
 }) {
   const { data: session, isPending } = authClient.useSession();
-  const [dbUser, setDbUser] = useState<AuthUser | null>(null);
+  const [dbUser, setDbUser] = useState<AuthUser | null>(initialUser || null);
   const [isFetchingDb, setIsFetchingDb] = useState(false);
 
   const fetchDbUser = useCallback(async () => {

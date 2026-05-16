@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
-import { type DbUser } from '@repo/db';
+import { UserDTO } from '@repo/validators';
 import { Button } from '@repo/ui/components/ui/button';
 
 import { useClickOutside } from '@/hooks/design/use-click-outside';
@@ -54,7 +54,7 @@ const MOCK_NOTIFICATIONS = [
   },
 ];
 
-export default function UserMenu({ user }: { user: DbUser | null }) {
+export default function UserMenu({ user }: { user: UserDTO | null }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 

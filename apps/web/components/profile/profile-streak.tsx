@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 
 import { DbStreake } from '@repo/db';
 import { cn } from '@repo/ui/utils';
+import { StreakDTO } from '@repo/validators';
 
 const WEEK_DAYS = [
   { label: 'Lu', active: true, today: false },
@@ -17,9 +18,12 @@ const WEEK_DAYS = [
 ];
 
 interface ProfileStreakProps {
-  user: {
-    name?: string | null;
-  } | null | undefined;
+  user:
+    | {
+        name?: string | null;
+      }
+    | null
+    | undefined;
   streak: DbStreake;
 }
 

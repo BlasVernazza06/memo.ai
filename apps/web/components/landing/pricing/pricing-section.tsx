@@ -4,13 +4,7 @@ import Link from 'next/link';
 
 import { useEffect, useState } from 'react';
 
-import {
-  Check,
-  type LucideIcon,
-  ShieldCheck,
-  Sparkles,
-  Zap,
-} from 'lucide-react';
+import { type LucideIcon, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import PricingBillingToggle from '@/components/landing/pricing/pricing-billing-toggle';

@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+
 import { Edit3, Settings, Share2, Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
+import { Skeleton } from '@repo/ui/components/ui/skeleton';
+
 import { UserAvatar } from '@/components/shared/dash-aside/user-avatar';
 import { useAuth } from '@/lib/auth-provider';
-import { Skeleton } from '@repo/ui/components/ui/skeleton';
 
 export function ProfileHero() {
   const { user, isLoading } = useAuth();
