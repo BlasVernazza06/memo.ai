@@ -8,7 +8,7 @@ import {
 
 import * as cacheManager from 'cache-manager';
 
-import { DbUser } from '@repo/db';
+import { UserDTO } from '@repo/validators';
 
 import { CACHE_KEYS } from '@/common/constants/cache-keys';
 
@@ -61,10 +61,10 @@ export class UsersService {
     }
   }
 
-  async getUser(userId: string): Promise<DbUser> {
+  async getUser(userId: string): Promise<UserDTO> {
     const cacheKey = CACHE_KEYS.USER_PROFILE(userId);
 
-    const cached = await this.cacheManager.get<DbUser>(cacheKey);
+    const cached = await this.cacheManager.get<UserDTO>(cacheKey);
     if (cached) {
       return cached;
     }
@@ -77,7 +77,7 @@ export class UsersService {
 
     await this.cacheManager.set(cacheKey, currentUser, 600000);
 
-    return currentUser;
+    return currentUser as UserDTO;
   }
 
   async deleteUser(userId: string): Promise<{ success: boolean }> {

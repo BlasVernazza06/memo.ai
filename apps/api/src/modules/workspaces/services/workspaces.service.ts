@@ -12,16 +12,13 @@ import { AiService } from '@/modules/ai/services/ai.service';
 import { StorageService } from '@/modules/storage/services/storage.service';
 
 import {
-  CreateWorkspaceDto,
-  UpdateWorkspaceDto,
-  WorkspaceCardDto,
+  CreateWorkspaceDTO,
+  UpdateWorkspaceDTO,
+  WorkspaceCardDTO,
+  WorkspaceDetailDTO,
 } from '../dto/workspace.dto';
 
-export type WorkspaceWithCounts = WorkspaceWithRelations & {
-  flashcards?: number;
-  quizzesCount?: number;
-  docs?: number;
-};
+
 
 @Injectable()
 export class WorkspacesService {
@@ -138,7 +135,7 @@ REGLAS CRÍTICAS:
 
   async create(
     userId: string,
-    data: CreateWorkspaceDto,
+    data: CreateWorkspaceDTO,
   ): Promise<{ id: string }> {
     // Lógica de negocio: Validar límite de workspaces
     await this.usersService.validateWorkspaceLimit(userId);
@@ -153,9 +150,9 @@ REGLAS CRÍTICAS:
     return result;
   }
 
-  async findAllForCards(userId: string): Promise<WorkspaceCardDto[]> {
+  async findAllForCards(userId: string): Promise<WorkspaceCardDTO[]> {
     const cacheKey = `workspaces:cards:${userId}`;
-    const cached = await this.cacheManager.get<WorkspaceCardDto[]>(cacheKey);
+    const cached = await this.cacheManager.get<WorkspaceCardDTO[]>(cacheKey);
 
     if (cached) return cached;
     const workspaces = await this.workspaceRepo.findAllForCards(userId);
@@ -181,10 +178,10 @@ REGLAS CRÍTICAS:
   async findById(
     userId: string,
     workspaceId: string,
-  ): Promise<WorkspaceWithCounts> {
+  ): Promise<WorkspaceDetailDTO> {
     const cacheKey = CACHE_KEYS.WORKSPACE(userId, workspaceId);
 
-    const cached = await this.cacheManager.get<WorkspaceWithCounts>(cacheKey);
+    const cached = await this.cacheManager.get<WorkspaceDetailDTO>(cacheKey);
     if (cached) {
       return cached;
     }
@@ -222,7 +219,7 @@ REGLAS CRÍTICAS:
 
     await this.cacheManager.set(cacheKey, formattedWorkspace, 1800);
 
-    return formattedWorkspace as WorkspaceWithCounts;
+    return formattedWorkspace as unknown as WorkspaceDetailDTO;
   }
 
   async like(
@@ -302,7 +299,7 @@ REGLAS CRÍTICAS:
   async update(
     userId: string,
     workspaceId: string,
-    data: UpdateWorkspaceDto,
+    data: UpdateWorkspaceDTO,
   ): Promise<{ success: boolean }> {
     // Validar existencia antes de actualizar
     const existing = await this.workspaceRepo.findById(userId, workspaceId);
