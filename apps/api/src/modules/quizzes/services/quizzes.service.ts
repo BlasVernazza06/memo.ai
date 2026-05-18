@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { QuizzesRepository } from '../repositories/quizzes.repository';
-import { QuizCardDTO, QuizDetailDTO } from '../dto/quiz.dto';
+
+import { QuizCardDTO, QuizDetailDTO } from '@modules/quizzes/dto/quiz.dto';
+import { QuizzesRepository } from '@modules/quizzes/repositories/quizzes.repository';
 
 @Injectable()
 export class QuizzesService {
@@ -19,7 +20,7 @@ export class QuizzesService {
 
   async findById(userId: string, quizId: string): Promise<QuizDetailDTO> {
     const foundQuiz = await this.quizzesRepo.findById(userId, quizId);
-    if (!foundQuiz || foundQuiz.workspace.userId !== userId) {
+    if (!foundQuiz) {
       throw new NotFoundException('Quiz no encontrado');
     }
     return foundQuiz;

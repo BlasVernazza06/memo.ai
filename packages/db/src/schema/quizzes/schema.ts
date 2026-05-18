@@ -1,7 +1,4 @@
-import {
-  type InferInsertModel,
-  type InferSelectModel,
-} from 'drizzle-orm';
+import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
 import {
   boolean,
   integer,
@@ -10,8 +7,9 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
-import { workspace } from '../workspaces/schema';
+
 import { user } from '../users/schema';
+import { workspace } from '../workspaces/schema';
 
 export const quiz = pgTable('quiz', {
   id: text('id').primaryKey(),
@@ -35,7 +33,7 @@ export const quizQuestion = pgTable('quiz_question', {
     .notNull()
     .references(() => quiz.id, { onDelete: 'cascade' }),
   question: text('question').notNull(),
-  options: jsonb('options').notNull(),
+  options: jsonb('options').$type<string[]>().notNull(),
   correctAnswer: integer('correct_answer').notNull(),
   explanation: text('explanation'),
   order: integer('order').default(0).notNull(),

@@ -6,11 +6,13 @@ import { type Database, quiz, quizQuestion, workspace } from '@repo/db';
 
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
+import { QuizCardDTO, QuizDetailDTO } from '../dto/quiz.dto';
+
 @Injectable()
 export class QuizzesRepository {
   constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
 
-  async findAllByUser(userId: string) {
+  async findAllByUser(userId: string): Promise<QuizCardDTO[]> {
     const data = await this.db
       .select({
         id: quiz.id,
@@ -31,7 +33,10 @@ export class QuizzesRepository {
     return data;
   }
 
-  async findByWorkspace(userId: string, workspaceId: string) {
+  async findByWorkspace(
+    userId: string,
+    workspaceId: string,
+  ): Promise<QuizCardDTO[]> {
     const data = await this.db
       .select({
         id: quiz.id,
@@ -60,7 +65,10 @@ export class QuizzesRepository {
     return data;
   }
 
-  async findById(userId: string, quizId: string) {
+  async findById(
+    userId: string,
+    quizId: string,
+  ): Promise<QuizDetailDTO | undefined> {
     const [q] = await this.db
       .select({
         id: quiz.id,
