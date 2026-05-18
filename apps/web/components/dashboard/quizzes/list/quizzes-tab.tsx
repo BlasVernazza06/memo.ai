@@ -1,10 +1,14 @@
 import Link from 'next/link';
+
 import { useState } from 'react';
+
 import { Brain, ChevronRight } from 'lucide-react';
-import type { DbQuiz } from '@repo/db';
+
+import { QuizCardDTO } from '@repo/validators';
+
 import SearchInput from '@/components/shared/search-input';
 
-export default function QuizzesList({ quizzes }: { quizzes: DbQuiz[] }) {
+export default function QuizzesList({ quizzes }: { quizzes: QuizCardDTO[] }) {
   const [filtered, setFiltered] = useState(quizzes);
 
   return (
@@ -18,7 +22,7 @@ export default function QuizzesList({ quizzes }: { quizzes: DbQuiz[] }) {
       {filtered.length === 0 ? (
         <div className="py-24 flex flex-col items-center justify-center space-y-4">
           <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center text-muted-foreground mb-2">
-             <Brain className="w-8 h-8 opacity-50" />
+            <Brain className="w-8 h-8 opacity-50" />
           </div>
           <p className="text-muted-foreground font-medium text-lg">
             No hay cuestionarios aún.
@@ -27,7 +31,6 @@ export default function QuizzesList({ quizzes }: { quizzes: DbQuiz[] }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filtered.map((quiz) => {
-            const questionCount = quiz.questions?.length || 0;
             return (
               <Link
                 key={quiz.id}
@@ -41,7 +44,7 @@ export default function QuizzesList({ quizzes }: { quizzes: DbQuiz[] }) {
                     <Brain className="w-6 h-6" />
                   </div>
                   <div className="w-10 h-10 rounded-full bg-background/50 border border-border/50 flex items-center justify-center opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                     <ChevronRight className="w-4 h-4 text-emerald-500" />
+                    <ChevronRight className="w-4 h-4 text-emerald-500" />
                   </div>
                 </div>
                 <div className="space-y-3 mt-auto relative z-10">
@@ -55,7 +58,7 @@ export default function QuizzesList({ quizzes }: { quizzes: DbQuiz[] }) {
                   </div>
                   <div className="flex items-center justify-between border-t border-border/40 pt-4">
                     <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest bg-background/60 shadow-inner px-3 py-1.5 rounded-lg border border-border/30">
-                      {questionCount} Preguntas
+                      {quiz.totalQuestions} Preguntas
                     </span>
                   </div>
                 </div>

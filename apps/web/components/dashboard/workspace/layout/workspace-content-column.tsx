@@ -1,6 +1,6 @@
 'use client';
 
-import { Layers, type LucideIcon, Plus } from 'lucide-react';
+import { Layers, Plus } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';

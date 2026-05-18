@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { Sparkles, Zap } from 'lucide-react';
 
+import { PricingCards } from '@/components/landing/pricing/pricing-cards';
+import { PricingCTA } from '@/components/landing/pricing/pricing-cta';
+import { PLAN_FEATURES, Plan } from '@/components/landing/pricing/pricing-data';
+import { PricingFAQ } from '@/components/landing/pricing/pricing-faq';
+import { PricingFeatureComparison } from '@/components/landing/pricing/pricing-feature-comparison';
+import { PricingHeader } from '@/components/landing/pricing/pricing-header';
+import { PricingHero } from '@/components/landing/pricing/pricing-hero';
+import { TestimonialStrip } from '@/components/landing/pricing/testimonial-strip';
 import { apiFetchClient } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-provider';
-
-import { PricingHeader } from './pricing/pricing-header';
-import { PricingHero } from './pricing/pricing-hero';
-import { PricingCards } from './pricing/pricing-cards';
-import { PricingFeatureComparison } from './pricing/pricing-feature-comparison';
-import { TestimonialStrip } from './pricing/testimonial-strip';
-import { PricingFAQ } from './pricing/pricing-faq';
-import { PricingCTA } from './pricing/pricing-cta';
-import { Plan, PLAN_FEATURES } from './pricing/pricing-data';
 
 export default function PricingPageContent() {
   const { user } = useAuth();
@@ -26,7 +26,10 @@ export default function PricingPageContent() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        interface RawPlan extends Omit<Plan, 'icon' | 'cta' | 'price' | 'popular'> {
+        interface RawPlan extends Omit<
+          Plan,
+          'icon' | 'cta' | 'price' | 'popular'
+        > {
           price: number;
           popular: boolean;
         }
@@ -56,16 +59,16 @@ export default function PricingPageContent() {
       <PricingHeader />
 
       <main>
-        <PricingHero 
-          billingCycle={billingCycle} 
-          setBillingCycle={setBillingCycle} 
+        <PricingHero
+          billingCycle={billingCycle}
+          setBillingCycle={setBillingCycle}
         />
 
-        <PricingCards 
-          plans={plans} 
-          loading={loading} 
-          billingCycle={billingCycle} 
-          userPlan={user?.plan} 
+        <PricingCards
+          plans={plans}
+          loading={loading}
+          billingCycle={billingCycle}
+          userPlan={user?.plan}
         />
 
         <PricingFeatureComparison />

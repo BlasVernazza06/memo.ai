@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import type {
-  CreateWorkspaceDto,
-  UpdateWorkspaceDto,
-  WorkspaceCardDto,
+  CreateWorkspaceDTO,
+  UpdateWorkspaceDTO,
+  WorkspaceCardDTO,
 } from '@modules/workspaces/dto/workspace.dto';
 import { and, count, countDistinct, eq, ilike, or, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,7 +24,7 @@ import {
 
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
-import { FlashcardUpdateDto } from '../dto/workspace.dto';
+import { FlashcardUpdateDTO } from '../dto/workspace.dto';
 
 @Injectable()
 export class WorkspacesRepository {
@@ -32,7 +32,7 @@ export class WorkspacesRepository {
 
   async create(
     userId: string,
-    data: CreateWorkspaceDto,
+    data: CreateWorkspaceDTO,
   ): Promise<{ id: string }> {
     const workspaceId = uuidv4();
     const batchRequests: unknown[] = [];
@@ -202,7 +202,7 @@ export class WorkspacesRepository {
     return { id: workspaceId };
   }
 
-  async findAllForCards(userId: string): Promise<WorkspaceCardDto[]> {
+  async findAllForCards(userId: string): Promise<WorkspaceCardDTO[]> {
     const data = await this.db
       .select({
         id: workspace.id,
@@ -319,10 +319,6 @@ export class WorkspacesRepository {
   }
 
   async delete(userId: string, workspaceId: string): Promise<boolean> {
-    // Gracias al 'onDelete: cascade' en el esquema de la base de datos,
-    // solo necesitamos borrar el workspace principal.
-    // Los documentos, quizzes, flashcards, chats, etc., se borrarán automáticamente en la BD.
-
     const result = await this.db
       .delete(workspace)
       .where(
@@ -354,7 +350,7 @@ export class WorkspacesRepository {
   async update(
     userId: string,
     workspaceId: string,
-    data: Partial<UpdateWorkspaceDto>,
+    data: Partial<UpdateWorkspaceDTO>,
   ): Promise<boolean> {
     const result = await this.db
       .update(workspace)
@@ -377,7 +373,7 @@ export class WorkspacesRepository {
 
   async addFlashcards(
     workspaceId: string,
-    cards: FlashcardUpdateDto[],
+    cards: FlashcardUpdateDTO[],
     deckName?: string,
   ): Promise<void> {
     const deckId = uuidv4();
@@ -392,7 +388,7 @@ export class WorkspacesRepository {
     );
 
     const cardsToInsert: NewFlashcard[] = cards.map(
-      (f: FlashcardUpdateDto) => ({
+      (f: FlashcardUpdateDTO) => ({
         id: uuidv4(),
         deckId,
         front: f.front || f.question || '',

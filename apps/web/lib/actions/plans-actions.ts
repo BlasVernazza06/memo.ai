@@ -1,23 +1,12 @@
-import { type LucideIcon } from 'lucide-react';
 import { cacheLife } from 'next/cache';
-import { apiFetch } from './api-fetch';
 
-export interface Plan {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stripePriceId: string;
-  features: string[];
-  popular: boolean;
-  icon: LucideIcon;
-  cta: string;
-}
+import { apiFetch } from '@/lib/api-fetch';
+import { Plan } from '@/types/plans';
 
 export async function getCachedPlans(): Promise<Plan[]> {
   'use cache';
   cacheLife('hours'); // Plans don't change often
-  
+
   try {
     const plans = await apiFetch<Plan[]>('/plans', { skipCookies: true });
     return plans;

@@ -4,21 +4,20 @@ import Link from 'next/link';
 
 import { useState } from 'react';
 
-import { Filter, Grid, Layers, List, Plus } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { Grid, Layers, List, Plus } from 'lucide-react';
+import { motion } from 'motion/react';
 
 import { Button } from '@repo/ui/components/ui/button';
+import { WorkspaceCardDTO } from '@repo/validators';
 
-import WorkspaceCard, {
-  Workspace,
-} from '@/components/dashboard/workspace/list/workspace-card';
+import WorkspaceCard from '@/components/dashboard/workspace/list/workspace-card';
 import SearchInput from '@/components/shared/search-input';
 
 interface WorkspacesClientProps {
-  initialWorkspaces: Workspace[];
+  initialWorkspaces: WorkspaceCardDTO[];
 }
 
-const SEARCH_KEYS: (keyof Workspace)[] = ['name', 'category'];
+const SEARCH_KEYS: (keyof WorkspaceCardDTO)[] = ['name', 'description'];
 
 export default function WorkspacesClient({
   initialWorkspaces,
@@ -36,7 +35,7 @@ export default function WorkspacesClient({
           data={initialWorkspaces}
           onResultsChange={setFilteredWorkspaces}
           searchKeys={SEARCH_KEYS}
-          placeholder="Buscar por nombre o categoría..."
+          placeholder="Buscar por nombre o descripción..."
           className="flex-1 w-full"
           value={searchQuery}
           onChange={setSearchQuery}
