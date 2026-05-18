@@ -11,7 +11,9 @@ import AuthLeftPanel from '@/components/auth/auth-left-panel';
 import OAuthButtons from '@/components/auth/forms/oauth-buttons';
 import SignUpForm from '@/components/auth/forms/signUp-form';
 
-export default function RegisterPage() {
+import { Suspense } from 'react';
+
+function RegisterContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
@@ -95,5 +97,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        Cargando...
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
   );
 }

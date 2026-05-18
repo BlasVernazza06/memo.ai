@@ -10,7 +10,9 @@ import { motion } from 'motion/react';
 import AuthRightPanel from '@/components/auth/auth-right-panel';
 import SignInForm from '@/components/auth/forms/signIn-form';
 
-export default function LoginPage() {
+import { Suspense } from 'react';
+
+function LoginContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
@@ -78,5 +80,17 @@ export default function LoginPage() {
         <AuthRightPanel />
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        Cargando...
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
