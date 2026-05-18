@@ -1,4 +1,4 @@
-export * from './auth-schema';
+export * from './auth';
 export * from './chat-schema';
 export * from './notification-schema';
-export * from './workspace-schema';
+export * from './workspace';
