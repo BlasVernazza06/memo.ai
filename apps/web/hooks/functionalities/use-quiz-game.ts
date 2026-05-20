@@ -2,8 +2,10 @@ import { useParams } from 'next/navigation';
 
 import { useEffect, useState } from 'react';
 
-import { apiFetchClient } from '@/lib/api-client';
 import { QuizDetailDTO, QuizQuestionDTO } from '@repo/validators';
+
+import { apiFetchClient } from '@/lib/api-client';
+import { recordStreakActivity } from '@/lib/record-streak-activity';
 
 export function useQuizGame() {
   const params = useParams();
@@ -133,6 +135,7 @@ export function useQuizGame() {
       setShake(false);
     } else {
       setGameState('completed');
+      recordStreakActivity();
     }
   };
 
