@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { DbStreake } from '@repo/db';
+import { StreakDTO } from '@repo/validators';
 
 import { ProfileAchievements } from '@/components/profile/profile-achievements';
 import { ProfileHero } from '@/components/profile/profile-hero';
@@ -17,7 +17,9 @@ export default async function ProfilePage() {
     return redirect('/auth/login');
   }
 
-  const streak = await apiFetch<DbStreake>(`/streaks`);
+  const streak = await apiFetch<StreakDTO | null>(`/streaks`, {
+    notFoundAsNull: true,
+  });
 
   // TODO: Fetch these real counts from your backend API
   // You could create a single endpoint like /users/me/stats

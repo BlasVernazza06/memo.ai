@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   BarChart3,
@@ -14,6 +14,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { toast } from 'sonner';
 
 import { Button } from '@repo/ui/components/ui/button';
 import { WorkspaceDetailDTO } from '@repo/validators';
@@ -61,10 +62,20 @@ export default function WorkspaceDetailClient({
   ) => {
     try {
       setIsGenerating(true);
-      await generateMoreContent(type, workspaceId, prompt);
+      const res = await generateMoreContent(type, workspaceId, prompt);
+      if (res && !res.success) {
+        toast.error(res.error || 'Error al generar más contenido');
+        return;
+      }
       await fetchWorkspace();
+      toast.success(
+        type === 'flashcards'
+          ? '¡Nuevas Flashcards creadas con éxito!'
+          : '¡Nuevo Quiz creado con éxito!'
+      );
     } catch (error) {
       console.error('Error generating more content:', error);
+      toast.error('Error al generar más contenido');
     } finally {
       setIsGenerating(false);
     }
@@ -200,8 +211,7 @@ export default function WorkspaceDetailClient({
           />
 
           <WorkspaceInsightsColumn
-            onGenerateMore={handleGenerateMore}
-            isGenerating={isGenerating}
+            workspace={workspace}
           />
         </div>
       </div>

@@ -1,152 +1,225 @@
 'use client';
 
-import { Trophy, Sparkles, Layers, Brain } from 'lucide-react';
-import { useState } from 'react';
-
-import { Button } from '@repo/ui/components/ui/button';
-import { Textarea } from '@repo/ui/components/ui/textarea';
+import {
+  Trophy,
+  Sparkles,
+  Brain,
+  BookOpen,
+  Zap,
+  Target,
+  ArrowUpRight
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import { WorkspaceDetailDTO } from '@repo/validators';
 
 interface WorkspaceInsightsColumnProps {
-  onGenerateMore: (type: 'flashcards' | 'quizzes', prompt?: string) => void;
-  isGenerating?: boolean;
+  workspace: WorkspaceDetailDTO;
 }
 
 export function WorkspaceInsightsColumn({
-  onGenerateMore,
-  isGenerating = false,
+  workspace,
 }: WorkspaceInsightsColumnProps) {
-  const [prompt, setPrompt] = useState('');
+  // 1. Calcular Dominio Real
+  const decks = workspace.flashcardDecks || [];
+  let totalCards = 0;
+  let totalMastery = 0;
+
+  decks.forEach((d) => {
+    if (Array.isArray(d.flashcards)) {
+      d.flashcards.forEach((c: any) => {
+        totalCards++;
+        totalMastery += c.mastery || 0;
+      });
+    }
+  });
+
+  const averageMastery = totalCards > 0 ? Math.round(totalMastery / totalCards) : 0;
+  const totalQuizzes = workspace.quizzes?.length || 0;
+  const totalDecks = workspace.flashcardDecks?.length || 0;
+  const primaryDoc = workspace.documents?.[0];
+
   return (
     <div className="lg:col-span-3 space-y-6 lg:sticky lg:top-8">
-      {/* Domain Metrics */}
-      <div className="bg-slate-900 border border-slate-800 text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full -mr-16 -mt-16" />
-
-        <div className="flex items-center gap-2 mb-8 opacity-40">
-          <Trophy className="w-3 h-3" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+      {/* 1. DOMINIO GLOBAL (Nivel de Maestría del Workspace) */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-slate-950 border border-slate-900 text-white rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/15 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/25 transition-all duration-500" />
+        
+        <div className="flex items-center gap-2 mb-6 opacity-40">
+          <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
             Dominio Global
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-6 mb-8">
-          <div className="relative w-28 h-28">
-            <svg className="w-full h-full -rotate-90">
+        <div className="flex flex-col items-center gap-5 mb-6">
+          <div className="relative w-28 h-28 flex items-center justify-center">
+            {/* SVG Circular Progress con efecto resplandor */}
+            <svg className="absolute inset-0 w-full h-full -rotate-90">
               <circle
                 cx="56"
                 cy="56"
-                r="50"
+                r="48"
                 className="stroke-white/5 fill-none"
-                strokeWidth="8"
+                strokeWidth="7"
               />
-              <circle
+              <motion.circle
                 cx="56"
                 cy="56"
-                r="50"
+                r="48"
                 className="stroke-primary fill-none transition-all duration-1000"
-                strokeWidth="8"
-                strokeDasharray="314"
-                strokeDashoffset={314 * (1 - 0.68)}
+                strokeWidth="7"
+                strokeDasharray="301.6"
+                initial={{ strokeDashoffset: 301.6 }}
+                animate={{ strokeDashoffset: 301.6 * (1 - averageMastery / 100) }}
                 strokeLinecap="round"
               />
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center font-black text-2xl tracking-tighter">
-              68 <span className="text-xs ml-0.5 opacity-40">%</span>
+            <div className="flex flex-col items-center justify-center relative">
+              <span className="font-black text-3xl tracking-tighter bg-linear-to-r from-white to-slate-350 bg-clip-text text-transparent">
+                {averageMastery}
+              </span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-primary mt-0.5">%</span>
             </div>
           </div>
+          
           <div className="text-center">
-            <p className="font-black text-lg leading-tight">
-              Buen Progreso
-            </p>
-            <p className="text-[10px] font-medium opacity-50 mt-1 uppercase tracking-widest text-balance">
-              Superando al 84% de usuarios
+            <h4 className="font-black text-md leading-tight text-white">
+              {averageMastery >= 80
+                ? '¡Dominio Excelente!'
+                : averageMastery >= 50
+                  ? 'Progreso Sólido'
+                  : averageMastery >= 20
+                    ? 'En Buen Camino'
+                    : 'Iniciando Aprendizaje'}
+            </h4>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+              {totalCards} {totalCards === 1 ? 'Concepto' : 'Conceptos'} en Total
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 pt-6 border-t border-white/5">
+        {/* Pequeño grid de datos abajo */}
+        <div className="grid grid-cols-2 gap-3 pt-5 border-t border-white/5">
           <div className="space-y-1">
-            <p className="text-[9px] font-bold opacity-30 uppercase">
-              Material
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+              Mazos
             </p>
-            <p className="font-black text-base">12/40</p>
+            <p className="font-black text-sm text-slate-200">
+              {totalDecks}
+            </p>
           </div>
           <div className="space-y-1">
-            <p className="text-[9px] font-bold opacity-30 uppercase">
-              Sesiones
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+              Quizzes
             </p>
-            <p className="font-black text-base">8 Hoy</p>
+            <p className="font-black text-sm text-slate-200">
+              {totalQuizzes}
+            </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* AI Suggestion Tip */}
-      <div className="bg-card/40 backdrop-blur-xl border border-border/40 rounded-4xl p-6 relative group overflow-hidden shadow-sm hover:shadow-md transition-all">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
-        <Sparkles className="w-5 h-5 text-primary mb-4" />
-        <h3 className="font-black text-xs uppercase tracking-widest mb-2">
-          Memo IA Sugiere
-        </h3>
-        <p className="text-[13px] text-muted-foreground leading-relaxed font-medium">
-          Has mejorado en <strong>Teoría de Redes</strong>. Repasemos
-          estos conceptos antes de tu próximo quiz.
-        </p>
-      </div>
+      {/* 2. RECOMENDACIONES DE REPASO IA (Widget Premium y Dinámico) */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.15 }}
+        className="bg-card border border-border/40 rounded-[2.5rem] p-6 shadow-xs relative overflow-hidden group hover:shadow-md hover:border-primary/20 transition-all duration-300"
+      >
+        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-primary/10 transition-all duration-500" />
+        
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+            <h3 className="font-black text-[10px] uppercase tracking-widest text-foreground">
+              Memo IA Sugiere
+            </h3>
+          </div>
+        </div>
 
-      {/* Generate More Section */}
-      <div className="bg-primary/5 border border-primary/10 rounded-4xl p-6 space-y-4">
-        <h3 className="font-black text-[10px] uppercase tracking-widest opacity-60 flex items-center gap-2">
-          <Sparkles className="w-3 h-3" />
-          Expandir Conocimiento
+        <div className="space-y-4">
+          <p className="text-[12px] text-muted-foreground leading-relaxed font-semibold">
+            {averageMastery < 30 ? (
+              <>
+                Has cargado el tema <strong>{workspace.name}</strong>. Te recomendamos repasar las <strong>flashcards iniciales</strong> para fijar los conceptos básicos antes de tomar tu primer cuestionario.
+              </>
+            ) : averageMastery < 70 ? (
+              <>
+                ¡Buen avance en <strong>{workspace.name}</strong>! Es hora de desafiarte realizando un <strong>quiz personalizado</strong> para consolidar los conocimientos intermedios.
+              </>
+            ) : (
+              <>
+                ¡Increíble dominio del tema! Estás listo para tomar el control absoluto. Revisa los conceptos que te resulten más difíciles y alcanza el 100% de maestría.
+              </>
+            )}
+          </p>
+
+          {/* Tarjeta de objetivo rápido interactivo */}
+          <div className="bg-muted/30 border border-border/20 rounded-2xl p-3 flex items-center justify-between group/action hover:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Target className="w-4 h-4 text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black text-foreground">Siguiente Meta</p>
+                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight mt-0.5">
+                  {averageMastery < 50 ? 'Subir al 50% de Dominio' : 'Alcanzar el 90%'}
+                </p>
+              </div>
+            </div>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover/action:text-primary group-hover/action:translate-x-0.5 group-hover/action:-translate-y-0.5 transition-all" />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 3. RESUMEN DE MATERIAL DEL WORKSPACE */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.25 }}
+        className="bg-muted/20 border border-border/30 rounded-[2.5rem] p-6 shadow-2xs space-y-4"
+      >
+        <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+          Detalle del Workspace
         </h3>
 
         <div className="space-y-3">
-          <div className="space-y-1.5">
-            <label className="text-[9px] font-bold opacity-40 uppercase ml-1">
-              ¿En qué quieres enfocarte? (Opcional)
-            </label>
-            <Textarea
-              placeholder="Ej: Enfócate en los capítulos 3 y 4, o haz preguntas más difíciles..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="resize-none bg-background/50 border-primary/10 rounded-2xl text-xs min-h-[80px] focus-visible:ring-primary/20"
-              disabled={isGenerating}
-            />
+          <div className="flex items-center justify-between py-1.5 border-b border-border/20">
+            <div className="flex items-center gap-2.5">
+              <BookOpen className="w-3.5 h-3.5 text-blue-500" />
+              <span className="text-[10px] font-bold text-foreground">Documento Fuente</span>
+            </div>
+            <span className="text-[9.5px] font-black text-muted-foreground max-w-[120px] truncate" title={primaryDoc?.name}>
+              {primaryDoc?.name || 'Texto Personalizado'}
+            </span>
           </div>
-          
-          <div className="grid grid-cols-1 gap-2">
-            <Button
-              onClick={() => onGenerateMore('flashcards', prompt)}
-              disabled={isGenerating}
-              variant="outline"
-              className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
-            >
-              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Layers className="w-4 h-4 text-primary" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs">Más Flashcards</p>
-                <p className="text-[9px] opacity-50 font-medium">Nuevos conceptos</p>
-              </div>
-            </Button>
 
-            <Button
-              onClick={() => onGenerateMore('quizzes', prompt)}
-              disabled={isGenerating}
-              variant="outline"
-              className="w-full justify-start gap-3 rounded-2xl border-primary/20 hover:bg-primary/10 hover:border-primary/30 transition-all font-bold group"
-            >
-              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Brain className="w-4 h-4 text-primary" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs">Más Quizzes</p>
-                <p className="text-[9px] opacity-50 font-medium">Ponte a prueba</p>
-              </div>
-            </Button>
+          <div className="flex items-center justify-between py-1.5 border-b border-border/20">
+            <div className="flex items-center gap-2.5">
+              <Zap className="w-3.5 h-3.5 text-yellow-500" />
+              <span className="text-[10px] font-bold text-foreground">Conceptos Clave</span>
+            </div>
+            <span className="text-[9.5px] font-black text-muted-foreground">
+              {totalCards} Tarjetas
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between py-1.5">
+            <div className="flex items-center gap-2.5">
+              <Brain className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-[10px] font-bold text-foreground">Cuestionarios</span>
+            </div>
+            <span className="text-[9.5px] font-black text-muted-foreground">
+              {totalQuizzes} Disponibles
+            </span>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,21 +1,17 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { Check, Flame, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { DbStreake } from '@repo/db';
 import { cn } from '@repo/ui/utils';
 import { StreakDTO } from '@repo/validators';
 
-const WEEK_DAYS = [
-  { label: 'Lu', active: true, today: false },
-  { label: 'Ma', active: true, today: false },
-  { label: 'Mi', active: true, today: false },
-  { label: 'Ju', active: true, today: true },
-  { label: 'Vi', active: false, today: false },
-  { label: 'Sa', active: false, today: false },
-  { label: 'Do', active: false, today: false },
-];
+import {
+  buildStreakTimeline,
+  getStreakProgressPercent,
+} from '@/lib/streak-timeline';
 
 interface ProfileStreakProps {
   user:
@@ -24,10 +20,17 @@ interface ProfileStreakProps {
       }
     | null
     | undefined;
-  streak: DbStreake;
+  streak: StreakDTO | null;
 }
 
 export function ProfileStreak({ user, streak }: ProfileStreakProps) {
+  const timelineDays = useMemo(() => buildStreakTimeline(streak), [streak]);
+  const progressPercent = useMemo(
+    () => getStreakProgressPercent(timelineDays),
+    [timelineDays],
+  );
+  const hasActiveStreak = (streak?.currentStreak ?? 0) > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -56,8 +59,14 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
               </div>
             </div>
             <p className="text-orange-50/90 text-xs font-bold flex items-center gap-1.5 bg-white/10 w-fit px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-sm">
-              ¡Estás en llamas, {user?.name?.split(' ')[0] || 'Memo'}!
-              <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
+              {hasActiveStreak ? (
+                <>
+                  ¡Estás en llamas, {user?.name?.split(' ')[0] || 'Memo'}!
+                  <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
+                </>
+              ) : (
+                <>Completa un quiz o flashcards para encender tu racha</>
+              )}
             </p>
           </div>
 
@@ -77,7 +86,7 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
         <div className="relative pt-2">
           {/* Labels Row */}
           <div className="flex items-center justify-between mb-6 px-1">
-            {WEEK_DAYS.map((day, i) => (
+            {timelineDays.map((day, i) => (
               <span
                 key={i}
                 className={cn(
@@ -96,7 +105,7 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
             <div className="absolute top-1/2 left-0 w-full h-1.5 bg-white/10 -translate-y-1/2 rounded-full overflow-hidden backdrop-blur-sm">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: '57%' }}
+                animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 1.5, ease: 'easeOut', delay: 0.5 }}
                 className="h-full bg-linear-to-r from-white via-white/80 to-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
               />
@@ -104,7 +113,7 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
 
             {/* Circles Row */}
             <div className="flex items-center justify-between relative z-10">
-              {WEEK_DAYS.map((day, i) => (
+              {timelineDays.map((day, i) => (
                 <div key={i} className="flex flex-col items-center">
                   <motion.div
                     whileHover={{ scale: 1.1 }}
