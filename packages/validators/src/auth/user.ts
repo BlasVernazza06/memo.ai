@@ -21,7 +21,7 @@ export const StreakSchema = z.object({
   userId: z.string(),
   currentStreak: z.number(),
   maxStreak: z.number(),
-  lastActivityDate: z.date().or(z.string()).nullable(),
+  lastActivity: z.date().or(z.string()).nullable(),
   streakDates: z.array(z.string()),
 });
 
