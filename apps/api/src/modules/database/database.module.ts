@@ -9,6 +9,7 @@ import {
   authSchema,
   chatSchema,
   planSchema,
+  streakSchema,
   workspaceSchema,
 } from '@repo/db';
 
@@ -29,6 +30,7 @@ import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
             ...activitySchema,
             ...chatSchema,
             ...planSchema,
+            ...streakSchema,
           },
         });
       },

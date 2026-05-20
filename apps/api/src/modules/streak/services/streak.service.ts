@@ -1,27 +1,65 @@
 import { Injectable } from '@nestjs/common';
-import { StreakRepository } from '../repositories/streak.repository';
+
+import { StreakRepository } from '@modules/streak/repositories/streak.repository';
+
+import { getDifferenceInCalendarDays } from '@/common/utils/date.utils';
 
 @Injectable()
 export class StreakService {
-  private readonly useMock = process.env.USE_MOCK_DATA === 'true';
-
   constructor(private readonly streakRepository: StreakRepository) {}
 
   async getUserStreak(userId: string) {
-    // Si el modo mock está activado, devolvemos datos falsos sin tocar la DB
-    if (this.useMock) {
-      console.log('🏗️ [MOCK MODE] Returning simulated streak data');
-      return {
-        id: 'mock-id',
-        userId: userId,
-        currentStreak: 12,
-        maxStreak: 25,
-        lastActivity: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    const streak = await this.streakRepository.findByUserId(userId);
+    if (!streak) return null;
+
+    const diffDays = getDifferenceInCalendarDays(
+      new Date(),
+      streak.lastActivity,
+    );
+
+    if (diffDays > 0 && streak.currentStreak > 0) {
+      await this.streakRepository.update(userId, {
+        currentStreak: 0,
+        maxStreak: streak.maxStreak,
+        lastActivity: streak.lastActivity,
+      });
+      streak.currentStreak = 0;
+    }
+    return streak;
+  }
+
+  async recordActivity(userId: string) {
+    const actualDate = new Date();
+    const userStreak = await this.streakRepository.findByUserId(userId);
+
+    if (!userStreak) {
+      await this.streakRepository.create(userId);
+      return;
     }
 
-    return await this.streakRepository.findByUserId(userId);
+    const diffDays = getDifferenceInCalendarDays(
+      actualDate,
+      userStreak.lastActivity,
+    );
+
+    if (diffDays == 0) {
+      await this.streakRepository.update(userId, {
+        currentStreak: userStreak.currentStreak,
+        maxStreak: userStreak?.maxStreak,
+        lastActivity: actualDate,
+      });
+    } else if (diffDays == 1) {
+      await this.streakRepository.update(userId, {
+        currentStreak: userStreak.currentStreak + 1,
+        maxStreak: Math.max(userStreak.maxStreak, userStreak.currentStreak),
+        lastActivity: actualDate,
+      });
+    } else {
+      await this.streakRepository.update(userId, {
+        currentStreak: 0,
+        maxStreak: userStreak?.maxStreak,
+        lastActivity: actualDate,
+      });
+    }
   }
 }
