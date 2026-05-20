@@ -14,7 +14,7 @@ const API_URL =
  */
 export async function apiFetch<T = unknown>(
   path: string,
-  options?: RequestInit & { skipCookies?: boolean },
+  options?: RequestInit & { skipCookies?: boolean; notFoundAsNull?: boolean },
 ): Promise<T> {
   const headers: Record<string, string> = {
     ...(options?.headers as Record<string, string>),
@@ -44,8 +44,16 @@ export async function apiFetch<T = unknown>(
   });
 
   if (!res.ok) {
+    if (options?.notFoundAsNull && res.status === 404) {
+      return null as T;
+    }
     throw new Error(`API error ${res.status}: ${res.statusText}`);
   }
 
-  return res.json() as Promise<T>;
+  const text = await res.text();
+  if (!text.trim()) {
+    return null as T;
+  }
+
+  return JSON.parse(text) as T;
 }

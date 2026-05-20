@@ -31,5 +31,10 @@ export async function apiFetchClient<T = unknown>(
     throw new Error(`API error ${res.status}: ${errorMsg || res.statusText}`);
   }
 
-  return res.json() as Promise<T>;
+  const text = await res.text();
+  if (!text.trim()) {
+    return null as T;
+  }
+
+  return JSON.parse(text) as T;
 }
