@@ -27,6 +27,7 @@ export default async function ProfilePage() {
     documents: 12,
     flashcards: 124,
     quizzes: 8,
+    workspaces: 3,
   };
 
   return (
@@ -48,7 +49,7 @@ export default async function ProfilePage() {
 
         {/* Achievements - Full Width */}
         <div className="lg:col-span-4">
-          <ProfileAchievements />
+          <ProfileAchievements stats={stats} streak={streak} />
         </div>
       </div>
     </div>
