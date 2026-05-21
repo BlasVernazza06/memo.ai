@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "check-types": "tsc -p tsconfig.build.json --noEmit",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
@@ -75,6 +76,8 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "@swc/cli": "^0.7.0",
+    "@swc/core": "^1.11.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },

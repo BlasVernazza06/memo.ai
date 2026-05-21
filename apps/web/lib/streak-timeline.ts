@@ -33,7 +33,7 @@ function buildEmptyTimeline(today: Date): StreakTimelineDay[] {
   return Array.from({ length: TIMELINE_LENGTH }, (_, i) => {
     const date = addCalendarDays(windowStart, i);
     return {
-      label: DAY_LABELS[date.getDay()],
+      label: DAY_LABELS[date.getDay()] ?? 'Do',
       active: false,
       today: date.getTime() === today.getTime(),
     };
@@ -74,7 +74,7 @@ export function buildStreakTimeline(streak: StreakDTO | null): StreakTimelineDay
       date.getTime() <= lastActivity.getTime();
 
     return {
-      label: DAY_LABELS[date.getDay()],
+      label: DAY_LABELS[date.getDay()] ?? 'Do',
       active,
       today: date.getTime() === today.getTime(),
     };

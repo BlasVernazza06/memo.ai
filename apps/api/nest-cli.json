@@ -5,9 +5,7 @@
   "entryFile": "main",
   "compilerOptions": {
     "deleteOutDir": true,
-    "webpack": true,
-    "webpackOptions": {
-      "webpackConfigPath": "./webpack.config.js"
-    }
+    "builder": "swc",
+    "typeCheck": false
   }
 }
