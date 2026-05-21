@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerModule } from '@nestjs/throttler';
 
 import { MockDataInterceptor } from '@/common/interceptors/mock-data.interceptor';
@@ -27,6 +28,7 @@ import { WorkspacesModule } from '@/modules/workspaces/workspaces.module';
       validate: (config) => envSchema.parse(config),
       isGlobal: true,
     }),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     EmailModule,
     BetterAuthModule,
