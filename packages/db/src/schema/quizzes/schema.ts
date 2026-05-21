@@ -53,7 +53,6 @@ export const quizAttempt = pgTable('quiz_attempt', {
     .references(() => user.id),
   score: integer('score').notNull(),
   totalQuestions: integer('total_questions').notNull(),
-  answers: jsonb('answers'),
   completedAt: timestamp('completed_at').defaultNow().notNull(),
 });
 
