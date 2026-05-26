@@ -16,6 +16,7 @@ import { DbUser } from './users';
 import * as users from './users';
 import { DbDocument, DbWorkspace } from './workspaces';
 import * as workspaces from './workspaces';
+import * as achievements from './achievements';
 
 export * from './users';
 export * from './plans';
@@ -25,6 +26,8 @@ export * from './quizzes';
 export * from './activity';
 export * from './chats';
 export * from './strake';
+export * from './achievements';
+
 
 // ============================================================
 // RELATION TYPES (DEEP)
@@ -111,3 +114,9 @@ export const streakSchema = {
   streaks: strake.streaks,
   streakRelations: strake.StreakeRelations,
 };
+
+export const achievementSchema = {
+  userAchievement: achievements.userAchievement,
+  userAchievementRelations: achievements.userAchievementRelations,
+};
+
