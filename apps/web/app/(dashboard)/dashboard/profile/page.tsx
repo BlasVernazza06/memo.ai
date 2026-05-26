@@ -17,9 +17,26 @@ export default async function ProfilePage() {
     return redirect('/auth/login');
   }
 
-  const streak = await apiFetch<StreakDTO | null>(`/streaks`, {
-    notFoundAsNull: true,
-  });
+  // Carga ultra-resiliente de racha con try/catch como fallback ante caídas de red o fallas de base de datos
+  let streak = null;
+  try {
+    streak = await apiFetch<StreakDTO | null>(`/streaks`, {
+      notFoundAsNull: true,
+    });
+  } catch (error) {
+    console.error('Error fetching streak data:', error);
+  }
+
+  // Carga asíncrona de los logros reales del usuario desde el endpoint NestJS
+  let userAchievements = null;
+  try {
+    const res = await apiFetch<{ success: boolean; data: any[] }>(`/achievements`, {
+      notFoundAsNull: true,
+    });
+    userAchievements = res?.data || null;
+  } catch (error) {
+    console.error('Error fetching achievements data:', error);
+  }
 
   // TODO: Fetch these real counts from your backend API
   // You could create a single endpoint like /users/me/stats
@@ -49,7 +66,11 @@ export default async function ProfilePage() {
 
         {/* Achievements - Full Width */}
         <div className="lg:col-span-4">
-          <ProfileAchievements stats={stats} streak={streak} />
+          <ProfileAchievements 
+            stats={stats} 
+            streak={streak} 
+            achievements={userAchievements} 
+          />
         </div>
       </div>
     </div>
