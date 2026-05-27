@@ -18,6 +18,7 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import { z } from 'zod';
 
+import { toast } from 'sonner';
 import { Button } from '@repo/ui/components/ui/button';
 import { CreateWorkspaceDTO, CreateWorkspaceSchema } from '@repo/validators';
 
@@ -231,10 +232,19 @@ export default function NewWorkspaceChatPage() {
       });
 
       console.log('[NewWorkspace] Creando registro en la base de datos...');
-      const data = await apiFetchClient<{ id: string }>(`/workspaces`, {
+      const data = await apiFetchClient<{ id: string; newlyUnlocked?: any[] }>(`/workspaces`, {
         method: 'POST',
         body: JSON.stringify(finalWorkspaceData),
       });
+
+      if (data?.newlyUnlocked && data.newlyUnlocked.length > 0) {
+        data.newlyUnlocked.forEach((achievement) => {
+          toast(`${achievement.icon || '🏆'} ¡Logro Desbloqueado!`, {
+            description: `Has ganado la insignia "${achievement.title}". ¡Felicidades!`,
+            duration: 6000,
+          });
+        });
+      }
 
       router.push(
         `/dashboard/workspaces/${slugify(finalWorkspaceData.name)}-${getShortId(data.id)}`,

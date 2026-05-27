@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { redirect } from 'next/navigation';
 
 import { StreakDTO } from '@repo/validators';
@@ -30,22 +32,37 @@ export default async function ProfilePage() {
   // Carga asíncrona de los logros reales del usuario desde el endpoint NestJS
   let userAchievements = null;
   try {
-    const res = await apiFetch<{ success: boolean; data: any[] }>(`/achievements`, {
-      notFoundAsNull: true,
-    });
+    const res = await apiFetch<{ success: boolean; data: any[] }>(
+      `/achievements`,
+      {
+        notFoundAsNull: true,
+      },
+    );
     userAchievements = res?.data || null;
   } catch (error) {
     console.error('Error fetching achievements data:', error);
   }
 
-  // TODO: Fetch these real counts from your backend API
-  // You could create a single endpoint like /users/me/stats
-  const stats = {
-    documents: 12,
-    flashcards: 124,
-    quizzes: 8,
-    workspaces: 3,
+  let stats = {
+    documents: 0,
+    flashcards: 0,
+    quizzes: 0,
+    workspaces: 0,
   };
+
+  try {
+    const res = await apiFetch<{
+      workspaces: number;
+      documents: number;
+      flashcards: number;
+      quizzes: number;
+    }>('/users/me/stats');
+    if (res) {
+      stats = res;
+    }
+  } catch (error) {
+    console.error('Error fetching stats data:', error);
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
@@ -66,10 +83,10 @@ export default async function ProfilePage() {
 
         {/* Achievements - Full Width */}
         <div className="lg:col-span-4">
-          <ProfileAchievements 
-            stats={stats} 
-            streak={streak} 
-            achievements={userAchievements} 
+          <ProfileAchievements
+            stats={stats}
+            streak={streak}
+            achievements={userAchievements}
           />
         </div>
       </div>
