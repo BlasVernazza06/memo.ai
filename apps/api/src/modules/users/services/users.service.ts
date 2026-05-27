@@ -106,4 +106,8 @@ export class UsersService {
       updatedAt: new Date(),
     });
   }
+
+  async getUserStats(userId: string) {
+    return await this.userRepo.getUserStats(userId);
+  }
 }

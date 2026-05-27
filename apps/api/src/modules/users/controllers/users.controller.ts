@@ -23,6 +23,11 @@ export class UsersController {
     return this.usersService.getUser(session.user.id);
   }
 
+  @Get('me/stats')
+  async getMyStats(@Session() session: UserSession) {
+    return this.usersService.getUserStats(session.user.id);
+  }
+
   @Delete('')
   async delete(@Session() session: UserSession) {
     return this.usersService.deleteUser(session.user.id);

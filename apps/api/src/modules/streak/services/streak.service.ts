@@ -17,7 +17,18 @@ export class StreakService {
       streak.lastActivity,
     );
 
-    if (diffDays > 0 && streak.currentStreak > 0) {
+    // Auto-curación: Si la última actividad fue hoy o ayer (diffDays <= 1), pero la racha quedó en 0 por el bug anterior,
+    // la reparamos a 1 de forma segura ya que el usuario completó actividad dentro del plazo de gracia.
+    if (diffDays <= 1 && streak.currentStreak === 0) {
+      await this.streakRepository.update(userId, {
+        currentStreak: 1,
+        maxStreak: Math.max(streak.maxStreak, 1),
+        lastActivity: streak.lastActivity,
+      });
+      streak.currentStreak = 1;
+      streak.maxStreak = Math.max(streak.maxStreak, 1);
+    } else if (diffDays > 1 && streak.currentStreak > 0) {
+      // Un día de gracia: solo reiniciamos a 0 si han pasado más de 1 día calendario sin actividad
       await this.streakRepository.update(userId, {
         currentStreak: 0,
         maxStreak: streak.maxStreak,
@@ -49,15 +60,17 @@ export class StreakService {
         lastActivity: actualDate,
       });
     } else if (diffDays == 1) {
+      const nextStreak = userStreak.currentStreak + 1;
       await this.streakRepository.update(userId, {
-        currentStreak: userStreak.currentStreak + 1,
-        maxStreak: Math.max(userStreak.maxStreak, userStreak.currentStreak),
+        currentStreak: nextStreak,
+        maxStreak: Math.max(userStreak.maxStreak, nextStreak),
         lastActivity: actualDate,
       });
     } else {
+      // Si la racha se había roto (pasó más de 1 día), la reiniciamos comenzando en 1 hoy
       await this.streakRepository.update(userId, {
-        currentStreak: 0,
-        maxStreak: userStreak?.maxStreak,
+        currentStreak: 1,
+        maxStreak: Math.max(userStreak.maxStreak, 1),
         lastActivity: actualDate,
       });
     }

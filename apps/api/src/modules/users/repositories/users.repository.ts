@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { DATABASE_CONNECTION } from '@modules/database/database-connection';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 import {
   type Database,
@@ -10,6 +10,9 @@ import {
   quiz,
   user,
   workspace,
+  document,
+  flashcard,
+  quizAttempt,
 } from '@repo/db';
 
 @Injectable()
@@ -92,5 +95,50 @@ export class UsersRepository {
       });
       return quizzes.length;
     }
+  }
+
+  async getUserStats(userId: string) {
+    const workspaces = await this.db.query.workspace.findMany({
+      where: eq(workspace.userId, userId),
+    });
+    const workspacesCount = workspaces.length;
+
+    const workspaceIds = workspaces.map((w) => w.id);
+    let documentsCount = 0;
+    let flashcardsCount = 0;
+
+    if (workspaceIds.length > 0) {
+      // contar documentos
+      const docs = await this.db.query.document.findMany({
+        where: inArray(document.workspaceId, workspaceIds),
+      });
+      documentsCount = docs.length;
+
+      // contar decks de flashcards
+      const decks = await this.db.query.flashcardDeck.findMany({
+        where: inArray(flashcardDeck.workspaceId, workspaceIds),
+      });
+      const deckIds = decks.map((d) => d.id);
+      if (deckIds.length > 0) {
+        // contar flashcards reales
+        const cards = await this.db.query.flashcard.findMany({
+          where: inArray(flashcard.deckId, deckIds),
+        });
+        flashcardsCount = cards.length;
+      }
+    }
+
+    // contar intentos de quiz completados
+    const attempts = await this.db.query.quizAttempt.findMany({
+      where: eq(quizAttempt.userId, userId),
+    });
+    const quizzesCount = attempts.length;
+
+    return {
+      workspaces: workspacesCount,
+      documents: documentsCount,
+      flashcards: flashcardsCount,
+      quizzes: quizzesCount,
+    };
   }
 }
