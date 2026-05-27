@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@thallesp/nestjs-better-auth';
 import { User } from '@/common/decorators/user.decorator';
 import { QuizzesService } from '../services/quizzes.service';
@@ -28,5 +28,18 @@ export class QuizzesController {
     @Param('id') id: string,
   ): Promise<QuizDetailDTO> {
     return await this.quizzesService.findById(userId, id);
+  }
+
+  @Post(':id/complete')
+  async completeQuiz(
+    @User('id') userId: string,
+    @Param('id') id: string,
+    @Body('score') score: number,
+  ) {
+    const newlyUnlocked = await this.quizzesService.completeQuiz(userId, id, score);
+    return {
+      success: true,
+      newlyUnlocked,
+    };
   }
 }

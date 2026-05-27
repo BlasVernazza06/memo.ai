@@ -1,12 +1,9 @@
 import { useParams } from 'next/navigation';
-
 import { useEffect, useState } from 'react';
-
 import { QuizDetailDTO, QuizQuestionDTO } from '@repo/validators';
-
 import { apiFetchClient } from '@/lib/api-client';
 import { recordStreakActivity } from '@/lib/record-streak-activity';
-
+import { toast } from 'sonner';
 export function useQuizGame() {
   const params = useParams();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -28,14 +25,12 @@ export function useQuizGame() {
   const [quiz, setQuiz] = useState<QuizDetailDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shake, setShake] = useState(false);
-
   const workspaceId = (params.id as string)?.includes('-')
     ? (params.id as string).split('-').pop()!
     : (params.id as string);
   const quizId = (params.quizId as string)?.includes('-')
     ? (params.quizId as string).split('-').pop()!
     : (params.quizId as string);
-
   useEffect(() => {
     async function loadData() {
       try {
@@ -48,21 +43,17 @@ export function useQuizGame() {
         setIsLoading(false);
       }
     }
-
     if (quizId) {
       loadData();
     }
   }, [quizId]);
-
   const questions: QuizQuestionDTO[] = quiz?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
-
   useEffect(() => {
     if (questions.length > 0 && results.length === 0) {
       setResults(new Array(questions.length).fill(null));
     }
   }, [questions.length]);
-
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (gameStage === 'countdown') {
@@ -78,7 +69,6 @@ export function useQuizGame() {
     }
     return () => clearInterval(interval);
   }, [gameStage]);
-
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (
@@ -93,32 +83,25 @@ export function useQuizGame() {
     }
     return () => clearInterval(interval);
   }, [gameStage, gameState, timerState, isAnswered]);
-
   const toggleTimer = () => {
     setTimerState((prev) => (prev === 'running' ? 'paused' : 'running'));
   };
-
   const handleStart = () => {
     setGameStage('countdown');
     setTimerState('running');
   };
-
   const handleOptionSelect = (index: number) => {
     if (isAnswered || timerState === 'paused') return;
     setSelectedOption(index);
   };
-
   const handleSubmitAnswer = () => {
     if (selectedOption === null || !currentQuestion || timerState === 'paused')
       return;
-
     setIsAnswered(true);
     const isCorrect = selectedOption === currentQuestion.correctAnswer;
-
     const newResults = [...results];
     newResults[currentQuestionIndex] = isCorrect ? 'correct' : 'incorrect';
     setResults(newResults);
-
     if (isCorrect) {
       setScore((prev) => prev + 1);
     } else {
@@ -126,7 +109,6 @@ export function useQuizGame() {
       setTimeout(() => setShake(false), 500);
     }
   };
-
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
@@ -136,9 +118,32 @@ export function useQuizGame() {
     } else {
       setGameState('completed');
       recordStreakActivity();
+
+      // Completar quiz en el backend para registrar el intento y evaluar logros
+      const actualQuizId = quiz?.id || quizId;
+      apiFetchClient<{ success: boolean; newlyUnlocked: any[] }>(
+        `/quizzes/${actualQuizId}/complete`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ score }),
+        },
+      )
+        .then((res) => {
+          if (res?.newlyUnlocked && res.newlyUnlocked.length > 0) {
+            // Disparar toasts para cada logro desbloqueado
+            res.newlyUnlocked.forEach((achievement) => {
+              toast(`${achievement.icon || '🏆'} ¡Logro Desbloqueado!`, {
+                description: `Has ganado la insignia "${achievement.title}". ¡Felicidades!`,
+                duration: 6000,
+              });
+            });
+          }
+        })
+        .catch((err) => {
+          console.error('Error completing quiz on backend:', err);
+        });
     }
   };
-
   const restartQuiz = () => {
     setCurrentQuestionIndex(0);
     setSelectedOption(null);
@@ -152,7 +157,6 @@ export function useQuizGame() {
     setResults(new Array(questions.length).fill(null));
     setShake(false);
   };
-
   return {
     workspaceId,
     quizId,

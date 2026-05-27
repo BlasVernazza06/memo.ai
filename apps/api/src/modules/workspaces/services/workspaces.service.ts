@@ -1,5 +1,6 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { UsersService } from '@modules/users/services/users.service';
 import { WorkspacesRepository } from '@modules/workspaces/repositories/workspaces.repository';
@@ -27,6 +28,7 @@ export class WorkspacesService {
     private readonly usersService: UsersService,
     private readonly aiService: AiService,
     private readonly storageService: StorageService,
+    private readonly eventEmitter: EventEmitter2,
     @Inject(CACHE_MANAGER) private cacheManager: cacheManager.Cache,
   ) {}
 
@@ -136,7 +138,7 @@ REGLAS CRÍTICAS:
   async create(
     userId: string,
     data: CreateWorkspaceDTO,
-  ): Promise<{ id: string }> {
+  ): Promise<{ id: string; newlyUnlocked: any[] }> {
     // Lógica de negocio: Validar límite de workspaces
     await this.usersService.validateWorkspaceLimit(userId);
 
@@ -147,7 +149,37 @@ REGLAS CRÍTICAS:
 
     await this.cacheManager.del(cacheKey);
 
-    return result;
+    const newlyUnlocked: any[] = [];
+    const tempListener = (event: any) => {
+      if (event.userId === userId) {
+        newlyUnlocked.push({
+          slug: event.slug,
+          title: event.title,
+          icon: event.icon,
+        });
+      }
+    };
+
+    // Registrar listener temporal
+    this.eventEmitter.on('achievement.unlocked', tempListener);
+
+    try {
+      const workspacesCount = await this.workspaceRepo.countWorkspaces(userId);
+      // Emitir el evento que evalúa los logros sincrónicamente
+      await this.eventEmitter.emitAsync('workspace.created', {
+        userId,
+        workspaceId: result.id,
+        totalCount: workspacesCount,
+      });
+    } finally {
+      // Desregistrar
+      this.eventEmitter.off('achievement.unlocked', tempListener);
+    }
+
+    return {
+      id: result.id,
+      newlyUnlocked,
+    };
   }
 
   async findAllForCards(userId: string): Promise<WorkspaceCardDTO[]> {

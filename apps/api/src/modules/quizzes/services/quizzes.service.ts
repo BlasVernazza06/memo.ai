@@ -30,15 +30,36 @@ export class QuizzesService {
     return foundQuiz;
   }
 
-  async completeQuiz(userId: string, quizId: string, score: number) {
+  async completeQuiz(userId: string, quizId: string, score: number): Promise<any[]> {
     await this.quizzesRepo.saveQuizAttempt(userId, quizId, score);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    this.eventEmitter.emit('quiz.completed', {
-      userId,
-      quizId,
-      score,
-      totalCompleted: await this.quizzesRepo.countUserCompletedQuizzes(userId),
-    });
+    const newlyUnlocked: any[] = [];
+    const tempListener = (event: any) => {
+      if (event.userId === userId) {
+        newlyUnlocked.push({
+          slug: event.slug,
+          title: event.title,
+          icon: event.icon,
+        });
+      }
+    };
+
+    // Registrar listener temporal
+    this.eventEmitter.on('achievement.unlocked', tempListener);
+
+    try {
+      // Emitir el evento que evalúa los logros sincrónicamente
+      await this.eventEmitter.emitAsync('quiz.completed', {
+        userId,
+        quizId,
+        score,
+        totalCompleted: await this.quizzesRepo.countUserCompletedQuizzes(userId),
+      });
+    } finally {
+      // Desregistrar para evitar pérdidas de memoria
+      this.eventEmitter.off('achievement.unlocked', tempListener);
+    }
+
+    return newlyUnlocked;
   }
 }
