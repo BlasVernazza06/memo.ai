@@ -6,6 +6,7 @@ import { ThemeProvider } from '@repo/ui/components/theme-provider';
 import { Toaster } from '@repo/ui/components/ui/sonner';
 
 import { AuthProvider } from '@/lib/auth-provider';
+import { StreakCelebrationProvider } from '@/components/streak/streak-celebration';
 
 import './globals.css';
 
@@ -52,6 +53,7 @@ export default function RootLayout({
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
         <Toaster />
+        <StreakCelebrationProvider />
       </body>
     </html>
   );

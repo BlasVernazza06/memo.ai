@@ -29,6 +29,15 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
     () => getStreakProgressPercent(timelineDays),
     [timelineDays],
   );
+
+  // Detect if today's study activity has been completed
+  const hasStudiedToday = useMemo(() => {
+    if (!streak || !streak.lastActivity) return false;
+    const todayStr = new Date().toDateString();
+    const lastActivityStr = new Date(streak.lastActivity).toDateString();
+    return todayStr === lastActivityStr;
+  }, [streak]);
+
   const hasActiveStreak = (streak?.currentStreak ?? 0) > 0;
 
   return (
@@ -47,7 +56,12 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-xl backdrop-blur-xl border border-white/30 shadow-lg">
-                <Flame className="w-6 h-6 text-white fill-white animate-bounce-slow" />
+                <Flame
+                  className={cn(
+                    'w-6 h-6 text-white fill-white animate-bounce-slow',
+                    !hasStudiedToday && 'opacity-70 animate-pulse',
+                  )}
+                />
               </div>
               <div className="space-y-0">
                 <h3 className="text-4xl font-black text-white tracking-tighter leading-none">
@@ -58,14 +72,24 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
                 </p>
               </div>
             </div>
-            <p className="text-orange-50/90 text-xs font-bold flex items-center gap-1.5 bg-white/10 w-fit px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-sm">
-              {hasActiveStreak ? (
+
+            <p
+              className={cn(
+                'text-xs font-bold flex items-center gap-1.5 w-fit px-3 py-1.5 rounded-full border backdrop-blur-sm transition-all duration-500',
+                hasStudiedToday
+                  ? 'text-orange-50/90 bg-white/10 border-white/10'
+                  : 'text-amber-100 bg-amber-500/20 border-amber-400/40 animate-pulse shadow-[0_0_15px_rgba(245,158,11,0.2)]',
+              )}
+            >
+              {hasStudiedToday ? (
                 <>
                   ¡Estás en llamas, {user?.name?.split(' ')[0] || 'Memo'}!
                   <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
                 </>
               ) : (
-                <>Completa un quiz o flashcards para encender tu racha</>
+                <>
+                  ⚠️ Racha pendiente para hoy. ¡Haz un quiz o flashcard ahora!
+                </>
               )}
             </p>
           </div>
@@ -122,17 +146,21 @@ export function ProfileStreak({ user, streak }: ProfileStreakProps) {
                       day.active
                         ? 'bg-white border-white text-orange-600 shadow-xl scale-110'
                         : day.today
-                          ? 'bg-orange-500 border-white/40 text-white animate-pulse scale-105'
+                          ? hasStudiedToday
+                            ? 'bg-white border-white text-orange-600 shadow-xl scale-110'
+                            : 'bg-amber-600/40 border-amber-400 border-dashed text-white animate-pulse scale-105 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
                           : 'bg-orange-700/30 border-transparent text-white/10 backdrop-blur-md',
                     )}
                   >
-                    {day.active ? (
+                    {day.active || (day.today && hasStudiedToday) ? (
                       <Check className="w-5 h-5 stroke-[4]" />
                     ) : (
                       <div
                         className={cn(
                           'w-2 h-2 rounded-full',
-                          day.today ? 'bg-white' : 'bg-white/20',
+                          day.today
+                            ? 'bg-amber-400 animate-ping'
+                            : 'bg-white/20',
                         )}
                       />
                     )}
