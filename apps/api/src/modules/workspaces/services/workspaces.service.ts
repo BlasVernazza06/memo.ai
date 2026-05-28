@@ -62,31 +62,65 @@ export class WorkspacesService {
         .join('\n') || '';
 
     // 3. Llamar a la IA con el contexto histórico y el prompt personalizado
+    const docSummary = workspaceDetail.documents?.[0]?.aiSummary || '';
+    const customContext = workspaceDetail.customContext || '';
+
     const context = `
 CONTEXTO DEL WORKSPACE:
 Nombre: ${workspaceDetail.name}
 Descripción: ${workspaceDetail.description || 'No proporcionada'}
+${customContext ? `Contexto personalizado del usuario: ${customContext}` : ''}
+${docSummary ? `Resumen del documento principal: ${docSummary}` : ''}
 
 HISTORIAL DE CREACIÓN:
 ${history || 'No hay mensajes previos.'}
 `;
 
+    // Extraer contenido ya existente para evitar similitudes
+    let existingContentText = '';
+    if (type === 'flashcards') {
+      const existingDecks = workspaceDetail.flashcardDecks || [];
+      const cardsList: string[] = [];
+      existingDecks.forEach((deck) => {
+        (deck as any).flashcards?.forEach((card: any) => {
+          if (card.front) cardsList.push(card.front);
+        });
+      });
+      if (cardsList.length > 0) {
+        existingContentText = `Flashcards ya creadas (¡NO las repitas ni generes preguntas muy similares!):\n${cardsList.map((c) => `- ${c}`).join('\n')}`;
+      }
+    } else {
+      const existingQuizzes = workspaceDetail.quizzes || [];
+      const questionsList: string[] = [];
+      existingQuizzes.forEach((q) => {
+        q.questions?.forEach((ques) => {
+          if (ques.question) questionsList.push(ques.question);
+        });
+      });
+      if (questionsList.length > 0) {
+        existingContentText = `Preguntas de quiz ya creadas (¡NO las repitas ni generes preguntas muy similares!):\n${questionsList.map((q) => `- ${q}`).join('\n')}`;
+      }
+    }
+
     const jsonSchema =
       type === 'flashcards'
         ? `{ "flashcards": [ { "front": "pregunta", "back": "respuesta" } ] }`
-        : `{ "quizzes": [ { "name": "Título", "description": "...", "questions": [ { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": "A", "explanation": "..." } ] } ] }`;
+        : `{ "quizzes": [ { "name": "Título del Quiz", "description": "...", "questions": [ { "question": "...", "options": ["Opción A", "Opción B", "Opción C", "Opción D"], "correctAnswer": 0, "explanation": "..." } ] } ] }`;
 
     const basePrompt = `Eres un experto en el tema "${workspaceDetail.name}". 
-Tu tarea es generar contenido educativo ADICIONAL basado ESTRICTAMENTE en el contexto y el historial proporcionados.
+Tu tarea es generar contenido educativo ADICIONAL basado ESTRICTAMENTE en el contexto, material y el historial proporcionados.
 
 REGLAS CRÍTICAS:
 1. No inventes temas nuevos ajenos al material.
-2. No repitas preguntas o tarjetas que ya aparezcan en el historial.
-3. Responde ÚNICAMENTE con un objeto JSON siguiendo este esquema: ${jsonSchema}
-4. Si el historial no es suficiente, básate en el nombre y descripción del workspace.`;
+2. No repitas preguntas o tarjetas que ya aparezcan en el historial o en el material ya existente.
+3. El campo "correctAnswer" de cada pregunta del quiz DEBE ser el índice base-0 numérico de la respuesta correcta dentro de la lista de "options" (ej. 0 para la primera opción, 1 para la segunda, etc.). DEBE ser un número entero, nunca un string.
+4. Responde ÚNICAMENTE con un objeto JSON siguiendo este esquema: ${jsonSchema}
+5. Si el historial no es suficiente, básate en el nombre y descripción del workspace.
+
+${existingContentText ? `${existingContentText}\n` : ''}`;
 
     const userInstruction = customPrompt
-      ? `\n\nINSTRUCCIONES ESPECÍFICAS DEL USUARIO: ${customPrompt}`
+      ? `\n\nINSTRUCCIONES ESPECÍFICAS DEL USUARIO (Prioriza este tema/contexto si se proporciona): ${customPrompt}`
       : '';
 
     const aiData = await this.aiService.generateContentFromPrompt(
@@ -104,7 +138,7 @@ REGLAS CRÍTICAS:
         // Si la IA devolvió mazos estructurados
         for (const deck of decks) {
           await this.workspaceRepo.addFlashcards(
-            workspaceId,
+            workspaceDetail.id,
             deck.flashcards,
             deck.name || workspaceDetail.name,
           );
@@ -112,7 +146,7 @@ REGLAS CRÍTICAS:
       } else if (singleCards && singleCards.length > 0) {
         // Formato de array simple de flashcards
         await this.workspaceRepo.addFlashcards(
-          workspaceId,
+          workspaceDetail.id,
           singleCards,
           workspaceDetail.name,
         );
@@ -123,7 +157,7 @@ REGLAS CRÍTICAS:
       const quizzesToSave = aiData.quizzes || (Array.isArray(aiData) ? aiData : null);
 
       if (quizzesToSave && quizzesToSave.length > 0) {
-        await this.workspaceRepo.addQuizzes(workspaceId, quizzesToSave);
+        await this.workspaceRepo.addQuizzes(workspaceDetail.id, quizzesToSave);
       } else {
         console.warn('[WorkspacesService] No se encontraron quizzes en la respuesta de la IA:', aiData);
       }

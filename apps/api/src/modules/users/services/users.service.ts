@@ -48,16 +48,9 @@ export class UsersService {
     if (!currentUser) throw new NotFoundException('Usuario no encontrado');
 
     if (currentUser.plan === 'free') {
-      // Por simplicidad, limitamos por total de items en el workspace
-      // Puedes ajustar esto según lo que el usuario considere un "Mazo" o "Quiz"
-      const total = await this.userRepo.countContent(workspaceId, type);
-      const MAX_FREE = 5;
-
-      if (total >= MAX_FREE) {
-        throw new ForbiddenException(
-          `Has alcanzado el límite de ${type} para el plan gratuito en este workspace (máx ${MAX_FREE}).`,
-        );
-      }
+      throw new ForbiddenException(
+        `La creación de ${type === 'flashcards' ? 'flashcards' : 'quizzes'} adicionales está limitada al plan Pro. ¡Pásate a Pro para estudiar sin límites!`
+      );
     }
   }
 
