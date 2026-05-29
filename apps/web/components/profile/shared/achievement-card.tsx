@@ -1,12 +1,12 @@
-'use client';
-
 import { useState } from 'react';
-import { Lock } from 'lucide-react';
+import { Lock, Sparkles } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { type Achievement } from '@repo/validators';
+import Link from 'next/link';
 
 import AchievementTooltip from './achievement-tooltip';
 import { getAchievementProgress } from '../profile-achievements';
+import { useAuth } from '@/lib/auth-provider';
 
 import {
   FirstQuizBadge,
@@ -98,7 +98,10 @@ export default function AchievementCard({
   apiAchievement,
 }: AchievementCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { user } = useAuth();
+  
   const target = achievement.target ?? 1;
+  const isFreePlan = user?.plan === 'free';
 
   const realProg = getAchievementProgress(
     achievement.slug,
@@ -107,10 +110,10 @@ export default function AchievementCard({
     target,
   );
 
-  // Es unlocked si la API lo confirma, O si las estadísticas reales calculadas en el cliente ya alcanzan el target
-  const unlocked = apiAchievement
-    ? apiAchievement.unlocked || realProg.unlocked
-    : realProg.unlocked;
+  // Si el usuario es del plan gratuito, los logros están forzados a estar bloqueados (unlocked: false)
+  const unlocked = isFreePlan 
+    ? false 
+    : (apiAchievement ? apiAchievement.unlocked || realProg.unlocked : realProg.unlocked);
 
   const current = unlocked ? target : realProg.current;
   const percentage = unlocked ? 100 : realProg.percentage;
@@ -131,14 +134,42 @@ export default function AchievementCard({
     >
       <AnimatePresence>
         {isHovered && (
-          <AchievementTooltip
-            title={achievement.title}
-            description={achievement.description}
-            current={current}
-            target={target}
-            unlocked={unlocked}
-            gradient={uiConfig.gradient}
-          />
+          isFreePlan ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10, x: '-50%' }}
+              animate={{ opacity: 1, scale: 1, y: 0, x: '-50%' }}
+              exit={{ opacity: 0, scale: 0.95, y: 10, x: '-50%' }}
+              className="absolute bottom-[115%] left-1/2 z-[200] w-64 p-5 bg-zinc-950 border-2 border-amber-500/30 rounded-3xl shadow-2xl flex flex-col items-center text-center gap-3"
+            >
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                <Lock className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-xs font-black text-white tracking-tight">
+                  LOGROS DESACTIVADOS
+                </h4>
+                <p className="text-[10px] text-zinc-400 font-medium leading-relaxed">
+                  Para desbloquear logros y ganar medallas por tu constancia, pásate al plan Pro.
+                </p>
+              </div>
+              <Link href="/pricing" className="w-full">
+                <button className="w-full bg-linear-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white text-[10px] font-black uppercase tracking-wider py-2 px-3 rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5 border border-white/10 pointer-events-auto">
+                  <Sparkles className="w-3.5 h-3.5 fill-white" />
+                  Pasar a Pro
+                </button>
+              </Link>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-zinc-950" />
+            </motion.div>
+          ) : (
+            <AchievementTooltip
+              title={achievement.title}
+              description={achievement.description}
+              current={current}
+              target={target}
+              unlocked={unlocked}
+              gradient={uiConfig.gradient}
+            />
+          )
         )}
       </AnimatePresence>
 

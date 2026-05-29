@@ -10,6 +10,10 @@ import { ACHIEVEMENTS, type Achievement } from '@repo/validators';
 
 import AchievementCard from './shared/achievement-card';
 
+import { useAuth } from '@/lib/auth-provider';
+import Link from 'next/link';
+import { Sparkles } from 'lucide-react';
+
 // Interface for component props
 interface ProfileAchievementsProps {
   stats?: {
@@ -80,6 +84,10 @@ export function ProfileAchievements({
   achievements,
 }: ProfileAchievementsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { user } = useAuth();
+  const [isSectionHovered, setIsSectionHovered] = useState(false);
+
+  const isFreePlan = user?.plan === 'free';
 
   // Mapeamos los logros de la API en un mapa llave-valor indexado por slug para acceso O(1)
   const apiAchievementsMap = useMemo(() => {
@@ -112,7 +120,9 @@ export function ProfileAchievements({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card border border-border/50 rounded-[2.5rem] p-6 shadow-sm space-y-6 relative"
+      onMouseEnter={() => isFreePlan && setIsSectionHovered(true)}
+      onMouseLeave={() => isFreePlan && setIsSectionHovered(false)}
+      className="bg-card border border-border/50 rounded-[2.5rem] p-6 shadow-sm space-y-6 relative overflow-hidden group/section"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-0.5">
@@ -121,24 +131,26 @@ export function ProfileAchievements({
             Logros
           </h3>
           <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-            {unlockedCount} de {ACHIEVEMENTS.length} desbloqueados
+            {isFreePlan ? 0 : unlockedCount} de {ACHIEVEMENTS.length} desbloqueados
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="rounded-lg font-bold text-[10px] uppercase tracking-widest flex gap-2 h-8 px-3 border-border/50 transition-all hover:bg-muted/30"
-        >
-          {isExpanded ? (
-            <>
-              Ver Menos <ChevronUp className="w-3.5 h-3.5" />
-            </>
-          ) : (
-            <>
-              Ver Todos <ChevronDown className="w-3.5 h-3.5" />
-            </>
-          )}
-        </Button>
+        {!isFreePlan && (
+          <Button
+            variant="outline"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="rounded-lg font-bold text-[10px] uppercase tracking-widest flex gap-2 h-8 px-3 border-border/50 transition-all hover:bg-muted/30"
+          >
+            {isExpanded ? (
+              <>
+                Ver Menos <ChevronUp className="w-3.5 h-3.5" />
+              </>
+            ) : (
+              <>
+                Ver Todos <ChevronDown className="w-3.5 h-3.5" />
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Grid container with smooth layout transitions (Solves all Tooltip crop bugs) */}
@@ -146,11 +158,11 @@ export function ProfileAchievements({
         <motion.div
           layout="position"
           transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-          className="overflow-visible pt-12"
+          className="overflow-visible pt-4"
         >
           {/* Se renderizan condicionalmente los logros en el DOM. Al ser overflow-visible siempre, los Tooltips nunca se recortarán */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-2">
-            {(isExpanded ? ACHIEVEMENTS : initialAchievements).map(
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-2 transition-all duration-500">
+            {(isFreePlan ? initialAchievements : (isExpanded ? ACHIEVEMENTS : initialAchievements)).map(
               (achievement) => (
                 <AchievementCard
                   key={achievement.slug}
@@ -165,6 +177,43 @@ export function ProfileAchievements({
             )}
           </div>
         </motion.div>
+
+        {/* Capa premium con blur difuminado que se revela al hacer hover sobre toda la sección de logros para el plan gratuito */}
+        <AnimatePresence>
+          {isFreePlan && isSectionHovered && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md rounded-[1.5rem] p-4 text-center border border-amber-500/20 shadow-2xl transition-all duration-300"
+            >
+              <motion.div
+                initial={{ scale: 0.9, y: 10 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 10 }}
+                className="max-w-xs space-y-4 flex flex-col items-center"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-lg shadow-amber-500/5">
+                  <Lock className="w-6 h-6 text-amber-400" />
+                </div>
+                <div className="space-y-1.5">
+                  <h4 className="text-sm font-black text-white tracking-wide uppercase">
+                    LOGROS EXCLUSIVOS PRO
+                  </h4>
+                  <p className="text-[11px] text-zinc-300 font-bold px-2 leading-relaxed">
+                    Desbloquea medallas, sigue tu progreso detallado y presume tu dedicación.
+                  </p>
+                </div>
+                <Link href="/pricing" className="w-full">
+                  <button className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 hover:opacity-95 text-white text-[10px] font-black uppercase tracking-wider py-3 px-6 rounded-2xl transition-all shadow-xl shadow-orange-500/20 active:scale-95 flex items-center justify-center gap-1.5 border border-white/10">
+                    <Sparkles className="w-4 h-4 fill-white" />
+                    Pasar al Plan Pro
+                  </button>
+                </Link>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
