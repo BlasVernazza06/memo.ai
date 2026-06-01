@@ -45,7 +45,16 @@ import { EmailService } from '@/modules/email/service/email.service';
           emailVerification: {
             sendOnSignUp: true,
             async sendVerificationEmail({ user, url }) {
-              await emailService.sendVerificationEmail(user.email, url);
+              if (user.email.startsWith('guest-')) {
+                console.log('[BetterAuth] Bypassing email verification for guest user:', user.email);
+                return;
+              }
+              try {
+                await emailService.sendVerificationEmail(user.email, url);
+              } catch (error) {
+                console.error('[BetterAuth] Error sending verification email via Brevo:', error);
+                // Gracefully catch to prevent signup flow from breaking on email delivery failure
+              }
             },
           },
           socialProviders: {

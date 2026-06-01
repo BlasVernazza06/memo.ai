@@ -11,7 +11,9 @@ import { UsersService } from '../services/users.service';
 @Controller('users')
 @UseGuards(AuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+  ) {}
 
   @Get('session')
   getSession(@Session() session: UserSession) {
@@ -33,3 +35,4 @@ export class UsersController {
     return this.usersService.deleteUser(session.user.id);
   }
 }
+
