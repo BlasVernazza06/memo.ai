@@ -16,7 +16,7 @@ export default function HeroSection({
   setIsSandboxOpen,
 }: HeroSectionProps) {
   return (
-    <section className="relative pt-30 pb-32 overflow-hidden">
+    <section className="relative pt-30 pb-32 overflow-x-clip">
       <AiSandbox
         isOpen={isSandboxOpen}
         onClose={() => setIsSandboxOpen(false)}

@@ -149,7 +149,7 @@ export default function HowItWorkSection() {
   };
 
   return (
-    <section className="py-24 bg-background overflow-hidden relative" id="how-it-works">
+    <section className="py-24 bg-background overflow-x-clip relative" id="how-it-works">
       {/* Background patterns */}
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.03),transparent_40%)] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_80%,rgba(139,92,246,0.03),transparent_40%)] pointer-events-none" />
@@ -189,35 +189,42 @@ export default function HowItWorkSection() {
 
         {/* Steps Grid */}
         <div className="grid lg:grid-cols-3 gap-8 relative">
-          {steps.map((step, index) => (
-            <div key={step.title} className="relative">
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ ...springTransition, delay: index * 0.1 }}
-                className="group flex flex-col p-8 md:p-10 rounded-[2.5rem] border border-border/40 bg-card hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-700 relative overflow-hidden"
-              >
-                {/* Numbered background decal */}
-                <div className="absolute -top-4 -right-4 text-9xl font-black text-foreground/[0.02] pointer-events-none select-none">
-                  {index + 1}
-                </div>
+          {steps.map((step, index) => {
+            const theme = index === 0 
+              ? { bg: 'bg-indigo-500/5', border: 'border-indigo-500/10', text: 'text-indigo-500', hoverBg: 'group-hover:bg-indigo-500/10', hoverBorder: 'group-hover:border-indigo-500/20', pillBg: 'bg-indigo-500/5 text-indigo-500 border-indigo-500/10' }
+              : index === 1
+              ? { bg: 'bg-sky-500/5', border: 'border-sky-500/10', text: 'text-sky-500', hoverBg: 'group-hover:bg-sky-500/10', hoverBorder: 'group-hover:border-sky-500/20', pillBg: 'bg-sky-500/5 text-sky-500 border-sky-500/10' }
+              : { bg: 'bg-violet-500/5', border: 'border-violet-500/10', text: 'text-violet-500', hoverBg: 'group-hover:bg-violet-500/10', hoverBorder: 'group-hover:border-violet-500/20', pillBg: 'bg-violet-500/5 text-violet-500 border-violet-500/10' };
 
-                <div className="flex items-center gap-5 mb-8">
-                  <div className="w-12 h-12 rounded-2xl bg-muted border border-border flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-primary/5 group-hover:border-primary/20 group-hover:rotate-3 shadow-sm">
-                    <step.icon className="w-6 h-6 text-foreground group-hover:text-primary transition-colors" />
+            return (
+              <div key={step.title} className="relative">
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ ...springTransition, delay: index * 0.1 }}
+                  className="group flex flex-col p-8 md:p-10 rounded-[2.5rem] border border-border/40 bg-card hover:border-primary/25 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-700 relative overflow-hidden dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)] before:absolute before:top-0 before:inset-x-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/20 before:to-transparent z-10"
+                >
+                  {/* Step pill badge */}
+                  <div className={`absolute top-6 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${theme.pillBg} select-none backdrop-blur-md`}>
+                    Paso {index + 1}
                   </div>
-                  <h3 className="text-2xl font-bold tracking-tight">
-                    {step.title}
-                  </h3>
-                </div>
-                
-                <p className="text-base text-muted-foreground font-medium leading-relaxed mb-8 flex-1">
-                  {step.description}
-                </p>
 
-                {step.mockup}
-              </motion.div>
+                  <div className="flex items-center gap-5 mb-8">
+                    <div className={`w-12 h-12 rounded-2xl ${theme.bg} border ${theme.border} flex items-center justify-center transition-all duration-500 group-hover:scale-110 ${theme.hoverBg} ${theme.hoverBorder} group-hover:rotate-3 shadow-xs`}>
+                      <step.icon className={`w-6 h-6 ${theme.text} transition-colors`} />
+                    </div>
+                    <h3 className="text-2xl font-bold tracking-tight">
+                      {step.title}
+                    </h3>
+                  </div>
+                  
+                  <p className="text-base text-muted-foreground font-medium leading-relaxed mb-8 flex-1">
+                    {step.description}
+                  </p>
+
+                  {step.mockup}
+                </motion.div>
 
               {/* Decorative Curvy Arrows between steps */}
               {index < steps.length - 1 && (
@@ -232,8 +239,9 @@ export default function HowItWorkSection() {
                 </div>
               )}
             </div>
-          ))}
-        </div>
+          );
+        })}
+      </div>
       </div>
     </section>
   );

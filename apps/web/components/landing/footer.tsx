@@ -5,7 +5,9 @@ import { Heart } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="py-20 bg-background border-t border-border/40">
+    <footer className="py-20 bg-background relative overflow-hidden">
+      {/* Soft gradient separator instead of a solid border line */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
       <div className="memo-container px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           <div className="col-span-2 md:col-span-1 space-y-6">
@@ -87,7 +89,7 @@ export default function Footer() {
                 placeholder="Email" 
                 className="bg-muted border border-border/60 rounded-xl px-4 py-2 text-xs w-full focus:outline-none focus:border-primary/50 transition-colors"
               />
-              <button className="bg-foreground text-background text-xs font-bold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
+              <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-black px-5 py-2.5 rounded-xl transition-all duration-300 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95">
                 →
               </button>
             </div>
