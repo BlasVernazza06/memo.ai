@@ -96,7 +96,7 @@ export default function PricingSection() {
 
   return (
     <section
-      className="py-24 relative overflow-hidden bg-background"
+      className="py-24 relative overflow-x-clip bg-background"
       id="pricing"
     >
       {/* Background decoration */}

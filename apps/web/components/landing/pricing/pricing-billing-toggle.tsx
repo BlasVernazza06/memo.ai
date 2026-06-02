@@ -42,7 +42,7 @@ export default function PricingBillingToggle({
           animate={{ opacity: 1, scale: 1 }}
           className="flex items-center gap-2"
         >
-          <div className="px-3 py-1 rounded-full bg-foreground text-background text-[10px] font-black uppercase tracking-widest shadow-xl">
+          <div className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20">
             Ahorra un 20%
           </div>
         </motion.div>

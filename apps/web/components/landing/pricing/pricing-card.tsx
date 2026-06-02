@@ -42,20 +42,20 @@ export function PricingCard({
       }}
       className={`relative p-10 rounded-[2.5rem] border transition-all duration-700 overflow-hidden group ${
         plan.popular
-          ? 'bg-foreground text-background border-primary/50 shadow-2xl md:scale-[1.02] z-20'
+          ? 'bg-gradient-to-br from-primary/95 via-primary to-indigo-950 text-white border-primary/30 shadow-2xl shadow-primary/20 md:scale-[1.02] z-20 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]'
           : isDisabled
             ? 'bg-muted/40 border-border/40 text-muted-foreground grayscale z-10'
-            : 'bg-card border-border/60 hover:border-border z-10'
+            : 'bg-card border-border/60 hover:border-primary/25 hover:shadow-2xl hover:shadow-primary/5 z-10 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)] before:absolute before:top-0 before:inset-x-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/20 before:to-transparent'
       } ${isDisabled ? 'pointer-events-none' : ''}`}
     >
       {plan.popular && (
         <>
-          <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent" />
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors duration-700" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-3xl rounded-full group-hover:bg-primary/20 transition-colors duration-700 animate-pulse" />
           <div className="absolute top-6 right-6">
-            <Sparkles className="w-5 h-5 text-primary/40 group-hover:text-primary/60 transition-colors" />
+            <Sparkles className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors" />
           </div>
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20">
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/10 text-white text-[10px] font-black uppercase tracking-widest border border-white/20 backdrop-blur-md shadow-xs">
             Recomendado
           </div>
         </>
@@ -63,14 +63,14 @@ export function PricingCard({
 
       <div className="mb-10 space-y-4 relative z-10">
         <div
-          className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 ${plan.popular ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-muted-foreground'}`}
+          className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 ${plan.popular ? 'bg-white/10 text-white border border-white/20' : 'bg-muted text-muted-foreground'}`}
         >
           <plan.icon className="w-6 h-6" />
         </div>
         <div>
           <h2 className="text-2xl font-black tracking-tight">{plan.name}</h2>
           <p
-            className={`text-[13px] mt-1.5 font-medium leading-relaxed ${plan.popular ? 'text-background/60' : 'text-muted-foreground'}`}
+            className={`text-[13px] mt-1.5 font-medium leading-relaxed ${plan.popular ? 'text-white/70' : 'text-muted-foreground'}`}
           >
             {plan.description}
           </p>
@@ -81,12 +81,12 @@ export function PricingCard({
           </span>
           <div className="flex flex-col">
             <span
-              className={`text-[10px] font-black uppercase tracking-[0.2em] ${plan.popular ? 'text-background/40' : 'text-muted-foreground/60'}`}
+              className={`text-[10px] font-black uppercase tracking-[0.2em] ${plan.popular ? 'text-white/50' : 'text-muted-foreground/60'}`}
             >
               USD / mes
             </span>
             {billingCycle === 'yearly' && (
-              <span className="text-[9px] font-bold text-emerald-500/80 uppercase">
+              <span className={`text-[9px] font-bold uppercase ${plan.popular ? 'text-emerald-300' : 'text-emerald-500/80'}`}>
                 Facturado anual
               </span>
             )}
@@ -98,12 +98,12 @@ export function PricingCard({
         {plan.features.map((feature) => (
           <li key={feature} className="flex items-start gap-3 group/item">
             <div
-              className={`mt-0.5 p-1 rounded-md ${plan.popular ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}
+              className={`mt-0.5 p-1 rounded-md ${plan.popular ? 'bg-white/15 text-white' : 'bg-muted text-muted-foreground'}`}
             >
               <Check className="w-3 h-3" />
             </div>
             <span
-              className={`text-sm tracking-tight ${plan.popular ? 'text-background/80' : 'text-muted-foreground'} font-medium group-hover/item:translate-x-0.5 transition-transform duration-300`}
+              className={`text-sm tracking-tight ${plan.popular ? 'text-white/95' : 'text-muted-foreground'} font-medium group-hover/item:translate-x-0.5 transition-transform duration-300`}
             >
               {feature}
             </span>
@@ -115,10 +115,10 @@ export function PricingCard({
         <Button
           disabled={isDisabled}
           asChild
-          className={`w-full py-6 rounded-xl text-sm font-bold transition-all ${
+          className={`w-full py-6 rounded-xl text-sm font-bold transition-all duration-300 ${
             plan.popular
-              ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20'
-              : 'bg-muted hover:bg-muted/80 text-foreground shadow-none'
+              ? 'bg-white hover:bg-white/95 text-primary hover:text-primary/90 shadow-lg shadow-black/10 font-extrabold hover:scale-[1.02] active:scale-[0.98]'
+              : 'bg-muted hover:bg-muted/80 text-foreground shadow-none hover:scale-[1.02] active:scale-[0.98]'
           }`}
         >
           {isDisabled ? (
@@ -130,7 +130,7 @@ export function PricingCard({
       </div>
 
       {plan.popular && (
-        <p className="text-center mt-4 text-background/40 text-[9px] font-semibold uppercase tracking-widest relative z-10">
+        <p className="text-center mt-4 text-white/50 text-[9px] font-semibold uppercase tracking-widest relative z-10">
           Cancela en cualquier momento
         </p>
       )}

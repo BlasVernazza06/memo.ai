@@ -72,7 +72,7 @@ export function PricingHero({ billingCycle, setBillingCycle }: PricingHeroProps)
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="px-3 py-1 rounded-full bg-foreground text-background text-[10px] font-black uppercase tracking-widest shadow-xl"
+              className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20"
             >
               Ahorra un 20%
             </motion.div>
