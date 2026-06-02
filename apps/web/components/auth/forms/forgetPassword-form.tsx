@@ -75,7 +75,7 @@ export default function ForgetPasswordForm() {
         </div>
         <Button
           asChild
-          className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all"
+          className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all btn-tactile"
         >
           <Link href="/auth/login">Volver al inicio de sesión</Link>
         </Button>
@@ -134,7 +134,7 @@ export default function ForgetPasswordForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98] disabled:opacity-70"
+          className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md"
         >
           {isLoading ? 'Enviando...' : 'Enviar enlace de recuperación'}
         </Button>

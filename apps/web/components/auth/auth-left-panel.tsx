@@ -59,9 +59,10 @@ export default function AuthLeftPanel() {
   const currentSlide = slides[current]!;
 
   return (
-    <div className="hidden md:flex w-[45%] bg-blue-50/50 dark:bg-blue-950/20 p-8 flex-col justify-between relative overflow-hidden font-sans border-r border-border/40">
-      <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-400/10 rounded-full blur-3xl" />
+    <div className="hidden md:flex w-[45%] bg-zinc-950/[0.08] dark:bg-black/[0.15] p-12 flex-col justify-between relative overflow-hidden border-r border-border/30 bg-dot-grid select-none">
+      {/* Decorative blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-indigo-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
       <motion.div
         key={`header-${current}`}
@@ -69,10 +70,10 @@ export default function AuthLeftPanel() {
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10 text-center space-y-3"
       >
-        <h2 className="text-3xl font-extrabold tracking-tight text-foreground">
+        <h2 className="text-3xl font-black tracking-tighter leading-[1.1] text-foreground font-sans">
           {currentSlide.title}
         </h2>
-        <p className="text-slate-500 text-sm max-w-xs mx-auto font-medium">
+        <p className="text-slate-500 text-xs uppercase tracking-wider max-w-xs mx-auto font-bold mt-2">
           {currentSlide.description}
         </p>
       </motion.div>

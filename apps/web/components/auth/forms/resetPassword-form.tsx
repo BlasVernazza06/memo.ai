@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, Suspense } from 'react';
+
+import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock, ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft, CheckCircle2, Lock } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 
 import { authClient } from '@repo/auth/client';
 import { Button } from '@repo/ui/components/ui/button';
@@ -37,7 +38,9 @@ function ResetPasswordFormContent() {
 
   const onSubmit = async (data: ResetPasswordFormValues) => {
     if (!token) {
-      setError('Token de recuperación faltante. Por favor, solicita un nuevo enlace.');
+      setError(
+        'Token de recuperación faltante. Por favor, solicita un nuevo enlace.',
+      );
       return;
     }
 
@@ -178,7 +181,7 @@ function ResetPasswordFormContent() {
         <Button
           type="submit"
           disabled={isLoading || !token}
-          className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98] disabled:opacity-70"
+          className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl font-bold text-md"
         >
           {isLoading ? 'Actualizando...' : 'Restablecer contraseña'}
         </Button>

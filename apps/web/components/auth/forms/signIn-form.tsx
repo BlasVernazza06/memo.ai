@@ -136,12 +136,13 @@ export default function SignInForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
           >
             {showPassword ? (
-              <Eye className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+              <Eye className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" aria-hidden="true" />
             ) : (
-              <EyeOff className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+              <EyeOff className="w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" aria-hidden="true" />
             )}
           </button>
         </div>
@@ -163,7 +164,7 @@ export default function SignInForm() {
 
       <Button
         type="submit"
-        className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-xl font-bold text-md shadow-lg shadow-primary/25 transition-all active:scale-[0.98]"
+        className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-xl font-bold text-md"
       >
         {isLoadingForm ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
       </Button>
