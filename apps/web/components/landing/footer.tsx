@@ -5,7 +5,7 @@ import { Heart } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="py-20 bg-background relative overflow-hidden">
+    <footer className="py-20 bg-transparent relative overflow-x-clip">
       {/* Soft gradient separator instead of a solid border line */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
       <div className="memo-container px-4">

@@ -96,11 +96,12 @@ export default function PricingSection() {
 
   return (
     <section
-      className="py-24 relative overflow-x-clip bg-background"
+      className="py-28 md:py-36 relative overflow-x-clip bg-transparent"
       id="pricing"
     >
-      {/* Background decoration */}
-      <div className="absolute top-[40%] left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-primary/[0.03] blur-[100px] rounded-full pointer-events-none" />
+      {/* Background decoration - smooth overlapping transitions */}
+      <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-violet-500/[0.04] blur-[170px] rounded-full pointer-events-none -z-10 animate-pulse" style={{ animationDuration: '9s' }} />
+      <div className="absolute bottom-0 left-[10%] w-[600px] h-[400px] bg-sky-500/[0.03] blur-[140px] rounded-full pointer-events-none -z-10" />
 
       <div className="memo-container relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-6">
@@ -108,18 +109,18 @@ export default function PricingSection() {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              className="flex items-center justify-center mb-4 gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-0.5 mx-auto w-fit"
+              className="flex items-center justify-center mb-4 gap-2 bg-primary/5 border border-primary/15 rounded-lg px-4 py-1.5 mx-auto w-fit relative blueprint-cross blueprint-cross-tl blueprint-cross-tr blueprint-cross-bl blueprint-cross-br"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[10px] font-bold text-primary uppercase tracking-widest">
+              <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">
                 Inversión en tu futuro
               </span>
             </motion.div>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Planes que{' '}
-              <span className="memo-gradient-text">crecen contigo</span>
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[1.05]">
+              Planes que <br />
+              <span className="font-serif italic text-primary font-normal tracking-wide py-2">crecen contigo.</span>
             </h2>
-            <p className="text-lg text-muted-foreground font-light px-4">
+            <p className="text-base md:text-lg text-muted-foreground font-medium leading-relaxed max-w-lg mx-auto mt-6">
               Empieza gratis y escala a medida que tus necesidades aumenten.
             </p>
           </div>

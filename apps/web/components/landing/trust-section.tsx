@@ -41,37 +41,43 @@ const stats = [
 
 export default function TrustSection() {
   return (
-    <section className="relative">
-      {/* Soft gradient separator lines */}
+    <section className="relative py-20 md:py-28 bg-transparent select-none">
+      {/* Ambient bottom bleed to blend into Features */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-indigo-500/[0.03] blur-[130px] rounded-full pointer-events-none -z-10 animate-pulse" style={{ animationDuration: '10s' }} />
 
       <div className="max-w-7xl mx-auto px-6">
         {/* Section label */}
-        <p className="text-center text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] mb-14">
-          Confiado por miles de estudiantes en toda Latinoamérica
-        </p>
+        <div className="flex flex-col items-center mb-16">
+          <span className="text-[9px] font-black text-primary/70 uppercase tracking-[0.3em] bg-primary/5 px-4 py-1.5 rounded-lg border border-primary/15 mb-3 relative blueprint-cross blueprint-cross-tl blueprint-cross-tr blueprint-cross-bl blueprint-cross-br">
+            Métricas de Rendimiento
+          </span>
+          <p className="text-center text-[9px] font-black text-muted-foreground/35 uppercase tracking-[0.2em] mt-1">
+            Confiado por miles de estudiantes en toda Latinoamérica
+          </p>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="group flex flex-col items-center gap-4 p-6 rounded-[2.5rem] border border-border/40 bg-card/40 hover:border-primary/25 hover:bg-card hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 text-center relative overflow-hidden dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)] shadow-[inset_0_1px_0_0_rgba(0,0,0,0.01)] before:absolute before:top-0 before:inset-x-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent z-10"
+              className="group flex flex-col items-center gap-4 p-6 rounded-xl border border-border/50 bg-card/30 hover:border-primary/25 hover:bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 text-center relative overflow-hidden blueprint-cross blueprint-cross-tl blueprint-cross-tr blueprint-cross-bl blueprint-cross-br before:absolute before:top-0 before:inset-x-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent z-10"
             >
               {/* Icon */}
               <div
-                className={`w-12 h-12 ${stat.bg} border ${stat.border} rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}
+                className={`w-10 h-10 ${stat.bg} border ${stat.border} rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:rotate-2 shadow-xs`}
               >
-                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                <stat.icon className={`w-5 h-5 ${stat.color}`} />
               </div>
 
               {/* Number + labels */}
               <div>
-                <div className="text-4xl font-black text-foreground tracking-tight leading-none mb-1">
+                <div className="text-3xl md:text-4xl font-black text-foreground tracking-tighter leading-none mb-1.5 font-sans">
                   {stat.value}
                 </div>
-                <div className="text-[11px] font-black text-muted-foreground/80 uppercase tracking-wider mb-1">
+                <div className="text-[10px] font-black text-muted-foreground/80 uppercase tracking-wider mb-1">
                   {stat.label}
                 </div>
-                <div className="text-[10px] font-medium text-muted-foreground/50 leading-snug">
+                <div className="text-[9px] font-bold text-muted-foreground/45 leading-snug uppercase tracking-wide">
                   {stat.description}
                 </div>
               </div>

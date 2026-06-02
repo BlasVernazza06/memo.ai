@@ -116,28 +116,73 @@ const steps = [
   },
 ];
 
-const CurvedArrow = ({ className }: { className?: string }) => (
+const CurvedArrow = ({ 
+  className,
+  fromColor,
+  toColor,
+  id
+}: { 
+  className?: string;
+  fromColor: string;
+  toColor: string;
+  id: string;
+}) => (
   <svg 
     viewBox="0 0 100 40" 
     fill="none" 
     className={className}
     preserveAspectRatio="none"
   >
+    <defs>
+      <linearGradient id={`arrow-grad-${id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor={fromColor} stopOpacity="0.05" />
+        <stop offset="50%" stopColor={toColor} stopOpacity="0.3" />
+        <stop offset="100%" stopColor={toColor} stopOpacity="0.05" />
+      </linearGradient>
+      <linearGradient id={`arrow-glow-${id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor={fromColor} />
+        <stop offset="100%" stopColor={toColor} />
+      </linearGradient>
+    </defs>
+    
+    {/* Thick background glow path */}
     <path 
       d="M5 20C20 5 45 5 50 15C55 25 80 35 95 20" 
-      stroke="currentColor" 
-      strokeWidth="2" 
+      stroke={`url(#arrow-grad-${id})`} 
+      strokeWidth="5" 
+      strokeLinecap="round" 
+    />
+    
+    {/* Main dashed path */}
+    <path 
+      d="M5 20C20 5 45 5 50 15C55 25 80 35 95 20" 
+      stroke={`url(#arrow-glow-${id})`} 
+      strokeWidth="1.5" 
       strokeLinecap="round" 
       strokeDasharray="4 4"
-      className="text-muted-foreground/30"
+      className="opacity-40"
     />
+    
+    {/* Animated traveling dash pulse */}
+    <path 
+      d="M5 20C20 5 45 5 50 15C55 25 80 35 95 20" 
+      stroke={`url(#arrow-glow-${id})`} 
+      strokeWidth="2.5" 
+      strokeLinecap="round" 
+      className="animate-dash"
+      style={{
+        strokeDasharray: '8 40',
+      }}
+    />
+    
+    {/* Arrow head */}
     <path 
       d="M90 15L95 20L90 25" 
-      stroke="currentColor" 
+      stroke={toColor} 
       strokeWidth="2" 
       strokeLinecap="round" 
       strokeLinejoin="round"
-      className="text-muted-foreground/30"
+      className="opacity-70"
     />
   </svg>
 );
@@ -149,10 +194,10 @@ export default function HowItWorkSection() {
   };
 
   return (
-    <section className="py-24 bg-background overflow-x-clip relative" id="how-it-works">
-      {/* Background patterns */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.03),transparent_40%)] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_80%,rgba(139,92,246,0.03),transparent_40%)] pointer-events-none" />
+    <section className="py-28 md:py-36 bg-transparent overflow-x-clip relative select-none" id="how-it-works">
+      {/* Background patterns and smooth ambient glow transitions */}
+      <div className="absolute top-[10%] left-[5%] w-[800px] h-[550px] bg-indigo-500/[0.045] blur-[150px] rounded-full pointer-events-none -z-10 animate-pulse" style={{ animationDuration: '9s' }} />
+      <div className="absolute bottom-[10%] right-[5%] w-[750px] h-[500px] bg-violet-500/[0.035] blur-[140px] rounded-full pointer-events-none -z-10 animate-pulse" style={{ animationDuration: '12s' }} />
 
       <div className="memo-container relative z-10">
         {/* Header */}
@@ -161,9 +206,9 @@ export default function HowItWorkSection() {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="flex items-center gap-2 bg-primary/5 text-primary border border-primary/10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] w-fit mb-6"
+            className="flex items-center gap-2 bg-primary/5 text-primary border border-primary/15 px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] w-fit mb-6 relative blueprint-cross blueprint-cross-tl blueprint-cross-tr blueprint-cross-bl blueprint-cross-br"
           >
-            <Sparkles className="w-3 h-3" />
+            <Sparkles className="w-3.5 h-3.5" />
             Flujo de trabajo inteligente
           </motion.div>
           <motion.h2
@@ -174,14 +219,14 @@ export default function HowItWorkSection() {
             className="text-4xl md:text-6xl font-black tracking-tighter leading-[1.05]"
           >
             Del papel a tu memoria <br />
-            <span className="memo-gradient-text italic">en cuestión de segundos.</span>
+            <span className="font-serif italic text-primary font-normal tracking-wide py-2">en cuestión de segundos.</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ ...springTransition, delay: 0.1 }}
-            className="text-xl text-muted-foreground mt-8 max-w-2xl font-medium leading-relaxed"
+            className="text-base md:text-lg text-muted-foreground mt-6 max-w-2xl font-medium leading-relaxed"
           >
             Automatizamos la parte difícil del estudio para que tú solo tengas que enfocarte en dominar el conocimiento.
           </motion.p>
@@ -203,23 +248,23 @@ export default function HowItWorkSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ ...springTransition, delay: index * 0.1 }}
-                  className="group flex flex-col p-8 md:p-10 rounded-[2.5rem] border border-border/40 bg-card hover:border-primary/25 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-700 relative overflow-hidden dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)] before:absolute before:top-0 before:inset-x-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/20 before:to-transparent z-10"
+                  className="group flex flex-col p-8 md:p-10 rounded-xl border border-border/50 bg-card/45 hover:border-primary/25 hover:bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-700 relative overflow-hidden blueprint-cross blueprint-cross-tl blueprint-cross-tr blueprint-cross-bl blueprint-cross-br z-10"
                 >
                   {/* Step pill badge */}
-                  <div className={`absolute top-6 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${theme.pillBg} select-none backdrop-blur-md`}>
+                  <div className={`absolute top-6 right-6 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${theme.pillBg} select-none backdrop-blur-md`}>
                     Paso {index + 1}
                   </div>
 
                   <div className="flex items-center gap-5 mb-8">
-                    <div className={`w-12 h-12 rounded-2xl ${theme.bg} border ${theme.border} flex items-center justify-center transition-all duration-500 group-hover:scale-110 ${theme.hoverBg} ${theme.hoverBorder} group-hover:rotate-3 shadow-xs`}>
-                      <step.icon className={`w-6 h-6 ${theme.text} transition-colors`} />
+                    <div className={`w-11 h-11 rounded-lg ${theme.bg} border ${theme.border} flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:rotate-2 shadow-xs`}>
+                      <step.icon className={`w-5 h-5 ${theme.text} transition-colors`} />
                     </div>
-                    <h3 className="text-2xl font-bold tracking-tight">
+                    <h3 className="text-xl font-black tracking-tight">
                       {step.title}
                     </h3>
                   </div>
                   
-                  <p className="text-base text-muted-foreground font-medium leading-relaxed mb-8 flex-1">
+                  <p className="text-sm text-muted-foreground font-medium leading-relaxed mb-8 flex-1">
                     {step.description}
                   </p>
 
@@ -234,7 +279,12 @@ export default function HowItWorkSection() {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + (index * 0.2) }}
                   >
-                    <CurvedArrow className="w-full h-full" />
+                    <CurvedArrow 
+                      className="w-full h-full" 
+                      fromColor={index === 0 ? '#6366f1' : '#0ea5e9'}
+                      toColor={index === 0 ? '#0ea5e9' : '#8b5cf6'}
+                      id={`step-${index}`}
+                    />
                   </motion.div>
                 </div>
               )}

@@ -110,7 +110,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1" aria-label="Navegación principal">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -173,6 +173,8 @@ export default function Header() {
           {/* Mobile Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Abrir menú de navegación"
+            aria-expanded={isOpen}
             className="lg:hidden p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors active:scale-95"
           >
             <div className="w-5 h-4 flex flex-col justify-between items-end">
@@ -199,7 +201,7 @@ export default function Header() {
             exit={{ opacity: 0, y: -10 }}
             className="lg:hidden absolute top-[64px] left-4 right-4 p-4 bg-background border border-border/60 rounded-2xl shadow-xl z-50"
           >
-            <nav className="flex flex-col gap-1">
+            <nav className="flex flex-col gap-1" aria-label="Navegación móvil">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
