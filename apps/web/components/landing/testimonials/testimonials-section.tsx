@@ -12,13 +12,13 @@ import YoutubeIcon from '@/components/landing/testimonials/youtube-icon';
 export default function TestimonialsSection() {
   return (
     <section
-      className="py-32 bg-background relative overflow-x-clip"
+      className="py-28 md:py-36 bg-transparent relative overflow-x-clip"
       id="testimonials"
     >
-      {/* Mesh Background for harmony */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-blue-400/5 blur-[100px] rounded-full" />
+      {/* Mesh Background for harmony - smooth overlapping transitions */}
+      <div className="absolute inset-0 pointer-events-none overflow-visible -z-10">
+        <div className="absolute top-0 right-[5%] w-[850px] h-[550px] bg-violet-500/[0.045] blur-[180px] rounded-full animate-pulse" style={{ animationDuration: '10s' }} />
+        <div className="absolute bottom-0 left-[5%] w-[800px] h-[500px] bg-sky-500/[0.035] blur-[150px] rounded-full" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
