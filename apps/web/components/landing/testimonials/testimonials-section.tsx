@@ -12,7 +12,7 @@ import YoutubeIcon from '@/components/landing/testimonials/youtube-icon';
 export default function TestimonialsSection() {
   return (
     <section
-      className="py-32 bg-background relative overflow-hidden"
+      className="py-32 bg-background relative overflow-x-clip"
       id="testimonials"
     >
       {/* Mesh Background for harmony */}
