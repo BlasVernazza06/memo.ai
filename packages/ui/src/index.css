@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  --font-serif: var(--font-serif);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -36,6 +37,7 @@
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-blob: blob 7s infinite;
   --animate-shimmer: shimmer 1.5s infinite;
+  --animate-dash: dash 4s linear infinite;
 
   @keyframes accordion-down {
     from { height: 0; }
@@ -54,6 +56,10 @@
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
+  }
+  @keyframes dash {
+    from { stroke-dashoffset: 90; }
+    to { stroke-dashoffset: 0; }
   }
 }
 
@@ -253,6 +259,92 @@
 
   .memo-glow-strong {
     box-shadow: 0 0 40px hsla(var(--memo-glow), 0.4);
+  }
+
+  /* Dot grid technical background */
+  .bg-dot-grid {
+    background-image: radial-gradient(
+      circle,
+      color-mix(in oklch, var(--border) 40%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+  }
+
+  /* Tactile index card styling */
+  .paper-card {
+    background: color-mix(in oklch, var(--card) 95%, transparent);
+    border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    box-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      0 4px 12px color-mix(in oklch, var(--border) 10%, transparent);
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .dark .paper-card {
+    background: color-mix(in oklch, var(--card) 85%, transparent);
+    border: 1px solid color-mix(in oklch, var(--border) 40%, transparent);
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .paper-card-red {
+    border-top: 3px solid #ff5f56 !important;
+  }
+  .paper-card-blue {
+    border-top: 3px solid var(--primary) !important;
+  }
+  .paper-card-yellow {
+    border-top: 3px solid #ffbd2e !important;
+  }
+  .paper-card-green {
+    border-top: 3px solid #27c93f !important;
+  }
+
+  /* Notebook-like lines */
+  .notebook-lines {
+    background-image: linear-gradient(
+      to bottom,
+      transparent 95%,
+      color-mix(in oklch, var(--border) 35%, transparent) 95%
+    );
+    background-size: 100% 2rem;
+    line-height: 2rem;
+  }
+
+  /* Blueprint crosshairs */
+  .blueprint-cross {
+    position: relative;
+  }
+  .blueprint-cross::before,
+  .blueprint-cross::after {
+    content: '';
+    position: absolute;
+    background: color-mix(in oklch, var(--border) 60%, transparent);
+    pointer-events: none;
+  }
+  .blueprint-cross-tl::before { top: -6px; left: 0; width: 1px; height: 13px; }
+  .blueprint-cross-tl::after { top: 0; left: -6px; width: 13px; height: 1px; }
+
+  .blueprint-cross-tr::before { top: -6px; right: 0; width: 1px; height: 13px; }
+  .blueprint-cross-tr::after { top: 0; right: -6px; width: 13px; height: 1px; }
+
+  .blueprint-cross-bl::before { bottom: -6px; left: 0; width: 1px; height: 13px; }
+  .blueprint-cross-bl::after { bottom: 0; left: -6px; width: 13px; height: 1px; }
+
+  .blueprint-cross-br::before { bottom: -6px; right: 0; width: 1px; height: 13px; }
+  .blueprint-cross-br::after { bottom: 0; right: -6px; width: 13px; height: 1px; }
+
+  /* Tactile button dynamic click */
+  .btn-tactile {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 0 0 color-mix(in oklch, var(--foreground) 100%, transparent);
+  }
+  .btn-tactile:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 0 color-mix(in oklch, var(--foreground) 100%, transparent);
   }
 
   .memo-container {

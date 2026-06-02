@@ -1,4 +1,4 @@
-import { Outfit } from 'next/font/google';
+import { Outfit, Fraunces } from 'next/font/google';
 
 import type { Metadata } from 'next';
 
@@ -17,7 +17,19 @@ const outfit = Outfit({
   weight: ['300', '400', '500', '600', '700', '800', '900'],
 });
 
+const fraunces = Fraunces({
+  variable: '--font-serif',
+  subsets: ['latin'],
+  display: 'swap',
+  style: ['normal', 'italic'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+});
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://memo-ai.com'),
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: '/logo-app.webp',
     apple: '/logo-app.webp',
@@ -41,8 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${outfit.variable} font-sans`}>
+    <html lang="es" suppressHydrationWarning>
+      <body className={`${outfit.variable} ${fraunces.variable} font-sans`}>
         <div className="grain-overlay" />
         <ThemeProvider
           attribute="class"

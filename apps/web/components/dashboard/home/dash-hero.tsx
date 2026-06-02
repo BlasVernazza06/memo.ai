@@ -69,18 +69,13 @@ export default function DashHero({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden border border-border/80 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 text-foreground shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-all"
+        className="relative overflow-hidden border border-border/80 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 text-foreground bg-card/65 backdrop-blur-xl shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-all blueprint-cross blueprint-cross-tl blueprint-cross-tr blueprint-cross-bl blueprint-cross-br"
       >
         {/* Decorative Background Assets */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
           <div className="absolute -top-[10%] -right-[5%] w-[50%] h-full bg-primary/10 dark:bg-primary/20 blur-[120px] rounded-full animate-pulse transition-all duration-[3000ms]" />
           <div
-            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08]"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 1.5px 1.5px, currentColor 1.5px, transparent 0)',
-              backgroundSize: '48px 48px',
-            }}
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08] bg-dot-grid"
           />
         </div>
 
@@ -92,7 +87,7 @@ export default function DashHero({
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary/5 border border-primary/15 text-[8px] font-black uppercase tracking-[0.2em] text-primary relative blueprint-cross blueprint-cross-tl blueprint-cross-tr blueprint-cross-bl blueprint-cross-br"
               >
                 <Sparkles className="w-3 h-3 text-primary animate-pulse" />
                 <span>
@@ -100,9 +95,9 @@ export default function DashHero({
                 </span>
               </motion.div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[1.1] sm:leading-[0.95] italic max-w-xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[1.1] sm:leading-[0.95] max-w-xl font-sans">
                 ¿Qué vamos a{' '}
-                <span className="text-primary not-italic relative inline-block group/learn">
+                <span className="font-serif italic text-primary font-normal tracking-wide px-1 relative inline-block">
                   aprender
                   <motion.span
                     initial={{ width: 0 }}
@@ -125,7 +120,7 @@ export default function DashHero({
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="bg-primary text-primary-foreground px-7 py-3 rounded-xl font-black shadow-lg shadow-primary/20 flex items-center gap-2.5 transition-all cursor-pointer text-sm"
+                  className="bg-primary text-primary-foreground px-7 py-3 rounded-xl font-black shadow-lg shadow-primary/20 flex items-center gap-2.5 transition-all cursor-pointer text-sm btn-tactile"
                 >
                   <Plus className="w-5 h-5" />
                   <span className="tracking-tight">Nuevo Workspace</span>
@@ -302,9 +297,10 @@ export default function DashHero({
                       </div>
                       <button
                         onClick={() => setShowTutorial(false)}
+                        aria-label="Cerrar tutorial"
                         className="text-muted-foreground hover:text-foreground cursor-pointer"
                       >
-                        <X className="w-5 h-5" />
+                        <X className="w-5 h-5" aria-hidden="true" />
                       </button>
                     </div>
 
