@@ -10,6 +10,12 @@ export const slugify = (text: string) => {
     .replace(/--+/g, '-'); // Evita múltiples guiones
 };
 
+export const normalizeString = (str: string) =>
+  str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
 export const getShortId = (id: string | number) => {
   if (!id) return '';
 

@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test('user can sign up with valid credentials', async ({ page }) => {
-  await page.goto('/auth/signup');
+  await page.goto('/auth/register');
 
   const uniqueEmail = `test-${Date.now()}@example.com`;
 

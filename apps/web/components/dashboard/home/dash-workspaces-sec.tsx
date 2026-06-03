@@ -2,28 +2,33 @@
 
 import Link from 'next/link';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Grid, List, Plus } from 'lucide-react';
-import { motion } from 'motion/react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Ellipsis,
+  Grid,
+  List,
+  Plus,
+  SeparatorVertical,
+  X,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 
+import { DbWorkspace } from '@repo/db';
 import type { WorkspaceCardDTO } from '@repo/validators';
 
 import EmptySearchWorkspaceSec from '@/components/dashboard/shared/empty-search-workspace-sec';
 import EmptyWorkspacesSec from '@/components/dashboard/shared/empty-workspaces-sec';
 import WorkspaceCard from '@/components/dashboard/workspace/list/workspace-card';
 import SearchInput from '@/components/shared/search-input';
+import { normalizeString } from '@/hooks/formats/use-slugify';
 
 interface DashWorkspacesSecProps {
-  workspaces?: WorkspaceCardDTO[];
-  initialWorkspaces?: WorkspaceCardDTO[];
+  workspaces?: DbWorkspace[];
+  initialWorkspaces?: DbWorkspace[];
 }
-
-const normalizeString = (str: string) =>
-  str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
 
 export default function DashWorkspacesSec({
   workspaces: providedWorkspaces,
@@ -33,16 +38,102 @@ export default function DashWorkspacesSec({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const filteredWorkspaces = workspaces
     .filter((ws) => {
       if (!ws || !ws.name) return false;
-      return normalizeString(ws.name).includes(normalizeString(searchQuery));
+      const matchesSearch = normalizeString(ws.name).includes(
+        normalizeString(searchQuery),
+      );
+      const matchesCategory =
+        !selectedCategory || ws.category === selectedCategory;
+      return matchesSearch && matchesCategory;
     })
     .sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
 
+  const MOCK_CATEGORIES = [
+    'Seguridad Informatica',
+    'Historia',
+    'Matematicas',
+    'Programacion',
+    'Quimica',
+    'Fisica',
+    'CiberSeguridad',
+    'Filosofia',
+    'Electronica',
+  ];
+
+  const workspaceCategories = Array.from(
+    new Set(
+      workspaces.map((ws) => ws.category).filter((cat): cat is string => !!cat),
+    ),
+  );
+
+  const allCategories = Array.from(
+    new Set([...workspaceCategories, ...MOCK_CATEGORIES]),
+  );
+
+  const scrollableCategories = allCategories.filter(
+    (cat) => cat !== selectedCategory,
+  );
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    if (containerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
+      setShowLeftArrow(scrollLeft > 2);
+      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 2);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const timer = setTimeout(checkScroll, 100);
+
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      const observer = new ResizeObserver(() => {
+        checkScroll();
+      });
+      observer.observe(containerRef.current);
+      return () => {
+        clearTimeout(timer);
+        observer.disconnect();
+      };
+    } else {
+      window.addEventListener('resize', checkScroll);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('resize', checkScroll);
+      };
+    }
+  }, [checkScroll, workspaces, selectedCategory]);
+
+  const handleCategoryClick = (cat: string) => {
+    if (selectedCategory === cat) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(cat);
+    }
+  };
+
+  const handleScrollLeft = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="space-y-12">
+    <section className="space-y-5">
       {/* Refined Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-border/40">
         <div className="space-y-2">
@@ -108,44 +199,132 @@ export default function DashWorkspacesSec({
 
       {workspaces.length === 0 ? (
         <EmptyWorkspacesSec />
-      ) : filteredWorkspaces.length === 0 ? (
-        <EmptySearchWorkspaceSec setSearchQuery={setSearchQuery} />
       ) : (
-        <div
-          className={
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8'
-              : 'flex flex-col gap-4'
-          }
-        >
-          {/* New Project Card */}
-          {viewMode === 'grid' && !searchQuery && (
-            <Link href="/dashboard/workspaces/new" className="group h-full">
-              <motion.div
-                whileTap={{ scale: 0.99 }}
-                className="relative border-2 border-dashed border-border/80 rounded-[2.5rem] flex flex-col items-center justify-center min-h-[400px] hover:border-primary/50 hover:bg-primary/5 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden"
+        <div>
+          {/* Categories Carousel (Always visible when workspaces exist, regardless of filters) */}
+          <div className="relative flex w-full items-center my-5 gap-2">
+            <AnimatePresence mode="popLayout">
+              {selectedCategory && (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scale: 0.8, x: -15 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, x: -15 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 26 }}
+                  className="flex items-center gap-2 shrink-0"
+                >
+                  <div
+                    onClick={() => setSelectedCategory(null)}
+                    className="flex items-center justify-center py-1 px-4 gap-1 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 hover:cursor-pointer shrink-0 transition-colors shadow-sm"
+                  >
+                    <X className="w-3 h-3 text-primary-foreground" />
+                    <span className="font-medium">{selectedCategory}</span>
+                  </div>
+                  <div className="w-px h-5 bg-border shrink-0" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Scrollable Container Wrapper with absolute arrows */}
+            <div className="relative flex-1 flex items-center overflow-hidden">
+              {/* Left Shadow Fade & ChevronLeft Button */}
+              <div
+                className={`absolute left-0 top-0 bottom-0 z-10 flex items-center pr-8 bg-gradient-to-r from-background via-background to-transparent transition-all duration-300 pointer-events-none ${
+                  showLeftArrow ? 'opacity-100' : 'opacity-0'
+                }`}
               >
-                {/* Decorative background glow */}
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors" />
+                <button
+                  onClick={handleScrollLeft}
+                  disabled={!showLeftArrow}
+                  className="pointer-events-auto flex items-center justify-center p-1 rounded-full border border-accent-foreground/10 bg-muted hover:border-accent-foreground/30 hover:cursor-pointer transition group"
+                >
+                  <ChevronLeft className="w-6 h-6 text-muted-foreground group-hover:text-white" />
+                </button>
+              </div>
 
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 group-hover:rotate-6 transition-all duration-500">
-                  <Plus className="w-8 h-8 text-primary shadow-sm" />
-                </div>
-                <div className="mt-8 text-center space-y-3 relative z-10">
-                  <h3 className="text-2xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">
-                    Nuevo Proyecto
-                  </h3>
-                  <p className="text-[11px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.2em] leading-relaxed max-w-[200px] mx-auto">
-                    Comienza una nueva biblioteca con IA
-                  </p>
-                </div>
-              </motion.div>
-            </Link>
+              {/* Scrollable Container */}
+              <div
+                ref={containerRef}
+                onScroll={checkScroll}
+                className="flex items-center gap-2 overflow-x-auto scrollbar-hide whitespace-nowrap scroll-smooth w-full px-1"
+              >
+                {scrollableCategories.map((cat, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleCategoryClick(cat)}
+                    className="flex items-center justify-center py-1 px-4 gap-1 rounded-full border border-accent-foreground/10 bg-muted group hover:border-primary/50 hover:cursor-pointer shrink-0"
+                  >
+                    <X className="w-3 h-3 group-hover:text-primary" />
+                    <span className="text-muted-foreground group-hover:text-primary">
+                      {cat}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right Shadow Fade & ChevronRight Button */}
+              <div
+                className={`absolute right-0 top-0 bottom-0 z-10 flex items-center pl-8 bg-gradient-to-l from-background via-background to-transparent transition-all duration-300 pointer-events-none ${
+                  showRightArrow ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                <button
+                  onClick={handleScrollRight}
+                  disabled={!showRightArrow}
+                  className="pointer-events-auto flex items-center justify-center p-1 rounded-full border border-accent-foreground/10 bg-muted hover:border-accent-foreground/30 hover:cursor-pointer transition group"
+                >
+                  <ChevronRight className="w-6 h-6 text-muted-foreground group-hover:text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Workspaces Content list/grid or Empty search results */}
+          {filteredWorkspaces.length === 0 ? (
+            <EmptySearchWorkspaceSec setSearchQuery={setSearchQuery} />
+          ) : (
+            <div
+              className={
+                viewMode === 'grid'
+                  ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8'
+                  : 'flex flex-col gap-4'
+              }
+            >
+              {/* New Project Card */}
+              {viewMode === 'grid' && !searchQuery && (
+                <Link href="/dashboard/workspaces/new" className="group h-full">
+                  <motion.div
+                    whileTap={{ scale: 0.99 }}
+                    className="relative border-2 border-dashed border-border/80 rounded-[2.5rem] flex flex-col items-center justify-center min-h-[400px] hover:border-primary/50 hover:bg-primary/5 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden"
+                  >
+                    {/* Decorative background glow */}
+                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors" />
+
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 group-hover:rotate-6 transition-all duration-500">
+                      <Plus className="w-8 h-8 text-primary shadow-sm" />
+                    </div>
+                    <div className="mt-8 text-center space-y-3 relative z-10">
+                      <h3 className="text-2xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">
+                        Nuevo Proyecto
+                      </h3>
+                      <p className="text-[11px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.2em] leading-relaxed max-w-[200px] mx-auto">
+                        Comienza una nueva biblioteca con IA
+                      </p>
+                    </div>
+                  </motion.div>
+                </Link>
+              )}
+
+              {filteredWorkspaces.map((ws, idx) => (
+                <WorkspaceCard
+                  key={ws.id}
+                  ws={ws}
+                  idx={idx}
+                  viewMode={viewMode}
+                />
+              ))}
+            </div>
           )}
-
-          {filteredWorkspaces.map((ws, idx) => (
-            <WorkspaceCard key={ws.id} ws={ws} idx={idx} viewMode={viewMode} />
-          ))}
         </div>
       )}
     </section>
