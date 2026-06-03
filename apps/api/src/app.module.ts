@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -46,12 +46,16 @@ import { WorkspacesModule } from '@/modules/workspaces/workspaces.module';
     NotificationsModule,
     CheckoutModule,
     WebhooksModule,
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => [
+        {
+          ttl: 60000,
+          limit: configService.get<string>('NODE_ENV') === 'development' ? 1000 : 10,
+        },
+      ],
+    }),
   ],
   controllers: [],
   providers: [
