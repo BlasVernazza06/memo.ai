@@ -12,6 +12,7 @@ INSTRUCCIONES DE PROCESAMIENTO:
 5. Genera EXACTAMENTE 3 quizzes con 5 preguntas cada uno.
 6. Selecciona un emoji (emoji) que represente visualmente el tema del workspace.
 7. Para cada mazo de flashcards, elige un color (color) en formato hexadecial que combine con el emoji y el tema.
+8. Clasifica el workspace en una categoría obligatoria que sea lo más general y amplia posible (ej. 'Seguridad Informática' para temas de hackeo/redes/criptografía/vulnerabilidades; 'Programación' para lenguajes/código/desarrollo; 'Ciencias' para física/biología; 'Historia', 'Matemáticas', etc.). Está estrictamente prohibido crear categorías específicas o redundantes (como 'Criptografía', 'React', 'Álgebra Lineal'). Si dos temas están aunque sea mínimamente relacionados, deben compartir la misma categoría general.
 
 REGLAS DE FORMATO:
 Debes responder ÚNICAMENTE en formato JSON. No incluyas texto antes ni después del JSON.
@@ -20,7 +21,7 @@ El JSON debe seguir esta estructura:
 {
   "name": "Título creativo y corto para el Workspace",
   "description": "Una descripción breve del material (1 frase).",
-  "category": "Una categoría lógica (ej. Ciencias, Historia, Programación, etc.)",
+  "category": "Una categoría lógica muy general y obligatoria (ej. 'Seguridad Informática', 'Programación', 'Ciencias', 'Historia', etc.) sin usar términos específicos.",
   "emoji": "🎯",
   "summary": "Un resumen ejecutivo de 6 párrafos del contenido.",
   "flashcardDecks": [
@@ -58,7 +59,7 @@ USER_PROMPT_TEMPLATE = """
 {file_content}
 
 --- TAREA ---
-Genera el resumen, 2 mazos de 5 flashcards cada uno y 3 quizzes de 5 preguntas cada uno basándote en el material anterior.
+Genera el resumen, una categoría lo más general posible para el workspace, 2 mazos de 5 flashcards cada uno y 3 quizzes de 5 preguntas cada uno basándote en el material anterior.
 Asigna un emoji al workspace y un color hexadecimal a cada mazo.
 Usa un tono profesional y educativo.
 """
