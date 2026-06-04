@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -45,5 +46,18 @@ export class FlashcardsController {
     @Param('id') id: string,
   ) {
     return await this.flashcardsService.findById(userId, id);
+  }
+
+  @Post(':id/complete')
+  async completeDeck(
+    @User('id') userId: string,
+    @Param('id') id: string,
+    @Body('cardsCount') cardsCount: number,
+  ) {
+    const newlyUnlocked = await this.flashcardsService.completeDeck(userId, id, cardsCount);
+    return {
+      success: true,
+      newlyUnlocked,
+    };
   }
 }

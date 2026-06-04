@@ -106,4 +106,38 @@ export class FlashcardsRepository {
       flashcards: cards,
     };
   }
+
+  async saveFlashcardSession(userId: string, deckId: string, cardsCount: number, workspaceId: string) {
+    const { randomUUID } = await import('crypto');
+    const { userActivity } = await import('@repo/db');
+    
+    await this.db.insert(userActivity).values({
+      id: randomUUID(),
+      userId,
+      workspaceId,
+      type: 'flashcard_completed',
+      metadata: { deckId, cardsCount },
+      date: new Date().toISOString().split('T')[0],
+      createdAt: new Date(),
+    });
+  }
+
+  async countUserCompletedDecks(userId: string) {
+    const { userActivity } = await import('@repo/db');
+    const result = await this.db
+      .select({ count: sql<number>`count(${userActivity.id})`.mapWith(Number) })
+      .from(userActivity)
+      .where(and(eq(userActivity.userId, userId), eq(userActivity.type, 'flashcard_completed')));
+    return result[0]?.count || 0;
+  }
+
+  async sumUserReviewedCards(userId: string) {
+    const { userActivity } = await import('@repo/db');
+    const activities = await this.db
+      .select({ metadata: userActivity.metadata })
+      .from(userActivity)
+      .where(and(eq(userActivity.userId, userId), eq(userActivity.type, 'flashcard_completed')));
+    
+    return activities.reduce((sum, act) => sum + ((act.metadata as any)?.cardsCount || 0), 0);
+  }
 }
