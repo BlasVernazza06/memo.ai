@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
-import { DbWorkspace } from '@repo/db';
 import type { WorkspaceCardDTO } from '@repo/validators';
 
 import EmptySearchWorkspaceSec from '@/components/dashboard/shared/empty-search-workspace-sec';
@@ -26,8 +25,8 @@ import SearchInput from '@/components/shared/search-input';
 import { normalizeString } from '@/hooks/formats/use-slugify';
 
 interface DashWorkspacesSecProps {
-  workspaces?: DbWorkspace[];
-  initialWorkspaces?: DbWorkspace[];
+  workspaces?: WorkspaceCardDTO[];
+  initialWorkspaces?: WorkspaceCardDTO[];
 }
 
 export default function DashWorkspacesSec({
@@ -60,8 +59,6 @@ export default function DashWorkspacesSec({
     'Quimica',
     'Fisica',
     'CiberSeguridad',
-    'Filosofia',
-    'Electronica',
   ];
 
   const workspaceCategories = Array.from(
@@ -150,7 +147,7 @@ export default function DashWorkspacesSec({
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-5 w-full md:w-auto">
+        <div className="flex items-center gap-5 w-full md:w-auto">
           {/* Search Bar */}
           <div className="relative w-full sm:w-80 group">
             <SearchInput

@@ -135,7 +135,15 @@ export default function WorkspaceCard({
         href={`/dashboard/workspaces/${slugify(ws.name)}-${getShortId(ws.id)}`}
         className="block h-full"
       >
-        <div className="h-full flex flex-col bg-card rounded-3xl border border-border/60 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 group-hover/ws:-translate-y-1 overflow-hidden">
+        <div
+          className="h-full flex flex-col bg-card rounded-3xl border border-border/60 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 group-hover/ws:-translate-y-1 overflow-hidden"
+          style={
+            {
+              '--tw-shadow-color': `${ws.bgColor || '#7C3AED'}14`,
+              borderColor: `${ws.bgColor || '#7C3AED'}14`,
+            } as React.CSSProperties
+          }
+        >
           {/* Minimal Header */}
           <div className="relative h-32 shrink-0 bg-muted/10 overflow-hidden isolate">
             <div

@@ -102,6 +102,7 @@ export default function Header() {
               width={32}
               height={32}
               className="object-cover"
+              priority
             />
           </div>
           <span className="text-lg font-bold tracking-tight text-foreground">
