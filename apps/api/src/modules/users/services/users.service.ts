@@ -11,6 +11,7 @@ import * as cacheManager from 'cache-manager';
 import { UserDTO } from '@repo/validators';
 
 import { CACHE_KEYS } from '@/common/constants/cache-keys';
+import { StorageService } from '@/modules/storage/services/storage.service';
 
 import { UsersRepository } from '../repositories/users.repository';
 
@@ -18,6 +19,7 @@ import { UsersRepository } from '../repositories/users.repository';
 export class UsersService {
   constructor(
     private readonly userRepo: UsersRepository,
+    private readonly storageService: StorageService,
     @Inject(CACHE_MANAGER) private cacheManager: cacheManager.Cache,
   ) {}
 
@@ -49,7 +51,7 @@ export class UsersService {
 
     if (currentUser.plan === 'free') {
       throw new ForbiddenException(
-        `La creación de ${type === 'flashcards' ? 'flashcards' : 'quizzes'} adicionales está limitada al plan Pro. ¡Pásate a Pro para estudiar sin límites!`
+        `La creación de ${type === 'flashcards' ? 'flashcards' : 'quizzes'} adicionales está limitada al plan Pro. ¡Pásate a Pro para estudiar sin límites!`,
       );
     }
   }
@@ -74,6 +76,40 @@ export class UsersService {
   }
 
   async deleteUser(userId: string): Promise<{ success: boolean }> {
+    // 1. Obtener todas las claves (keys) de S3 de todos los documentos del usuario
+    try {
+      const keys = await this.userRepo.getUserDocumentKeys(userId);
+      if (keys.length > 0) {
+        console.log(
+          `[UsersService] Borrando ${keys.length} archivos de S3 para el usuario ${userId}...`,
+        );
+        // Borramos los archivos en paralelo usando Promise.allSettled
+        // para que si alguno falla, no se interrumpa el flujo del resto
+        const deleteResults = await Promise.allSettled(
+          keys.map((key) => this.storageService.deleteFile(key)),
+        );
+        deleteResults.forEach((result, idx) => {
+          if (result.status === 'rejected') {
+            console.error(
+              `[UsersService] Error al borrar el archivo ${keys[idx]} de S3:`,
+              result.reason,
+            );
+          } else {
+            console.log(
+              `[UsersService] Archivo borrado exitosamente de S3: ${keys[idx]}`,
+            );
+          }
+        });
+      }
+    } catch (error) {
+      console.error(
+        `[UsersService] Error crítico al obtener o borrar archivos de S3 para usuario ${userId}:`,
+        error,
+      );
+      // Continuamos de todas formas para no dejar la cuenta del usuario en un estado corrupto
+    }
+
+    // 2. Proceder a borrar el usuario de la base de datos (desencadena cascada)
     const success = await this.userRepo.deleteUserById(userId);
 
     if (success) {

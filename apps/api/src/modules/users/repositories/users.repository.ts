@@ -63,6 +63,25 @@ export class UsersRepository {
     }
   }
 
+  async getUserDocumentKeys(userId: string): Promise<string[]> {
+    const userWorkspaces = await this.db.query.workspace.findMany({
+      where: eq(workspace.userId, userId),
+      columns: { id: true },
+    });
+
+    if (userWorkspaces.length === 0) {
+      return [];
+    }
+
+    const workspaceIds = userWorkspaces.map((w) => w.id);
+    const docs = await this.db.query.document.findMany({
+      where: inArray(document.workspaceId, workspaceIds),
+      columns: { key: true },
+    });
+
+    return docs.map((d) => d.key).filter((k): k is string => !!k);
+  }
+
   async deleteUserById(userId: string): Promise<boolean> {
     const result = await this.db.delete(user).where(eq(user.id, userId));
 

@@ -1,18 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { DATABASE_CONNECTION } from '@modules/database/database-connection';
-import { lt, and, like } from 'drizzle-orm';
+import { and, like, lt } from 'drizzle-orm';
+// Helper eq para drizzle que no está importado arriba
+import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
+
 import {
   type Database,
-  user,
-  workspace,
-  flashcardDeck,
   flashcard,
+  flashcardDeck,
   quiz,
-  quizQuestion,
   quizAttempt,
+  quizQuestion,
   streaks,
+  user,
   userAchievement,
+  workspace,
 } from '@repo/db';
 
 @Injectable()
@@ -23,10 +27,15 @@ export class UsersDemoService {
    * Semilla datos interactivos premium para un usuario demo recién registrado.
    */
   async seedDemoData(userId: string) {
-    console.log(`[UsersDemoService] Iniciando semillado premium para usuario demo: ${userId}`);
+    console.log(
+      `[UsersDemoService] Iniciando semillado premium para usuario demo: ${userId}`,
+    );
 
     // Forzar la verificación del email en base de datos para la cuenta demo
-    await this.db.update(user).set({ emailVerified: true }).where(eq(user.id, userId));
+    await this.db
+      .update(user)
+      .set({ emailVerified: true })
+      .where(eq(user.id, userId));
 
     // 1. Crear Workspace 1: Inteligencia Artificial (Violeta)
     const ws1Id = uuidv4();
@@ -34,7 +43,8 @@ export class UsersDemoService {
       id: ws1Id,
       userId,
       name: '🤖 Inteligencia Artificial',
-      description: 'Conceptos clave, algoritmos de Machine Learning y Redes Neuronales.',
+      description:
+        'Conceptos clave, algoritmos de Machine Learning y Redes Neuronales.',
       icon: 'brain',
       bgColor: '#7C3AED',
       isFavorite: true,
@@ -48,7 +58,8 @@ export class UsersDemoService {
       id: ws2Id,
       userId,
       name: '📚 Historia del Arte',
-      description: 'Repaso general de movimientos artísticos desde el Renacimiento hasta el Arte Moderno.',
+      description:
+        'Repaso general de movimientos artísticos desde el Renacimiento hasta el Arte Moderno.',
       icon: 'palette',
       bgColor: '#F59E0B',
       isFavorite: false,
@@ -110,7 +121,8 @@ export class UsersDemoService {
       id: quizId,
       workspaceId: ws1Id,
       name: 'Introducción a Redes Neuronales',
-      description: 'Quiz interactivo para evaluar los conceptos de capas, funciones de activación y optimizadores.',
+      description:
+        'Quiz interactivo para evaluar los conceptos de capas, funciones de activación y optimizadores.',
       totalQuestions: 3,
       isAiGenerated: true,
       createdAt: new Date(),
@@ -120,13 +132,21 @@ export class UsersDemoService {
     // 6. Añadir preguntas al Quiz
     const questions = [
       {
-        question: '¿Cuál de los siguientes es un algoritmo clásico de Machine Learning?',
-        options: ['Regresión Lineal', 'HTML5 Nesting', 'Docker Compose', 'CSS Grid Layout'],
+        question:
+          '¿Cuál de los siguientes es un algoritmo clásico de Machine Learning?',
+        options: [
+          'Regresión Lineal',
+          'HTML5 Nesting',
+          'Docker Compose',
+          'CSS Grid Layout',
+        ],
         correctAnswer: 0,
-        explanation: 'La regresión lineal es un modelo estadístico y de aprendizaje supervisado básico altamente utilizado.',
+        explanation:
+          'La regresión lineal es un modelo estadístico y de aprendizaje supervisado básico altamente utilizado.',
       },
       {
-        question: '¿Qué significa el término "overfitting" en Inteligencia Artificial?',
+        question:
+          '¿Qué significa el término "overfitting" en Inteligencia Artificial?',
         options: [
           'Que el modelo es demasiado rápido',
           'Que el modelo memorizó los datos de entrenamiento y falla al predecir datos nuevos',
@@ -134,13 +154,16 @@ export class UsersDemoService {
           'Que las variables de entrada son redundantes',
         ],
         correctAnswer: 1,
-        explanation: 'El sobreajuste u overfitting ocurre cuando el modelo aprende el ruido de los datos de entrenamiento, perdiendo generalización.',
+        explanation:
+          'El sobreajuste u overfitting ocurre cuando el modelo aprende el ruido de los datos de entrenamiento, perdiendo generalización.',
       },
       {
-        question: '¿Qué función se utiliza comúnmente para normalizar la salida de una red neuronal multiclasificación en probabilidades?',
+        question:
+          '¿Qué función se utiliza comúnmente para normalizar la salida de una red neuronal multiclasificación en probabilidades?',
         options: ['ReLU', 'Softmax', 'Sigmoide', 'Tangente Hiperbólica'],
         correctAnswer: 1,
-        explanation: 'Softmax escala las salidas en valores entre 0 y 1 que en conjunto suman exactamente 1.0 (probabilidades).',
+        explanation:
+          'Softmax escala las salidas en valores entre 0 y 1 que en conjunto suman exactamente 1.0 (probabilidades).',
       },
     ];
 
@@ -171,7 +194,7 @@ export class UsersDemoService {
     // 8. Crear racha de estudio activa (Streak de 3 días) para detonar las animaciones de celebración
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    
+
     await this.db.insert(streaks).values({
       id: uuidv4(),
       userId,
@@ -204,11 +227,16 @@ export class UsersDemoService {
       unlockedAt: new Date(),
     });
 
-    console.log(`[UsersDemoService] Semillado completado con éxito para: ${userId}`);
+    console.log(
+      `[UsersDemoService] Semillado completado con éxito para: ${userId}`,
+    );
 
     // 10. Limpieza en segundo plano de usuarios demo obsoletos (> 24 horas)
     this.cleanupExpiredDemoUsers().catch((err) => {
-      console.error('[UsersDemoService] Error al limpiar usuarios demo caducados:', err);
+      console.error(
+        '[UsersDemoService] Error al limpiar usuarios demo caducados:',
+        err,
+      );
     });
   }
 
@@ -220,35 +248,38 @@ export class UsersDemoService {
     const oneDayAgo = new Date();
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
-    console.log('[UsersDemoService] Ejecutando limpieza automática de usuarios demo expirados...');
+    console.log(
+      '[UsersDemoService] Ejecutando limpieza automática de usuarios demo expirados...',
+    );
 
     const expiredUsers = await this.db
       .select({ id: user.id })
       .from(user)
-      .where(
-        and(
-          like(user.email, 'guest-%'),
-          lt(user.createdAt, oneDayAgo)
-        )
-      );
+      .where(and(like(user.email, 'guest-%'), lt(user.createdAt, oneDayAgo)));
 
     if (expiredUsers.length === 0) {
-      console.log('[UsersDemoService] No se encontraron usuarios demo expirados para limpiar.');
+      console.log(
+        '[UsersDemoService] No se encontraron usuarios demo expirados para limpiar.',
+      );
       return;
     }
 
-    console.log(`[UsersDemoService] Se encontraron ${expiredUsers.length} usuarios demo expirados. Eliminando...`);
+    console.log(
+      `[UsersDemoService] Se encontraron ${expiredUsers.length} usuarios demo expirados. Eliminando...`,
+    );
 
     for (const expUser of expiredUsers) {
       try {
         await this.db.delete(user).where(eq(user.id, expUser.id));
-        console.log(`[UsersDemoService] Usuario demo eliminado correctamente: ${expUser.id}`);
+        console.log(
+          `[UsersDemoService] Usuario demo eliminado correctamente: ${expUser.id}`,
+        );
       } catch (err) {
-        console.error(`[UsersDemoService] Error al borrar usuario ${expUser.id}:`, err);
+        console.error(
+          `[UsersDemoService] Error al borrar usuario ${expUser.id}:`,
+          err,
+        );
       }
     }
   }
 }
-
-// Helper eq para drizzle que no está importado arriba
-import { eq } from 'drizzle-orm';

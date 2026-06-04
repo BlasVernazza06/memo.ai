@@ -1,8 +1,11 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 import { UsersRepository } from '@modules/users/repositories/users.repository';
 import { UsersService } from '@modules/users/services/users.service';
+import { StorageService } from '@/modules/storage/services/storage.service';
+import { CACHE_KEYS } from '@/common/constants/cache-keys';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -12,6 +15,18 @@ describe('UsersService', () => {
     findById: jest.fn(),
     countWorkspaces: jest.fn(),
     update: jest.fn(),
+    getUserDocumentKeys: jest.fn(),
+    deleteUserById: jest.fn(),
+  };
+
+  const mockStorageService = {
+    deleteFile: jest.fn(),
+  };
+
+  const mockCacheManager = {
+    get: jest.fn(),
+    set: jest.fn(),
+    del: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -20,7 +35,15 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: UsersRepository,
-          useValue: mockUsersRepository, // Aquí inyectamos el doble
+          useValue: mockUsersRepository,
+        },
+        {
+          provide: StorageService,
+          useValue: mockStorageService,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
         },
       ],
     }).compile();
@@ -130,6 +153,41 @@ describe('UsersService', () => {
         ...billingData,
         updatedAt: expect.any(Date),
       });
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('deberia obtener las keys, eliminar archivos de S3 y luego borrar al usuario', async () => {
+      const userId = 'user-123';
+      const mockKeys = ['key-1', 'key-2'];
+      mockUsersRepository.getUserDocumentKeys.mockResolvedValue(mockKeys);
+      mockStorageService.deleteFile.mockResolvedValue(undefined);
+      mockUsersRepository.deleteUserById.mockResolvedValue(true);
+
+      const result = await service.deleteUser(userId);
+
+      expect(result).toEqual({ success: true });
+      expect(mockUsersRepository.getUserDocumentKeys).toHaveBeenCalledWith(userId);
+      expect(mockStorageService.deleteFile).toHaveBeenCalledWith('key-1');
+      expect(mockStorageService.deleteFile).toHaveBeenCalledWith('key-2');
+      expect(mockUsersRepository.deleteUserById).toHaveBeenCalledWith(userId);
+      expect(mockCacheManager.del).toHaveBeenCalledWith(CACHE_KEYS.WORKSPACES_LIST(userId));
+      expect(mockCacheManager.del).toHaveBeenCalledWith(CACHE_KEYS.USER_PROFILE(userId));
+    });
+
+    it('deberia continuar y borrar el usuario aun si falla el borrado de S3', async () => {
+      const userId = 'user-123';
+      const mockKeys = ['key-1'];
+      mockUsersRepository.getUserDocumentKeys.mockResolvedValue(mockKeys);
+      mockStorageService.deleteFile.mockRejectedValue(new Error('S3 error'));
+      mockUsersRepository.deleteUserById.mockResolvedValue(true);
+
+      const result = await service.deleteUser(userId);
+
+      expect(result).toEqual({ success: true });
+      expect(mockUsersRepository.getUserDocumentKeys).toHaveBeenCalledWith(userId);
+      expect(mockStorageService.deleteFile).toHaveBeenCalledWith('key-1');
+      expect(mockUsersRepository.deleteUserById).toHaveBeenCalledWith(userId);
     });
   });
 });
