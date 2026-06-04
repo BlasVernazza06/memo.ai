@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
+import { ACHIEVEMENTS } from '@/modules/achievements/constants/achievements.list';
 import { NotificationsService } from '../services/notifications.service';
 
 interface AchievementUnlockedPayload {
@@ -20,16 +21,19 @@ export class AchievementNotificationListener {
    */
   @OnEvent('achievement.unlocked')
   async handleAchievementUnlocked(payload: AchievementUnlockedPayload) {
-    const { userId, title, icon } = payload;
+    const { userId, slug } = payload;
+    const achievement = ACHIEVEMENTS.find((a) => a.slug === slug);
+
+    if (!achievement) return;
 
     await this.notificationsService.createNotification({
       userId,
       type: 'achievement_unlocked',
-      title: '¡Logro Desbloqueado! 🏆',
-      message: `Has conseguido el logro: "${title}"`,
-      icon: icon || '⭐',
+      title: `¡Logro Desbloqueado: ${achievement.title}!`,
+      message: achievement.description,
+      icon: achievement.icon || '🏆',
       metadata: {
-        achievementSlug: payload.slug,
+        achievementSlug: slug,
       },
     });
   }
