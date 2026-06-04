@@ -10,8 +10,8 @@
       "default": "./dist/index.js"
     },
     "./auth": {
-      "types": "./dist/auth-schema.d.ts",
-      "default": "./dist/auth-schema.js"
+      "types": "./dist/auth/index.d.ts",
+      "default": "./dist/auth/index.js"
     }
   },
   "scripts": {
