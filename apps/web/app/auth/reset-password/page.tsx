@@ -39,6 +39,7 @@ export default function ResetPasswordPage() {
                 width={32}
                 height={32}
                 className="rounded-lg border border-border/50"
+                priority
               />
               <span className="text-xl text-foreground font-bold tracking-tight">
                 memo<span className="text-primary">.ai</span>

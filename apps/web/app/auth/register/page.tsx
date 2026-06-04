@@ -55,6 +55,7 @@ function RegisterContent() {
                 width={32}
                 height={32}
                 className="rounded-lg border border-border/50"
+                priority
               />
             </Link>
           </motion.div>

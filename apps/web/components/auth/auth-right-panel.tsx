@@ -116,6 +116,7 @@ export default function AuthRightPanel() {
             width={60}
             height={60}
             className="rounded-xl"
+            priority
           />
           <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white shadow-lg">
             <Sparkles className="w-4 h-4" />
