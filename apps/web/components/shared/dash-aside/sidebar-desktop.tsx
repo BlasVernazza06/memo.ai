@@ -38,6 +38,7 @@ export function SidebarDesktop({
               height={22}
               alt="Logo Memo.ai"
               className="rounded-md"
+              priority
             />
           </div>
           <span className="text-xl font-black text-foreground tracking-tighter italic">

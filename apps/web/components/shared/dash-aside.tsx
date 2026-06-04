@@ -5,16 +5,19 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import {
+  Brain,
   BrainCircuit,
   HelpCircle,
   Layers,
   LayoutDashboard,
   LogOut,
+  Medal,
   Settings,
 } from 'lucide-react';
 import { Plus } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { SidebarNotifications } from '@/components/shared/dash-aside/sidebar-notifications';
 import { SidebarUserAvatar } from '@/components/shared/dash-aside/user-avatar';
 import { authClient } from '@/lib/auth-client';
 import { useAuth } from '@/lib/auth-provider';
@@ -48,6 +51,27 @@ export default function DashAside() {
     return <SidebarUserAvatar user={user} isLoading={isLoading} />;
   };
 
+  const MOCKUP_NOTIFICATIONS = [
+    {
+      id: 1,
+      icon: Medal,
+      title: 'Primera Victoria',
+      description: 'El conocimiento empieza a florecer en ti',
+    },
+    /*{
+      id: 2,
+      icon: Brain,
+      title: 'Sabio',
+      description: 'El conocimiento empieza a florecer en ti'
+    },
+    {
+      id: 3,
+      icon: Medal,
+      title: 'Primera Victoria',
+      description: 'El conocimiento empieza a florecer en ti'
+    }*/
+  ];
+
   return (
     <>
       {/* Desktop Professional Sidebar */}
@@ -62,6 +86,7 @@ export default function DashAside() {
                 height={22}
                 alt="Logo Memo.ai"
                 className="rounded-md"
+                priority
               />
             </div>
 
@@ -138,6 +163,8 @@ export default function DashAside() {
             </Link>
           </div>
         </nav>
+        {/* Notifications Carousel */}
+        <SidebarNotifications />
 
         {/* User Profile Footer */}
         <div className="p-6 pt-0 mt-auto">
