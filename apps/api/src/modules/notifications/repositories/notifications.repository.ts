@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { randomUUID } from 'crypto';
-import { eq, desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 import { type Database, notification } from '@repo/db';
+
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
 
 export interface CreateNotificationDto {
@@ -26,7 +28,7 @@ export class NotificationsRepository {
    */
   async create(data: CreateNotificationDto) {
     const notificationId = randomUUID();
-    
+
     await this.db.insert(notification).values({
       id: notificationId,
       userId: data.userId,

@@ -28,55 +28,35 @@ function parseLastActivity(
   return startOfCalendarDay(parsed);
 }
 
-function buildEmptyTimeline(today: Date): StreakTimelineDay[] {
-  const windowStart = addCalendarDays(today, -(TIMELINE_LENGTH - 1));
-  return Array.from({ length: TIMELINE_LENGTH }, (_, i) => {
-    const date = addCalendarDays(windowStart, i);
-    return {
-      label: DAY_LABELS[date.getDay()] ?? 'Do',
-      active: false,
-      today: date.getTime() === today.getTime(),
-    };
-  });
-}
-
-/**
- * Ventana de 7 días anclada al inicio de la racha actual (consecutiva).
- * Si la racha supera 7 días, muestra los últimos 7 hasta lastActivity.
- * Sin racha activa: últimos 7 días calendario, todos inactivos.
- */
 export function buildStreakTimeline(streak: StreakDTO | null): StreakTimelineDay[] {
   const today = startOfCalendarDay(new Date());
 
-  if (!streak || streak.currentStreak <= 0) {
-    return buildEmptyTimeline(today);
+  // Define active range if streak is active
+  let streakStart: number | null = null;
+  let lastActivity: number | null = null;
+
+  if (streak && streak.currentStreak > 0) {
+    const parsedLast = parseLastActivity(streak.lastActivity);
+    if (parsedLast) {
+      lastActivity = parsedLast.getTime();
+      streakStart = addCalendarDays(parsedLast, -(streak.currentStreak - 1)).getTime();
+    }
   }
-
-  const lastActivity = parseLastActivity(streak.lastActivity);
-  if (!lastActivity) {
-    return buildEmptyTimeline(today);
-  }
-
-  const streakStart = addCalendarDays(
-    lastActivity,
-    -(streak.currentStreak - 1),
-  );
-
-  const windowStart =
-    streak.currentStreak > TIMELINE_LENGTH
-      ? addCalendarDays(lastActivity, -(TIMELINE_LENGTH - 1))
-      : streakStart;
 
   return Array.from({ length: TIMELINE_LENGTH }, (_, i) => {
-    const date = addCalendarDays(windowStart, i);
+    const date = addCalendarDays(today, -i); // Go backwards from today
+    const time = date.getTime();
+
     const active =
-      date.getTime() >= streakStart.getTime() &&
-      date.getTime() <= lastActivity.getTime();
+      streakStart !== null &&
+      lastActivity !== null &&
+      time >= streakStart &&
+      time <= lastActivity;
 
     return {
       label: DAY_LABELS[date.getDay()] ?? 'Do',
       active,
-      today: date.getTime() === today.getTime(),
+      today: time === today.getTime(),
     };
   });
 }

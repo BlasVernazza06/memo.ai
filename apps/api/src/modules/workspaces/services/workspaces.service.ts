@@ -6,8 +6,6 @@ import { UsersService } from '@modules/users/services/users.service';
 import { WorkspacesRepository } from '@modules/workspaces/repositories/workspaces.repository';
 import * as cacheManager from 'cache-manager';
 
-import { type WorkspaceWithRelations } from '@repo/db';
-
 import { CACHE_KEYS } from '@/common/constants/cache-keys';
 import { AiService } from '@/modules/ai/services/ai.service';
 import { StorageService } from '@/modules/storage/services/storage.service';
@@ -18,8 +16,6 @@ import {
   WorkspaceCardDTO,
   WorkspaceDetailDTO,
 } from '../dto/workspace.dto';
-
-
 
 @Injectable()
 export class WorkspacesService {
@@ -132,7 +128,8 @@ ${existingContentText ? `${existingContentText}\n` : ''}`;
     // 4. Guardar el nuevo contenido
     if (type === 'flashcards') {
       const decks = aiData.flashcardDecks || [];
-      const singleCards = aiData.flashcards || (Array.isArray(aiData) ? aiData : null);
+      const singleCards =
+        aiData.flashcards || (Array.isArray(aiData) ? aiData : null);
 
       if (decks.length > 0) {
         // Si la IA devolvió mazos estructurados
@@ -151,15 +148,22 @@ ${existingContentText ? `${existingContentText}\n` : ''}`;
           workspaceDetail.name,
         );
       } else {
-        console.warn('[WorkspacesService] No se encontraron flashcards en la respuesta de la IA:', aiData);
+        console.warn(
+          '[WorkspacesService] No se encontraron flashcards en la respuesta de la IA:',
+          aiData,
+        );
       }
     } else if (type === 'quizzes') {
-      const quizzesToSave = aiData.quizzes || (Array.isArray(aiData) ? aiData : null);
+      const quizzesToSave =
+        aiData.quizzes || (Array.isArray(aiData) ? aiData : null);
 
       if (quizzesToSave && quizzesToSave.length > 0) {
         await this.workspaceRepo.addQuizzes(workspaceDetail.id, quizzesToSave);
       } else {
-        console.warn('[WorkspacesService] No se encontraron quizzes en la respuesta de la IA:', aiData);
+        console.warn(
+          '[WorkspacesService] No se encontraron quizzes en la respuesta de la IA:',
+          aiData,
+        );
       }
     }
 
@@ -229,15 +233,15 @@ ${existingContentText ? `${existingContentText}\n` : ''}`;
 
   async getSummary(userId: string): Promise<{
     workspaces: number;
-    docs: number;
-    flashcards: number;
+    currentStreak: number;
+    achievements: number;
   }> {
     const summary = await this.workspaceRepo.getSummary(userId);
 
     return {
       workspaces: Number(summary.workspaces),
-      docs: Number(summary.docs),
-      flashcards: Number(summary.flashcards),
+      currentStreak: Number(summary.currentStreak),
+      achievements: Number(summary.achievements),
     };
   }
 

@@ -20,6 +20,8 @@ import {
   quiz,
   quizQuestion,
   workspace,
+  streaks,
+  userAchievement,
 } from '@repo/db';
 
 import { DATABASE_CONNECTION } from '@/modules/database/database-connection';
@@ -450,17 +452,35 @@ export class WorkspacesRepository {
   }
 
   async getSummary(userId: string) {
-    const [result] = await this.db
-      .select({
-        workspaces: countDistinct(workspace.id),
-        docs: countDistinct(document.id),
-        flashcards: countDistinct(flashcardDeck.id),
-      })
+    const [workspaceResult] = await this.db
+      .select({ count: count(workspace.id) })
       .from(workspace)
-      .leftJoin(document, eq(workspace.id, document.workspaceId))
-      .leftJoin(flashcardDeck, eq(workspace.id, flashcardDeck.workspaceId))
       .where(eq(workspace.userId, userId));
 
-    return result || { workspaces: 0, docs: 0, flashcards: 0 };
+    const streakResult = await this.db.query.streaks.findFirst({
+      where: eq(streaks.userId, userId),
+      columns: {
+        currentStreak: true,
+      },
+    });
+
+    const [achievementResult] = await this.db
+      .select({ count: count(userAchievement.id) })
+      .from(userAchievement)
+      .where(eq(userAchievement.userId, userId));
+
+    return {
+      workspaces: workspaceResult?.count || 0,
+      currentStreak: streakResult?.currentStreak || 0,
+      achievements: achievementResult?.count || 0,
+    };
+  }
+
+  async countWorkspaces(userId: string): Promise<number> {
+    const [result] = await this.db
+      .select({ count: count(workspace.id) })
+      .from(workspace)
+      .where(eq(workspace.userId, userId));
+    return result?.count || 0;
   }
 }
