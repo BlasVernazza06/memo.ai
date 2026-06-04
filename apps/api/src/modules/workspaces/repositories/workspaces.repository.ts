@@ -208,6 +208,7 @@ export class WorkspacesRepository {
         id: workspace.id,
         name: workspace.name,
         description: workspace.description,
+        category: workspace.category,
         createdAt: workspace.createdAt,
         icon: workspace.icon,
         bgColor: workspace.bgColor,

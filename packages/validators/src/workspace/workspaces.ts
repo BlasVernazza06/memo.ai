@@ -31,6 +31,7 @@ export const WorkspaceCardSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().nullable(),
+  category: z.string().nullable().optional(),
   icon: z.string().nullable(),
   bgColor: z.string().nullable(),
   isFavorite: z.boolean(),
