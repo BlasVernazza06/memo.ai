@@ -51,25 +51,13 @@ export default function DashWorkspacesSec({
     })
     .sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
 
-  const MOCK_CATEGORIES = [
-    'Seguridad Informatica',
-    'Historia',
-    'Matematicas',
-    'Programacion',
-    'Quimica',
-    'Fisica',
-    'CiberSeguridad',
-  ];
-
   const workspaceCategories = Array.from(
     new Set(
       workspaces.map((ws) => ws.category).filter((cat): cat is string => !!cat),
     ),
   );
 
-  const allCategories = Array.from(
-    new Set([...workspaceCategories, ...MOCK_CATEGORIES]),
-  );
+  const allCategories = Array.from(new Set([...workspaceCategories]));
 
   const scrollableCategories = allCategories.filter(
     (cat) => cat !== selectedCategory,
@@ -200,6 +188,11 @@ export default function DashWorkspacesSec({
         <div>
           {/* Categories Carousel (Always visible when workspaces exist, regardless of filters) */}
           <div className="relative flex w-full items-center my-5 gap-2">
+            <div>
+              <span className="text-xl font-medium underline underline-offset-2">
+                Categorias:{' '}
+              </span>
+            </div>
             <AnimatePresence mode="popLayout">
               {selectedCategory && (
                 <motion.div

@@ -12,11 +12,13 @@ import {
   CardSim,
   FileCheck,
   FileText,
+  Flame,
   IdCardIcon,
   Network,
   Plus,
   Sparkles,
   Target,
+  Trophy,
   X,
   Zap,
 } from 'lucide-react';
@@ -30,7 +32,7 @@ import { useAuth } from '@/lib/auth-provider';
 export default function DashHero({
   summary,
 }: {
-  summary: { workspaces: number; docs: number; flashcards: number };
+  summary: { workspaces: number; currentStreak: number; achievements: number };
 }) {
   const { user } = useAuth();
   const [showTutorial, setShowTutorial] = useState(false);
@@ -74,9 +76,7 @@ export default function DashHero({
         {/* Decorative Background Assets */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
           <div className="absolute -top-[10%] -right-[5%] w-[50%] h-full bg-primary/10 dark:bg-primary/20 blur-[120px] rounded-full animate-pulse transition-all duration-[3000ms]" />
-          <div
-            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08] bg-dot-grid"
-          />
+          <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08] bg-dot-grid" />
         </div>
 
         <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-center justify-between">
@@ -138,10 +138,37 @@ export default function DashHero({
 
             {/* Compact Status Row */}
             <div className="flex flex-wrap items-center gap-x-12 gap-y-6 pt-8 border-t border-border/40">
+              {/* Racha actual */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
+                className="group/stat flex items-center gap-4 cursor-default"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-orange-500/10 rounded-2xl blur-xl opacity-0 group-hover/stat:opacity-100 transition-opacity" />
+                  <div className="relative size-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center text-orange-500">
+                    <Flame className="size-6 fill-current animate-pulse" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] leading-none mb-1">
+                    Racha
+                  </p>
+                  <p className="text-2xl font-black tracking-tight">
+                    {summary.currentStreak}{' '}
+                    {summary.currentStreak === 1 ? 'día' : 'días'}
+                  </p>
+                </div>
+              </motion.div>
+
+              <div className="hidden sm:block w-px h-10 bg-border/30" />
+
+              {/* Workspaces */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
                 className="group/stat flex items-center gap-4 cursor-default"
               >
                 <div className="relative">
@@ -152,7 +179,7 @@ export default function DashHero({
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] leading-none mb-1">
-                    Proyectos
+                    Workspaces
                   </p>
                   <p className="text-2xl font-black tracking-tight">
                     {summary.workspaces}
@@ -162,30 +189,7 @@ export default function DashHero({
 
               <div className="hidden sm:block w-px h-10 bg-border/30" />
 
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="group/stat flex items-center gap-4 cursor-default"
-              >
-                <div className="relative">
-                  <div className="absolute inset-0 bg-blue-500/10 rounded-2xl blur-xl opacity-0 group-hover/stat:opacity-100 transition-opacity" />
-                  <div className="relative size-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center text-blue-500">
-                    <FileCheck className="size-6" />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] leading-none mb-1">
-                    Docs
-                  </p>
-                  <p className="text-2xl font-black tracking-tight">
-                    {summary.docs}
-                  </p>
-                </div>
-              </motion.div>
-
-              <div className="hidden sm:block w-px h-10 bg-border/30" />
-
+              {/* Logros */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -193,17 +197,17 @@ export default function DashHero({
                 className="group/stat flex items-center gap-4 cursor-default"
               >
                 <div className="relative">
-                  <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl blur-xl opacity-0 group-hover/stat:opacity-100 transition-opacity" />
-                  <div className="relative size-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center text-emerald-500">
-                    <IdCardIcon className="size-6" />
+                  <div className="absolute inset-0 bg-amber-500/10 rounded-2xl blur-xl opacity-0 group-hover/stat:opacity-100 transition-opacity" />
+                  <div className="relative size-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center text-amber-500">
+                    <Trophy className="size-6" />
                   </div>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] leading-none mb-1">
-                    Flashcards
+                    Logros
                   </p>
                   <p className="text-2xl font-black tracking-tight">
-                    {summary.flashcards}
+                    {summary.achievements}
                   </p>
                 </div>
               </motion.div>
