@@ -25,7 +25,25 @@ async function bootstrap() {
 
   // Habilitar CORS para que el Frontend pueda comunicarse con el Backend
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:3000'],
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      const allowedPatterns = [
+        /^http:\/\/localhost:\d+$/,
+        /\.vercel\.app$/,
+      ];
+      const isAllowed =
+        allowedPatterns.some((pattern) => pattern.test(origin)) ||
+        origin === process.env.NEXT_PUBLIC_APP_URL;
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     exposedHeaders: ['Location', 'location', 'set-cookie'],

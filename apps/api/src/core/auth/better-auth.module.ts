@@ -80,7 +80,10 @@ import { EmailService } from '@/modules/email/service/email.service';
               stripePriceId: { type: 'string', input: false },
             },
           },
-          trustedOrigins: [configService.getOrThrow('NEXT_PUBLIC_APP_URL')],
+          trustedOrigins: [
+            configService.getOrThrow('NEXT_PUBLIC_APP_URL'),
+            'https://*.vercel.app',
+          ],
           hooks: {
             after: async (context) => {
               const ctx = context as any;

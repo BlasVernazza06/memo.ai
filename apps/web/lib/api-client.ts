@@ -1,7 +1,9 @@
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.NEXT_PUBLIC_APP_URL ||
-  'http://localhost:3000';
+  typeof window !== 'undefined'
+    ? ''
+    : process.env.NEXT_PUBLIC_API_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'http://localhost:3000';
 
 /**
  * Client-side authenticated fetch to the API.

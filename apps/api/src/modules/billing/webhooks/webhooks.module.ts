@@ -14,13 +14,13 @@ import { WebhooksService } from './services/webhooks.service';
     {
       provide: 'STRIPE_SECRET_KEY',
       useFactory: (config: ConfigService) =>
-        config.getOrThrow<string>('stripe.secretKey'),
+        config.get<string>('stripe.secretKey') || '',
       inject: [ConfigService],
     },
     {
       provide: 'STRIPE_WEBHOOK_SECRET',
       useFactory: (config: ConfigService) =>
-        config.getOrThrow<string>('stripe.webhookSecret'),
+        config.get<string>('stripe.webhookSecret') || '',
       inject: [ConfigService],
     },
   ],
