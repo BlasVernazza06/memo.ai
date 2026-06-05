@@ -22,9 +22,7 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    const apiUrl = process.env.API_URL;
-
-    if (!apiUrl) return [];
+    const apiUrl = process.env.API_URL || 'http://localhost:3000';
 
     return [
       {
