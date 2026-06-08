@@ -31,15 +31,19 @@ import { EmailService } from '@/modules/email/service/email.service';
         emailService: EmailService,
         cache: cacheManager.Cache,
       ) => {
-        const isProd = configService.get('NODE_ENV') === 'production';
         const frontendUrl = configService.getOrThrow('NEXT_PUBLIC_APP_URL');
+        const cleanFrontendUrl = frontendUrl.endsWith('/') ? frontendUrl.slice(0, -1) : frontendUrl;
+        
+        const isProd =
+          configService.get('NODE_ENV') === 'production' ||
+          (!cleanFrontendUrl.includes('localhost') && !cleanFrontendUrl.includes('127.0.0.1'));
         
         const auth = betterAuth({
           database: drizzleAdapter(database, {
             provider: 'pg',
             schema: authSchema,
           }),
-          errorURL: `${frontendUrl}/auth/error`,
+          errorURL: `${cleanFrontendUrl}/auth/error`,
           advanced: {
             defaultCookieAttributes: {
               sameSite: isProd ? 'none' : undefined,
