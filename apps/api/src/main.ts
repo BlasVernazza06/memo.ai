@@ -15,6 +15,11 @@ async function bootstrap() {
     rawBody: true,
   });
 
+  // Habilitar trust proxy para que NestJS/Express lea correctamente X-Forwarded-Proto y X-Forwarded-Host
+  // Esto es obligatorio al estar detrás de los proxies de Render y Vercel
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', true);
+
   // Aumentar el límite para JSON y URL encoded (necesario para workspaces grandes)
   // Excluimos las rutas de Better Auth (/api/auth) para que no interfieran con el stream crudo
   app.use((req, res, next) => {
