@@ -33,7 +33,11 @@ export default function OAuthButtons({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ provider, callbackURL: redirectTo }),
+        body: JSON.stringify({
+          provider,
+          callbackURL: redirectTo,
+          errorCallbackURL: `${webUrl}/auth/error`
+        }),
       });
 
       const locationHeader = response.headers.get('Location') || response.headers.get('location');
@@ -44,7 +48,11 @@ export default function OAuthButtons({
       }
       
       // Fallback if Location header is missing
-      const res = await signIn.social({ provider, callbackURL: redirectTo });
+      const res = await signIn.social({
+        provider,
+        callbackURL: redirectTo,
+        errorCallbackURL: `${webUrl}/auth/error`
+      });
       if (res?.error) {
         console.error('OAuth error:', res.error);
         alert(`Error: ${res.error.message || 'Unknown OAuth error'}`);
