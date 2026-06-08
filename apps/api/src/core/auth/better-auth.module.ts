@@ -32,12 +32,14 @@ import { EmailService } from '@/modules/email/service/email.service';
         cache: cacheManager.Cache,
       ) => {
         const isProd = configService.get('NODE_ENV') === 'production';
+        const frontendUrl = configService.getOrThrow('NEXT_PUBLIC_APP_URL');
         
         const auth = betterAuth({
           database: drizzleAdapter(database, {
             provider: 'pg',
             schema: authSchema,
           }),
+          errorURL: `${frontendUrl}/auth/error`,
           advanced: {
             defaultCookieAttributes: {
               sameSite: isProd ? 'none' : undefined,
