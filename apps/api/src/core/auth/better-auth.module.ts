@@ -31,6 +31,8 @@ import { EmailService } from '@/modules/email/service/email.service';
         emailService: EmailService,
         cache: cacheManager.Cache,
       ) => {
+        const isProd = configService.get('NODE_ENV') === 'production';
+        
         const auth = betterAuth({
           database: drizzleAdapter(database, {
             provider: 'pg',
@@ -38,8 +40,8 @@ import { EmailService } from '@/modules/email/service/email.service';
           }),
           advanced: {
             defaultCookieAttributes: {
-              sameSite: 'none',
-              secure: true,
+              sameSite: isProd ? 'none' : undefined,
+              secure: isProd ? true : undefined,
             },
           },
           emailAndPassword: {
