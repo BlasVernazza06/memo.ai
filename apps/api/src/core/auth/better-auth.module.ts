@@ -36,6 +36,12 @@ import { EmailService } from '@/modules/email/service/email.service';
             provider: 'pg',
             schema: authSchema,
           }),
+          advanced: {
+            defaultCookieAttributes: {
+              sameSite: 'none',
+              secure: true,
+            },
+          },
           emailAndPassword: {
             enabled: true,
             async sendResetPassword({ user, url }) {
