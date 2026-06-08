@@ -16,8 +16,21 @@ async function bootstrap() {
   });
 
   // Aumentar el límite para JSON y URL encoded (necesario para workspaces grandes)
-  app.use(json({ limit: '10mb' }));
-  app.use(urlencoded({ extended: true, limit: '10mb' }));
+  // Excluimos las rutas de Better Auth (/api/auth) para que no interfieran con el stream crudo
+  app.use((req, res, next) => {
+    if (req.originalUrl.startsWith('/api/auth')) {
+      next();
+    } else {
+      json({ limit: '10mb' })(req, res, next);
+    }
+  });
+  app.use((req, res, next) => {
+    if (req.originalUrl.startsWith('/api/auth')) {
+      next();
+    } else {
+      urlencoded({ extended: true, limit: '10mb' })(req, res, next);
+    }
+  });
 
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new HttpExceptionFilter());
