@@ -6,9 +6,9 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = ['/dashboard', '/checkout'];
 
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
-    const sessionCookie = request.cookies.get(
-      'better-auth.session_token',
-    )?.value;
+    const sessionCookie =
+      request.cookies.get('better-auth.session_token')?.value ||
+      request.cookies.get('__Secure-better-auth.session_token')?.value;
 
     if (!sessionCookie) {
       const loginUrl = new URL('/auth/login', request.url);
