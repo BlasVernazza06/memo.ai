@@ -39,6 +39,7 @@ import { EmailService } from '@/modules/email/service/email.service';
           (!cleanFrontendUrl.includes('localhost') && !cleanFrontendUrl.includes('127.0.0.1'));
         
         const auth = betterAuth({
+          baseURL: `${cleanFrontendUrl}/api/auth`,
           database: drizzleAdapter(database, {
             provider: 'pg',
             schema: authSchema,
