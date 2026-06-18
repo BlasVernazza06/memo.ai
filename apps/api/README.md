@@ -1,98 +1,115 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🎛️ Memo AI — API Gateway & Backend Engine (API)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este servicio es el núcleo transaccional y la API Gateway de **Memo AI**, desarrollado con **NestJS v11** y **TypeScript**. Se encarga de la orquestación de flujos de negocio, autenticación, persistencia relacional en PostgreSQL y la integración con proveedores de servicios externos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🛠️ Stack Tecnológico del Backend
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+*   **Framework**: NestJS v11 (con compilación SWC ultrarrápida).
+*   **Base de Datos**: PostgreSQL utilizando Drizzle ORM y el driver `@neondatabase/serverless` para escalabilidad serverless.
+*   **Autenticación**: Integración de Servidor con **Better Auth** (`@thallesp/nestjs-better-auth`).
+*   **Gestión de Archivos**: AWS S3 SDK (Presigned URLs) y Uploadthing.
+*   **Pasarela de Pago**: Stripe SDK para la gestión de suscripciones y facturación.
+*   **Comunicaciones**: Brevo SDK (Envío transaccional de correos electrónicos).
+*   **Validación y Tipos**: Zod junto a `nestjs-zod` y `class-validator`.
+*   **Optimización**: Cache Manager integrado y Throttler para protección de tasa límite (Rate Limiting).
+*   **Testing**: Jest y Supertest (E2E y unitarios).
 
-## Project setup
+---
 
-```bash
-$ pnpm install
+## 📁 Estructura Arquitectónica
+
+El backend sigue un patrón modular limpio y desacoplado:
+
+```text
+apps/api/src/
+├── main.ts               # Punto de entrada de la aplicación NestJS
+├── app.module.ts         # Módulo raíz que orquesta los submódulos globales
+├── config/               # Configuraciones tipadas del sistema y variables de entorno
+├── core/                 # Filtros globales de error, interceptores y guards de seguridad
+├── common/               # Clases, decorators y utilidades compartidas
+└── modules/              # Módulos encapsulados por dominio de negocio
+    ├── auth/             # Módulo de integración de Better Auth
+    ├── users/            # Gestión de cuentas de usuario y perfiles
+    ├── documents/        # Subida, parseo y orquestación de archivos
+    ├── study/            # Lógica y almacenamiento de flashcards y quices
+    └── billing/          # Webhooks y suscripciones con Stripe
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ pnpm run start
+## 🔒 Seguridad e Integración de Autenticación
 
-# watch mode
-$ pnpm run start:dev
+Toda la seguridad de rutas está controlada por Guards integrados que validan la sesión de Better Auth propagada por el cliente. Las cabeceras del protocolo se parsean automáticamente para inyectar la información del usuario autenticado en el contexto de ejecución.
 
-# production mode
-$ pnpm run start:prod
+---
+
+## ⚙️ Guía de Inicio Rápido para Desarrollo
+
+### 1. Variables de Entorno Requeridas (`apps/api/.env`)
+
+Crea y configura las siguientes credenciales:
+
+```env
+PORT=3000
+
+# Base de datos
+DATABASE_URL="postgresql://usuario:password@localhost:5432/memo_ai"
+
+# URL del microservicio de Inteligencia Artificial (FastAPI)
+AI_SERVICE_URL="http://localhost:8000"
+
+# Configuración de Better Auth
+BETTER_AUTH_SECRET="tu-secreto-compartido-de-32-caracteres"
+
+# Pasarela de pagos (Stripe)
+STRIPE_API_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+
+# Proveedor de correo (Brevo)
+BREVO_API_KEY="xkeysib-..."
+
+# Almacenamiento (AWS S3)
+AWS_ACCESS_KEY_ID="your_access_key"
+AWS_SECRET_ACCESS_KEY="your_secret_key"
+AWS_S3_BUCKET_NAME="memo-ai-documents"
 ```
 
-## Run tests
+### 2. Comandos de Consola del Backend
 
-```bash
-# unit tests
-$ pnpm run test
+Ejecuta estos comandos desde la raíz del monorepo o dentro de `apps/api`:
 
-# e2e tests
-$ pnpm run test:e2e
+*   **Levantar Servidor en Modo Watch (Desarrollo)**:
+    ```bash
+    pnpm dev
+    ```
 
-# test coverage
-$ pnpm run test:cov
-```
+*   **Compilar el Código (Production ready)**:
+    ```bash
+    pnpm build
+    ```
 
-## Deployment
+*   **Ejecutar Tests Unitarios (Jest)**:
+    ```bash
+    pnpm test
+    ```
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+*   **Ejecutar Tests de Integración End-to-End (E2E)**:
+    ```bash
+    pnpm test:e2e
+    ```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+*   **Verificar Cobertura de Código**:
+    ```bash
+    pnpm test:cov
+    ```
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+---
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🔄 Flujo de Orquestación del Ingestion Pipeline
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+1.  **Presigned URL**: El cliente web solicita una URL de subida segura mediante el módulo de `documents`.
+2.  **Carga S3**: El cliente sube el archivo directamente a AWS S3 o Uploadthing sin saturar el ancho de banda del backend.
+3.  **Procesamiento**: El cliente notifica al módulo de `documents` la finalización de la carga. La API NestJS delega la extracción y procesamiento de lenguaje natural al microservicio Python.
+4.  **Generación & Persistencia**: Los resultados estructurados son inyectados y creados en bloque a la base de datos a través de Drizzle ORM, aplicando transacciones atómicas para garantizar la integridad de los datos.
