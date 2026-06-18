@@ -113,36 +113,37 @@ export default function WorkspaceSettingsModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-3 sm:p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
           />
 
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
-            className="bg-[#f8fafc] border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl relative z-101"
+            className="bg-background border border-border rounded-2xl sm:rounded-3xl w-full max-w-lg md:max-w-xl shadow-2xl relative z-101 flex flex-col max-h-[90vh] md:max-h-[85vh] overflow-hidden"
           >
-            {/* Header */}
-            <div className="px-8 py-6 flex items-center justify-between border-b border-white">
-              <h2 className="text-xl font-semibold text-slate-900">
+            {/* Header - Fixed at the top */}
+            <div className="px-5 py-4 sm:px-8 sm:py-5 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-xs">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground">
                 Ajustes del Workspace
               </h2>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-slate-200/50 rounded-full transition-colors text-slate-400"
+                className="p-1.5 sm:p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground"
                 disabled={isDeleting || isSaving}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            {/* Scrollable body content */}
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
               <AnimatePresence mode="wait">
                 {view === 'settings' ? (
                   <motion.div
@@ -150,13 +151,13 @@ export default function WorkspaceSettingsModal({
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
-                    className="space-y-6"
+                    className="space-y-4 sm:space-y-6"
                   >
                     {/* General Section Card */}
-                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
-                      <div className="flex items-center gap-3 text-blue-600">
+                    <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
+                      <div className="flex items-center gap-3 text-blue-500">
                         <Layers className="w-5 h-5" />
-                        <h3 className="font-semibold text-slate-900">
+                        <h3 className="font-semibold text-foreground">
                           General
                         </h3>
                       </div>
@@ -166,21 +167,21 @@ export default function WorkspaceSettingsModal({
                         setFormData={setFormData}
                       />
 
-                      <div className="flex items-center justify-end gap-3 pt-2">
+                      <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-2">
                         <Button
                           variant="ghost"
                           onClick={handleClose}
-                          className="font-medium text-slate-600 hover:bg-slate-50"
+                          className="font-medium text-muted-foreground hover:bg-muted w-full sm:w-auto"
                         >
                           Cancelar
                         </Button>
                         <Button
                           onClick={handleSave}
                           disabled={isSaving}
-                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 min-w-32"
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 min-w-32 w-full sm:w-auto"
                         >
                           {isSaving ? (
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white animate-spin rounded-full" />
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white animate-spin rounded-full mx-auto" />
                           ) : (
                             'Actualizar'
                           )}
@@ -189,16 +190,16 @@ export default function WorkspaceSettingsModal({
                     </div>
 
                     {/* Meta Info Row */}
-                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center justify-between">
+                    <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-blue-50 rounded-xl text-blue-600">
+                        <div className="p-2 bg-blue-500/10 rounded-xl text-blue-500 shrink-0">
                           <Calendar className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-xs font-medium text-slate-400">
+                          <p className="text-xs font-medium text-muted-foreground">
                             Última actualización
                           </p>
-                          <p className="text-sm font-semibold text-slate-700">
+                          <p className="text-sm font-semibold text-foreground">
                             {workspace.updatedAt
                               ? new Date(
                                   workspace.updatedAt,
@@ -207,32 +208,32 @@ export default function WorkspaceSettingsModal({
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-green-50 rounded-full border border-green-100">
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 self-start sm:self-auto">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        <span className="text-[10px] font-bold text-green-600 uppercase">
+                        <span className="text-[10px] font-bold text-green-500 uppercase">
                           Activo
                         </span>
                       </div>
                     </div>
 
                     {/* Danger Zone */}
-                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center justify-between group overflow-hidden">
+                    <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 group overflow-hidden">
                       <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-red-50 rounded-xl text-red-500">
+                        <div className="p-2.5 bg-red-500/10 rounded-xl text-red-500 shrink-0">
                           <Trash2 className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-foreground">
                             Eliminar Workspace
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             Esta acción borrará todos los datos asociados.
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={() => setView('delete-confirm')}
-                        className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all"
+                        className="flex items-center justify-center gap-1 px-4 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all w-full sm:w-auto"
                       >
                         Eliminar
                         <ChevronRight className="w-4 h-4" />

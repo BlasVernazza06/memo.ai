@@ -127,7 +127,7 @@ export default function WorkspaceDetailClient({
   return (
     <div className="min-h-screen w-full">
       {/* Notion-style Cover Area */}
-      <div className="relative h-72 md:h-96 w-full overflow-hidden group">
+      <div className="relative h-48 sm:h-72 md:h-96 w-full overflow-hidden group">
         <div
           className="w-full h-full relative"
           style={{
@@ -138,28 +138,28 @@ export default function WorkspaceDetailClient({
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent)]" />
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 sm:h-48 bg-linear-to-t from-background via-background/60 to-transparent" />
       </div>
 
       {/* Content Container */}
-      <div className="w-full px-8 md:px-16 lg:px-24 -mt-30 relative z-10 pb-32">
-        <div className="flex items-end justify-between mb-8 group/top">
+      <div className="w-full px-4 sm:px-8 md:px-16 lg:px-24 -mt-20 sm:-mt-30 relative z-10 pb-20 sm:pb-32">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-6 sm:mb-8 gap-4 sm:gap-0 group/top">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 bg-white rounded-[2.5rem] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-20 group/icon border border-white/40"
+            className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 bg-white rounded-2xl sm:rounded-[2.5rem] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative z-20 group/icon border border-white/40"
           >
-            <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative flex items-center justify-center bg-slate-50">
+            <div className="w-full h-full rounded-[1.2rem] sm:rounded-[2.2rem] overflow-hidden relative flex items-center justify-center bg-slate-50">
               <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-sky-400/10 to-emerald-400/10" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.8),transparent)]" />
-              <span className="text-5xl md:text-6xl relative z-10 transition-transform duration-500 group-hover/icon:scale-110 group-hover/icon:rotate-3">
+              <span className="text-3xl sm:text-5xl md:text-6xl relative z-10 transition-transform duration-500 group-hover/icon:scale-110 group-hover/icon:rotate-3">
                 {workspace.icon || '📚'}
               </span>
             </div>
           </motion.div>
 
-          <div className="flex flex-col items-end gap-6 mb-2">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end gap-6 w-full sm:w-auto">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
               <Link
                 href="/dashboard"
                 className="flex items-center gap-2 px-4 py-2 bg-background/50 backdrop-blur-md border border-border/50 rounded-xl text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all shadow-sm"

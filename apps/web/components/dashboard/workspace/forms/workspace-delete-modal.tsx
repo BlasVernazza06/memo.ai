@@ -26,12 +26,12 @@ export default function WorkspaceDeleteModal({
       exit={{ opacity: 0, x: -10 }}
       className="space-y-6"
     >
-      <div className="bg-red-50 border border-red-100 rounded-2xl p-6 space-y-4">
-        <div className="flex items-center gap-3 text-red-600">
+      <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 space-y-4">
+        <div className="flex items-center gap-3 text-red-500">
           <AlertTriangle className="w-6 h-6" />
           <h3 className="font-bold">¿Estás completamente seguro?</h3>
         </div>
-        <p className="text-sm text-red-700 leading-relaxed">
+        <p className="text-sm text-red-600 dark:text-red-200/90 leading-relaxed">
           Estás eliminando <span className="font-bold">&quot;{workspaceName}&quot;</span>.
           Esta acción es definitiva y resultará en la pérdida de todos los
           documentos y configuraciones.
@@ -53,7 +53,7 @@ export default function WorkspaceDeleteModal({
         <button
           onClick={onCancel}
           disabled={isDeleting}
-          className="w-full py-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
+          className="w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           Cancelar y volver
         </button>

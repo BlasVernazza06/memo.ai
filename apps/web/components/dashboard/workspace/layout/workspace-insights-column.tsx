@@ -39,7 +39,7 @@ export function WorkspaceInsightsColumn({
   const primaryDoc = workspace.documents?.[0];
 
   return (
-    <div className="lg:col-span-3 space-y-6 lg:sticky lg:top-8">
+    <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 lg:flex lg:flex-col gap-6 lg:sticky lg:top-8">
       {/* 1. DOMINIO GLOBAL (Nivel de Maestría del Workspace) */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}

@@ -50,15 +50,13 @@ export default function IconSelector({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`h-12 w-12 flex items-center justify-center rounded-xl border-2 transition-all active:scale-95 shadow-sm ${
+        className={`h-11 w-11 flex items-center justify-center rounded-xl border transition-all active:scale-95 shadow-sm group ${
           isOpen
-            ? 'border-blue-500 bg-blue-50/50'
-            : 'border-slate-200 bg-white hover:border-slate-300'
+            ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+            : 'border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground'
         }`}
       >
-        <span className="text-2xl">
-          <Smile className="text-slate-400 w-6 h-6" />
-        </span>
+        <Smile className="w-5 h-5 transition-transform group-hover:scale-110" />
       </button>
 
       <AnimatePresence>
@@ -74,15 +72,15 @@ export default function IconSelector({
               initial={{ opacity: 0, scale: 0.9, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: -10 }}
-              className="absolute left-0 top-full mt-3 z-50 bg-white border border-slate-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-4 w-72 origin-top-left"
+              className="absolute left-0 top-full mt-3 z-50 bg-popover border border-border rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-4 w-72 origin-top-left"
             >
               <div className="flex items-center justify-between mb-3 px-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
                   Seleccionar Icono
                 </span>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
+                  className="p-1 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -97,10 +95,10 @@ export default function IconSelector({
                       onSelect(emoji);
                       setIsOpen(false);
                     }}
-                    className={`w-10 h-10 flex items-center justify-center text-xl rounded-xl transition-all hover:bg-slate-50 hover:scale-110 active:scale-90 ${
+                    className={`w-10 h-10 flex items-center justify-center text-xl rounded-xl transition-all hover:bg-muted hover:scale-110 active:scale-90 ${
                       currentIcon === emoji
-                        ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-inner'
-                        : 'text-slate-700'
+                        ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20 shadow-inner'
+                        : 'text-foreground'
                     }`}
                   >
                     {emoji}

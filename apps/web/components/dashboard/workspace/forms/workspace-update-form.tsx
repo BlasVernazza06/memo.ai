@@ -15,11 +15,11 @@ export default function UpdateWorkspaceForm({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-600 ml-1">
+          <label className="text-sm font-medium text-muted-foreground ml-1">
             Nombre del workspace
           </label>
           <input
-            className="w-full bg-white border border-slate-200 rounded-xl px-4 h-11 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-hidden text-slate-900"
+            className="w-full bg-background border border-border rounded-xl px-4 h-11 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-hidden text-foreground"
             value={formData.name || ''}
             onChange={(e) =>
               setFormData((prev) => ({
@@ -31,7 +31,7 @@ export default function UpdateWorkspaceForm({
           />
         </div>
         <div className="space-y-2 relative">
-          <label className="text-sm font-medium text-slate-600 ml-1">
+          <label className="text-sm font-medium text-muted-foreground ml-1">
             Icono (opcional)
           </label>
           <div className="flex gap-2">
@@ -40,7 +40,7 @@ export default function UpdateWorkspaceForm({
               onSelect={(icon) => setFormData((prev) => ({ ...prev, icon }))}
             />
             <input
-              className="w-16 bg-white border border-slate-200 rounded-xl text-center h-12 text-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-hidden text-slate-900"
+              className="w-16 bg-background border border-border rounded-xl text-center h-11 text-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-hidden text-foreground"
               value={formData.icon || ''}
               onChange={(e) => {
                 const val = e.target.value;
@@ -67,7 +67,7 @@ export default function UpdateWorkspaceForm({
       </div>
 
       <div className="space-y-3">
-        <label className="text-sm font-medium text-slate-600 ml-1">
+        <label className="text-sm font-medium text-muted-foreground ml-1">
           Color de ambiente
         </label>
         <div className="flex flex-wrap gap-3">
@@ -102,11 +102,11 @@ export default function UpdateWorkspaceForm({
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-600 ml-1">
+        <label className="text-sm font-medium text-muted-foreground ml-1">
           Descripción
         </label>
         <textarea
-          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all min-h-24 resize-none outline-hidden text-slate-900"
+          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all min-h-24 resize-none outline-hidden text-foreground"
           value={formData.description || ''}
           onChange={(e) =>
             setFormData((prev) => ({

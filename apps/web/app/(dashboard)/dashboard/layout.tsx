@@ -23,7 +23,7 @@ export default async function DashboardLayout({
       <DashAside />
 
       {/* Main Content Area */}
-      <main className="flex-1 relative overflow-y-auto h-screen custom-scrollbar">
+      <main className="flex-1 relative overflow-y-auto h-screen custom-scrollbar pb-28 lg:pb-0">
         <div className="relative z-10 w-full animate-in fade-in duration-700">
           {children}
         </div>
