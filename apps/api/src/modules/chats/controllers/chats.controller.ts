@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   UploadedFile,
   UseGuards,
@@ -40,7 +41,7 @@ export class ChatsController {
   @Post(':id/messages')
   @UseInterceptors(FileInterceptor('file'))
   async sendMessage(
-    @Param('id') chatId: string,
+    @Param('id', ParseUUIDPipe) chatId: string,
     @Session() session: UserSession,
     @Body('content') content: string,
     @UploadedFile() file?: Express.Multer.File,
@@ -75,7 +76,7 @@ export class ChatsController {
   }
 
   @Get(':id')
-  async getChatHistory(@Param('id') chatId: string) {
+  async getChatHistory(@Param('id', ParseUUIDPipe) chatId: string) {
     return this.chatsService.getChatHistory(chatId);
   }
 

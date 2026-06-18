@@ -194,7 +194,7 @@ export class WorkspacesController {
   @Get(':id')
   async findById(
     @User('id') userId: string,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<WorkspaceDetailDTO> {
     return await this.workspacesService.findById(userId, id);
   }
@@ -202,26 +202,32 @@ export class WorkspacesController {
   @Patch(':id')
   async update(
     @User('id') userId: string,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdateWorkspaceDTO,
   ) {
     return await this.workspacesService.update(userId, id, data);
   }
 
   @Delete(':id')
-  async delete(@User('id') userId: string, @Param('id') id: string) {
+  async delete(
+    @User('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return await this.workspacesService.delete(userId, id);
   }
 
   @Post(':id/like')
-  async like(@User('id') userId: string, @Param('id') id: string) {
+  async like(
+    @User('id') userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return await this.workspacesService.like(userId, id);
   }
 
   @Post(':id/generate-more')
   async generateMore(
     @User('id') userId: string,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body('type') type: 'flashcards' | 'quizzes',
     @Body('prompt') prompt?: string,
   ) {
